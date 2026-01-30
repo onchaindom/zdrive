@@ -387,13 +387,30 @@ export async function fetchCoinSwaps(
   }
 }
 
-// Format raw token balance string to human-readable
+// Format raw 18-decimal token balance string to human-readable.
+// Zora coin balances come as raw integers with 18 decimal places
+// e.g., "990000000000000000000" = 990 tokens.
+// The API sometimes appends a decimal like "990000000000000000.008" — we strip it.
 function formatTokenBalance(balance: string): string {
-  const num = parseFloat(balance);
+  // Take only the integer part (API sometimes appends fractional noise)
+  const cleaned = balance.split('.')[0];
+
+  // Convert from 18-decimal to human-readable
+  let num: number;
+  if (cleaned.length > 18) {
+    const intPart = cleaned.slice(0, cleaned.length - 18);
+    const fracPart = cleaned.slice(cleaned.length - 18, cleaned.length - 12); // 6 digits precision
+    num = parseFloat(`${intPart}.${fracPart}`);
+  } else {
+    const padded = cleaned.padStart(18, '0');
+    num = parseFloat(`0.${padded}`);
+  }
+
   if (isNaN(num)) return '0';
   if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(2) + 'B';
   if (num >= 1_000_000) return (num / 1_000_000).toFixed(2) + 'M';
   if (num >= 1_000) return (num / 1_000).toFixed(2) + 'K';
+  if (num >= 1) return num.toFixed(2);
   if (num < 0.001 && num > 0) return '<0.001';
   return num.toFixed(3);
 }
