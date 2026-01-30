@@ -386,7 +386,7 @@ export default function CreatePage() {
             <div className="mt-8 space-y-6">
               {isWrongChain && (
                 <div className="border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
-                  Your wallet is on the wrong network. You'll be prompted to switch to Base when creating.
+                  Your wallet is on the wrong network. You&apos;ll be prompted to switch to Base when creating.
                 </div>
               )}
 

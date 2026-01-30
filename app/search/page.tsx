@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Header, Footer } from '@/components/layout';
 import { ReleaseGrid, type ReleaseItem } from '@/components/release';
-import { SearchBar } from '@/components/ui';
+import { SearchBar, LoadingPage } from '@/components/ui';
 import {
   fetchNewCoins,
   fetchCoinsByCreator,
@@ -20,6 +21,14 @@ function isEthAddress(value: string): boolean {
 }
 
 export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen flex-col"><Header /><LoadingPage /><Footer /></div>}>
+      <SearchPageContent />
+    </Suspense>
+  );
+}
+
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
 
