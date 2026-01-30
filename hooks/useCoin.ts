@@ -9,7 +9,8 @@ export function useCoin(address?: string) {
     queryKey: ['coin-stats', address],
     queryFn: () => fetchCoinStats(address!),
     enabled: !!address,
-    staleTime: 20 * 1000, // 20 seconds for fresh market data
+    staleTime: 20_000, // 20 seconds for fresh market data
+    retry: 2,
   });
 }
 

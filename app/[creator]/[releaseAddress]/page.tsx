@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Header, Footer } from '@/components/layout';
-import { LoadingPage } from '@/components/ui';
+import { LoadingPage, ErrorBoundary } from '@/components/ui';
 import { useRelease } from '@/hooks/useRelease';
 import { useLicenseStatus } from '@/hooks/useLicenseStatus';
 import { PreviewRenderer, DownloadList } from '@/components/preview';
@@ -83,7 +83,9 @@ export default function ReleasePage({ params }: ReleasePageProps) {
             {/* Main column: Preview + Attachments */}
             <div className="lg:col-span-2">
               {/* Preview area */}
-              <PreviewRenderer metadata={metadata} />
+              <ErrorBoundary>
+                <PreviewRenderer metadata={metadata} />
+              </ErrorBoundary>
 
               {/* Attachments */}
               {assets.length > 0 && (
