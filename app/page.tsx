@@ -40,8 +40,8 @@ export default function Home() {
             <div>
               <h3 className="font-medium">Publish Anything</h3>
               <p className="mt-2 text-sm text-zdrive-text-secondary">
-                PDFs, 3D models, fonts, source code, archives. Native previews
-                for supported formats.
+                PDFs, 3D models, images, videos, source code, archives. Native
+                previews for supported formats.
               </p>
             </div>
             <div>
