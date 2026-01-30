@@ -1,0 +1,56 @@
+diff --git a/node_modules/@zoralabs/coins-sdk/dist/actions/tradeCoin.d.ts b/node_modules/@zoralabs/coins-sdk/dist/actions/tradeCoin.d.ts
+index ce58522..5ceb75c 100644
+--- a/node_modules/@zoralabs/coins-sdk/dist/actions/tradeCoin.d.ts
++++ b/node_modules/@zoralabs/coins-sdk/dist/actions/tradeCoin.d.ts
+@@ -45,6 +45,7 @@ export type TradeParameters = {
+     recipient?: Address;
+     signatures?: SignatureWithPermit<PermitStringAmounts>[];
+     permitActiveSeconds?: number;
++    referrer?: Address;
+ };
+ export declare function tradeCoin({ tradeParameters, walletClient, account, publicClient, validateTransaction, }: {
+     tradeParameters: TradeParameters;
+diff --git a/node_modules/@zoralabs/coins-sdk/dist/index.cjs b/node_modules/@zoralabs/coins-sdk/dist/index.cjs
+index 7f8cc11..33c0d85 100644
+--- a/node_modules/@zoralabs/coins-sdk/dist/index.cjs
++++ b/node_modules/@zoralabs/coins-sdk/dist/index.cjs
+@@ -891,6 +891,7 @@ async function createTradeCall(tradeParameters) {
+   }
+   const quote = await postQuote({
+     body: {
++      referrer: tradeParameters.referrer,
+       tokenIn: tradeParameters.sell,
+       tokenOut: tradeParameters.buy,
+       amountIn: tradeParameters.amountIn.toString(),
+diff --git a/node_modules/@zoralabs/coins-sdk/dist/index.js b/node_modules/@zoralabs/coins-sdk/dist/index.js
+index 3bbed11..5b1c321 100644
+--- a/node_modules/@zoralabs/coins-sdk/dist/index.js
++++ b/node_modules/@zoralabs/coins-sdk/dist/index.js
+@@ -891,6 +891,7 @@ async function createTradeCall(tradeParameters) {
+   }
+   const quote = await postQuote({
+     body: {
++      referrer: tradeParameters.referrer,
+       tokenIn: tradeParameters.sell,
+       tokenOut: tradeParameters.buy,
+       amountIn: tradeParameters.amountIn.toString(),
+diff --git a/node_modules/@zoralabs/coins-sdk/src/actions/tradeCoin.ts b/node_modules/@zoralabs/coins-sdk/src/actions/tradeCoin.ts
+index a9cfc43..af7e03a 100644
+--- a/node_modules/@zoralabs/coins-sdk/src/actions/tradeCoin.ts
++++ b/node_modules/@zoralabs/coins-sdk/src/actions/tradeCoin.ts
+@@ -90,6 +90,7 @@ export type TradeParameters = {
+   recipient?: Address;
+   signatures?: SignatureWithPermit<PermitStringAmounts>[];
+   permitActiveSeconds?: number;
++  referrer?: Address;
+ };
+ 
+ export async function tradeCoin({
+@@ -234,6 +235,7 @@ export async function createTradeCall(
+ 
+   const quote = await postQuote({
+     body: {
++      referrer: tradeParameters.referrer,
+       tokenIn: tradeParameters.sell,
+       tokenOut: tradeParameters.buy,
+       amountIn: tradeParameters.amountIn.toString(),

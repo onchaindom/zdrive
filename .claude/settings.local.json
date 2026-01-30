@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm view:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run dev)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill -9)",
+      "Bash(npm show:*)",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx patch-package:*)",
+      "Bash(npm run postinstall:*)",
+      "Bash(grep:*)",
+      "Bash(pgrep:*)",
+      "Bash(node -e:*)",
+      "Bash(cat:*)"
+    ]
+  }
+}
