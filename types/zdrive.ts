@@ -67,6 +67,7 @@ export interface ZDriveMetadata {
   name: string;
   description: string;
   image: string; // Cover image URI (required)
+  animation_url?: string; // Zora uses this for rich content preview
   content?: {
     mime: string;
     uri: string;
@@ -77,7 +78,7 @@ export interface ZDriveMetadata {
 }
 
 // Supported preview file types
-export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'stl' | 'github' | 'font';
+export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'stl' | 'github' | 'image' | 'video';
 export type DownloadOnlyFileType = 'zip' | 'other';
 export type FileType = PreviewableFileType | DownloadOnlyFileType;
 
@@ -104,7 +105,8 @@ export function getFileType(mime?: string, filename?: string): FileType {
       case 'gltf': return 'gltf';
       case 'stl': return 'stl';
       case 'zip': return 'zip';
-      case 'otf': case 'ttf': case 'woff2': return 'font';
+      case 'jpg': case 'jpeg': case 'png': case 'gif': case 'webp': return 'image';
+      case 'mp4': case 'webm': return 'video';
     }
   }
 
@@ -121,9 +123,10 @@ export function getFileType(mime?: string, filename?: string): FileType {
     ) return 'stl';
     if (mime === 'application/zip' || mime === 'application/x-zip-compressed') return 'zip';
     if (
-      mime === 'font/otf' || mime === 'font/ttf' || mime === 'font/woff2' ||
-      mime === 'application/x-font-opentype' || mime === 'application/x-font-truetype'
-    ) return 'font';
+      mime === 'image/jpeg' || mime === 'image/png' ||
+      mime === 'image/gif' || mime === 'image/webp'
+    ) return 'image';
+    if (mime === 'video/mp4' || mime === 'video/webm') return 'video';
   }
 
   return 'other';

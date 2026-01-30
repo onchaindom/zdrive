@@ -153,12 +153,13 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 
 ## Native Preview (guaranteed)
 
+* **Images**: JPG, PNG, GIF, WebP — full-size viewer with zoom.
+* **Video**: MP4, WebM — native HTML5 video player.
 * **PDF**: embedded viewer.
 * **3D**:
 
   * **GLB/GLTF**: three.js viewer
   * **STL**: three.js STL viewer (neutral shading, auto-fit, orbit controls)
-* **Fonts**: upload OTF/TTF (optionally WOFF2); render a specimen page (editable text, sizes).
 * **GitHub**: render README + show repo/ref metadata (external link model).
 
 ## Download-only
@@ -177,7 +178,7 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 * Releases grid, filter by:
 
   * Collection
-  * File type (PDF / 3D / Font / GitHub / Zip / Other)
+  * File type (Image / Video / PDF / 3D / GitHub / Zip / Other)
 * “Follow strength” indicator = creator coin balance tiers (UI-only)
 
 ## 2) Release Page (Are.na-like)
@@ -227,7 +228,7 @@ Tabs:
 3. Upload:
 
    * Cover image (required)
-   * Optional preview target file (PDF/GLB/STL/font) OR GitHub external preview
+   * Optional preview target file (image/video/PDF/GLB/STL) OR GitHub external preview
    * Attachments (any)
 4. Set collection (optional):
 
@@ -282,13 +283,13 @@ Tabs:
 
   * cover image,
   * any number of attachments,
-  * optional preview target (PDF/3D/font) or GitHub external,
+  * optional preview target (image/video/PDF/3D) or GitHub external,
   * optional collection membership (stable `collection.id`),
   * a16z CBE license with optional gate (release coin balance).
 * A viewer can:
 
   * browse creator pages, releases, collections,
-  * see a native preview for PDF/GLB/STL/fonts/GitHub,
+  * see a native preview for images/video/PDF/GLB/STL/GitHub,
   * see license status based on their release-coin balance,
   * collect/trade from the release page.
 * No schema migrations required to add richer collection pages later.

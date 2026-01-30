@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, http, type PublicClient } from 'viem';
 import { base } from 'viem/chains';
 import { forceChainSwitch, isUserRejectedError } from '@/lib/utils/wallets';
 import { Header, Footer } from '@/components/layout';
@@ -21,10 +21,13 @@ import type { CBELicenseType, ZDriveExternalLink } from '@/types/zdrive';
 
 type CreateStep = 'details' | 'files' | 'options' | 'confirm';
 
+// Cast needed: Base chain includes OP Stack 'deposit' transaction type which
+// is more specific than viem's default PublicClient generic. The Zora SDK
+// accepts PublicClient<any, any, any, any> internally, so this is safe.
 const publicClient = createPublicClient({
   chain: base,
   transport: http(),
-});
+}) as unknown as PublicClient;
 
 export default function CreatePage() {
   const router = useRouter();
@@ -151,8 +154,7 @@ export default function CreatePage() {
           creatorAddress: address,
         },
         walletClient,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        publicClient as any
+        publicClient
       );
 
       if (result.success && result.coinAddress) {
@@ -284,11 +286,14 @@ export default function CreatePage() {
                   'model/gltf-binary': ['.glb'],
                   'model/gltf+json': ['.gltf'],
                   'model/stl': ['.stl'],
-                  'font/otf': ['.otf'],
-                  'font/ttf': ['.ttf'],
-                  'font/woff2': ['.woff2'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                  'image/png': ['.png'],
+                  'image/gif': ['.gif'],
+                  'image/webp': ['.webp'],
+                  'video/mp4': ['.mp4'],
+                  'video/webm': ['.webm'],
                 }}
-                hint="PDF, 3D file, or font that will be rendered in the viewer"
+                hint="PDF, 3D file, image, or video that will be rendered in the viewer"
               />
 
               <div className="border-t border-zdrive-border pt-6">

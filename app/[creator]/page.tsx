@@ -13,7 +13,7 @@ import { truncateAddress, ipfsToHttp } from '@/lib/constants';
 import { getFileType } from '@/types/zdrive';
 import clsx from 'clsx';
 
-type FilterType = 'all' | 'pdf' | '3d' | 'font' | 'github' | 'other';
+type FilterType = 'all' | 'pdf' | '3d' | 'image' | 'video' | 'github' | 'other';
 
 interface CreatorPageProps {
   params: {
@@ -54,13 +54,15 @@ export default function CreatorPage({ params }: CreatorPageProps) {
           return contentType === 'pdf';
         case '3d':
           return ['glb', 'gltf', 'stl'].includes(contentType);
-        case 'font':
-          return contentType === 'font';
+        case 'image':
+          return contentType === 'image';
+        case 'video':
+          return contentType === 'video';
         case 'github':
           return hasGitHub;
         case 'other':
           return (
-            !['pdf', 'glb', 'gltf', 'stl', 'font'].includes(contentType) && !hasGitHub
+            !['pdf', 'glb', 'gltf', 'stl', 'image', 'video'].includes(contentType) && !hasGitHub
           );
         default:
           return true;
@@ -197,7 +199,8 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                 { id: 'all', label: 'All' },
                 { id: 'pdf', label: 'PDF' },
                 { id: '3d', label: '3D' },
-                { id: 'font', label: 'Font' },
+                { id: 'image', label: 'Image' },
+                { id: 'video', label: 'Video' },
                 { id: 'github', label: 'GitHub' },
                 { id: 'other', label: 'Other' },
               ] as { id: FilterType; label: string }[]
