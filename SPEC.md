@@ -2,7 +2,7 @@
 
 ## Product
 
-**Z:Drive** is an artist-first release platform on Zora where creators “coin” *releases* (not posts): PDFs, 3D print files, fonts, GitHub releases, zips, etc. A release is a **Zora content coin** whose metadata describes a bundle of assets and a license policy. Z:Drive emphasizes **viewing + interaction** first (Are.na-like), with collecting/trading secondary.
+**Z:Drive** is an artist-first release platform on Zora where creators "coin" *releases* (not posts): images, videos, PDFs, 3D print files, GitHub releases, zips, etc. A release is a **Zora content coin** whose metadata describes a bundle of assets and a license policy. Z:Drive emphasizes **viewing + interaction** first (Are.na-like), with collecting/trading secondary.
 
 ## Goals
 
@@ -296,9 +296,84 @@ Tabs:
 
 ---
 
-# Phase 2 (Roadmap)
+# Implementation Status
+
+All six phases of the initial build are complete and merged on `feat/zora-uploader`.
+
+## Phase 1: Upload Pipeline Migration ✅
+
+* Replaced Pinata IPFS with Zora native uploader (`createZoraUploaderForCreator`)
+* New `lib/uploads/zoraUploader.ts`: `ZoraUploadService` with parallel uploads, retry, SHA-256 hashing
+* Rewrote `lib/zora/createRelease.ts` to use new service
+* Deleted `app/api/upload/`, `app/api/upload-json/`, `lib/uploads/ipfsUploader.ts`
+* Fixed `publicClient` type cast for Base OP Stack chain types
+* Tests: `upload-pipeline.test.ts`, `metadata.test.ts`, `zdrive-types.test.ts`
+
+## Phase 2: Release Detail Page ✅
+
+* Created `PreviewRenderer` dispatcher: routes by MIME type → ImageViewer, VideoPlayer, PDFViewer, ThreeDViewer, GitHubPreview, or fallback
+* Created `ImageViewer` (click-to-zoom fullscreen) and `VideoPlayer` (HTML5 with poster frame)
+* Rewrote `app/[creator]/[releaseAddress]/page.tsx`: two-column responsive layout with preview, trade widget, license panel, collection context, metadata details
+* Updated `CollectButton` with inline `CoinTradeWidget` instead of external Zora link
+* Removed `FontViewer` (fonts no longer a supported preview type)
+* Tests: `preview-renderer.test.ts`
+
+## Phase 3: Create Flow Improvements ✅
+
+* Created `hooks/useCreatorCollections.ts`: scans existing releases for collection metadata
+* Updated `CollectionPicker`: "Existing / Create New" toggle with auto-populated fields
+* Added upload progress state with phase indicators to create page
+* Updated preview file accept types: added image/video, removed fonts
+
+## Phase 4: Cleanup ✅
+
+* Deleted `FontViewer.tsx`
+* Updated `PREVIEWABLE_MIMES` (removed fonts, added image/video)
+* Bounded metadata cache: `MAX_CACHE_SIZE = 200` with LRU eviction
+* Verified all Pinata references removed
+
+## Phase 5: Error Handling ✅
+
+* Created `ErrorBoundary` class component (`components/ui/ErrorBoundary.tsx`)
+* Wrapped `PreviewRenderer` on release page
+* Added `retry: 2` to `useRelease` and `useCoin` hooks
+* Added `staleTime: 30_000` to `useRelease`
+
+## Phase 6: Polish ✅
+
+* Fixed unescaped apostrophe build error
+* Added `Suspense` boundary for search page (`useSearchParams`)
+* Type safety audit: only 3 justified `as unknown` casts remain
+* Updated marketing copy (fonts → images/videos)
+* Production build passes, 85 tests passing across 6 test files
+
+## Post-Phase Fix: BigInt Balance Formatting ✅
+
+* `formatTokenBalance` now correctly handles 18-decimal ERC-20 balances
+* API returns raw integers like `"990000000000000000000"` (= 990 tokens); previously `parseFloat` treated the whole string as a regular number
+* Now strips API decimal noise (`.split('.')[0]`), converts from 18-decimal, formats with K/M/B abbreviations
+* Tests: `format-balance.test.ts` (11 tests)
+
+---
+
+# Tech Stack
+
+* **Framework**: Next.js 14 (App Router, `'use client'` pages)
+* **Language**: TypeScript strict
+* **Styling**: Tailwind CSS with `zdrive-*` design tokens
+* **Auth**: Privy (`@privy-io/react-auth`)
+* **Wallet**: wagmi v2 + viem (Base chain)
+* **Blockchain**: Zora Coins SDK v0.4.0 (`@zoralabs/coins-sdk`)
+* **3D**: Three.js via `@react-three/fiber` + `@react-three/drei`
+* **State**: React Query (`@tanstack/react-query`)
+* **Testing**: Vitest
+* **Linting**: ESLint + Prettier
+
+---
+
+# Future Roadmap
 
 * Optional server-side conversion pipeline (OBJ → GLB)
 * Stronger feed via event indexing
-* Optional “license receipt” proof page for qualifying holders
-* Optional onchain “collection coin” as an augmentation only (must not replace `collection.id` grouping)
+* Optional "license receipt" proof page for qualifying holders
+* Optional onchain "collection coin" as an augmentation only (must not replace `collection.id` grouping)
