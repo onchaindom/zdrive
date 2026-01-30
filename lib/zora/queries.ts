@@ -67,8 +67,20 @@ function extractMediaContent(mediaContent: unknown): { previewImage?: string; or
   };
 }
 
-// In-memory cache for resolved token metadata
+// In-memory cache for resolved token metadata (bounded to prevent memory leaks)
+const MAX_CACHE_SIZE = 200;
 const metadataCache = new Map<string, unknown>();
+
+function boundedCacheSet(key: string, value: unknown) {
+  if (metadataCache.size >= MAX_CACHE_SIZE) {
+    // Delete oldest entry (first key in insertion order)
+    const oldestKey = metadataCache.keys().next().value;
+    if (oldestKey !== undefined) {
+      metadataCache.delete(oldestKey);
+    }
+  }
+  metadataCache.set(key, value);
+}
 
 // Resolve full metadata JSON from a tokenUri (IPFS/HTTPS)
 export async function resolveTokenMetadata(tokenUri: string): Promise<unknown> {
@@ -80,7 +92,7 @@ export async function resolveTokenMetadata(tokenUri: string): Promise<unknown> {
     const response = await fetch(url);
     if (!response.ok) return null;
     const json = await response.json();
-    metadataCache.set(tokenUri, json);
+    boundedCacheSet(tokenUri, json);
     return json;
   } catch {
     return null;
