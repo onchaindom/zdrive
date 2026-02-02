@@ -57,3 +57,23 @@ leverage git heavily. for every large task (like features, bugfixes, refactors),
 </workflow>
 
 </principles>
+
+<zdrive-constraints>
+
+## Upload & File Types
+- **Zora-only uploads**: All file uploads go through Zora's native IPFS uploader. No Pinata.
+- **Empirically verify** any new file type against the live Zora endpoint before adding support. Zora does server-side magic-byte sniffing and ignores client MIME headers.
+- **Supported types**: PNG, JPEG, GIF, WebP, SVG, MP4, PDF, GLB, GLTF, JSON, text, HTML.
+- **Rejected types** (do not add back without Pinata fallback): STL, WebM, ZIP.
+
+## Testing for Production
+- Dev server is very slow due to Privy (321MB) and Three.js (29MB). Always use `npm run build && npx next start` for manual testing.
+- Run `npx vitest run`, `npx tsc --noEmit`, and `npm run build` before committing.
+
+## IPFS Gateway
+- Use `magic.decentralized-content.com` (Zora's gateway). Do not use `ipfs.io` — it has CORS issues with binary files like GLB.
+
+## On-Chain Data
+- Always use real on-chain data (e.g. coin symbol from `useCoin()`) rather than deriving from metadata fields. Metadata is user-input; on-chain is truth.
+
+</zdrive-constraints>

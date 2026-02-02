@@ -77,7 +77,7 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 
 ### Optional but recommended
 
-* `content` for the primary preview target file (PDF/GLB/STL/font), when applicable:
+* `content` for the primary preview target file (image/video/PDF/GLB/GLTF), when applicable:
 
   * `content.mime`
   * `content.uri`
@@ -93,7 +93,7 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
   "name": "Tyrolean Chair Studies #12",
   "description": "Ongoing release series…",
   "image": "ipfs://<cover>",
-  "content": { "mime": "model/stl", "uri": "ipfs://<stl-file>" },
+  "content": { "mime": "model/gltf-binary", "uri": "ipfs://<glb-file>" },
 
   "properties": {
     "zdrive": {
@@ -151,21 +151,29 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 
 # Supported Formats (MVP)
 
-## Native Preview (guaranteed)
+## Native Preview (empirically verified against Zora IPFS endpoint)
 
-* **Images**: JPG, PNG, GIF, WebP — full-size viewer with zoom.
-* **Video**: MP4, WebM — native HTML5 video player.
+* **Images**: JPG, PNG, GIF, WebP, SVG — full-size viewer with zoom.
+* **Video**: MP4 — native HTML5 video player.
 * **PDF**: embedded viewer.
-* **3D**:
-
-  * **GLB/GLTF**: three.js viewer
-  * **STL**: three.js STL viewer (neutral shading, auto-fit, orbit controls)
+* **3D**: GLB/GLTF — three.js viewer with orbit controls + error boundary.
 * **GitHub**: render README + show repo/ref metadata (external link model).
+
+## Dropped from MVP (Zora IPFS rejects these)
+
+* **STL**: Zora's IPFS endpoint does server-side magic-byte sniffing; binary STL has no recognizable magic bytes → rejected as `application/octet-stream`. Use GLB/GLTF instead.
+* **WebM**: Failed empirical upload test against live Zora endpoint.
+* **ZIP**: Explicitly blocked by Zora's IPFS endpoint even when correctly detected.
 
 ## Download-only
 
-* ZIP: show manifest (file list if feasible), hash/size, download link.
 * Everything else: download link + metadata.
+
+## Upload Architecture
+
+* **Zora-only**: All uploads go through Zora's native IPFS uploader (`ipfs-uploader.zora.co`). No Pinata fallback.
+* **Server-side MIME sniffing**: Zora ignores client-sent MIME types and detects format from raw bytes. `ensureCorrectMime()` still needed for GLB/GLTF because browsers assign `application/octet-stream` to these, and the multipart form boundary needs a recognizable MIME.
+* **IPFS gateway**: `magic.decentralized-content.com` (Zora's gateway, CORS-friendly for binary files like GLB).
 
 ---
 
@@ -228,7 +236,7 @@ Tabs:
 3. Upload:
 
    * Cover image (required)
-   * Optional preview target file (image/video/PDF/GLB/STL) OR GitHub external preview
+   * Optional preview target file (image/video/PDF/GLB/GLTF) OR GitHub external preview
    * Attachments (any)
 4. Set collection (optional):
 
@@ -289,7 +297,7 @@ Tabs:
 * A viewer can:
 
   * browse creator pages, releases, collections,
-  * see a native preview for images/video/PDF/GLB/STL/GitHub,
+  * see a native preview for images/video/PDF/GLB/GLTF/GitHub,
   * see license status based on their release-coin balance,
   * collect/trade from the release page.
 * No schema migrations required to add richer collection pages later.
@@ -298,7 +306,7 @@ Tabs:
 
 # Implementation Status
 
-All six phases of the initial build are complete and merged on `feat/zora-uploader`.
+All six phases of the initial build plus post-merge fixes are complete and merged to `main`.
 
 ## Phase 1: Upload Pipeline Migration ✅
 
@@ -354,6 +362,17 @@ All six phases of the initial build are complete and merged on `feat/zora-upload
 * Now strips API decimal noise (`.split('.')[0]`), converts from 18-decimal, formats with K/M/B abbreviations
 * Tests: `format-balance.test.ts` (11 tests)
 
+## Post-Merge: Upload Strategy & Viewer Fixes ✅
+
+* Empirically tested 15+ MIME/magic-byte combinations against live Zora IPFS endpoint
+* Dropped STL (no magic bytes), WebM (failed test), ZIP (explicitly blocked)
+* Simplified to Zora-only upload (removed Pinata fallback code)
+* Fixed Collect button ticker: uses real on-chain symbol from `useCoin()` instead of name truncation
+* Switched IPFS gateway from `ipfs.io` to Zora's `magic.decentralized-content.com` (better CORS)
+* Added `GLTFErrorBoundary` to ThreeDViewer for graceful failure with download fallback
+* Removed STL viewer code, STLLoader import, and all STL/WebM/ZIP references across codebase
+* 90 tests passing, clean production build
+
 ---
 
 # Tech Stack
@@ -373,7 +392,9 @@ All six phases of the initial build are complete and merged on `feat/zora-upload
 
 # Future Roadmap
 
-* Optional server-side conversion pipeline (OBJ → GLB)
+* **Pinata fallback for exotic file types** (STL, WebM, ZIP etc.) — add when user demand is validated
+* Optional server-side conversion pipeline (OBJ/STL → GLB)
+* UX polish pass + design system / branding
 * Stronger feed via event indexing
 * Optional "license receipt" proof page for qualifying holders
 * Optional onchain "collection coin" as an augmentation only (must not replace `collection.id` grouping)
