@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, http, type PublicClient } from 'viem';
 import { base } from 'viem/chains';
 import { forceChainSwitch, isUserRejectedError } from '@/lib/utils/wallets';
 import { Header, Footer } from '@/components/layout';
@@ -16,15 +16,18 @@ import {
   CollectionPicker,
 } from '@/components/create';
 import { ConnectButton } from '@/components/wallet/ConnectButton';
-import { createRelease } from '@/lib/zora/createRelease';
+import { createRelease, type UploadPhase } from '@/lib/zora/createRelease';
 import type { CBELicenseType, ZDriveExternalLink } from '@/types/zdrive';
 
 type CreateStep = 'details' | 'files' | 'options' | 'confirm';
 
+// Cast needed: Base chain includes OP Stack 'deposit' transaction type which
+// is more specific than viem's default PublicClient generic. The Zora SDK
+// accepts PublicClient<any, any, any, any> internally, so this is safe.
 const publicClient = createPublicClient({
   chain: base,
   transport: http(),
-});
+}) as unknown as PublicClient;
 
 export default function CreatePage() {
   const router = useRouter();
@@ -37,6 +40,11 @@ export default function CreatePage() {
   const [step, setStep] = useState<CreateStep>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<{
+    phase: UploadPhase;
+    completed: number;
+    total: number;
+  } | null>(null);
 
   // Release details
   const [name, setName] = useState('');
@@ -83,6 +91,7 @@ export default function CreatePage() {
 
     setIsSubmitting(true);
     setError(null);
+    setUploadProgress(null);
 
     try {
       // ALWAYS force chain switch - don't trust wallet.chainId from Privy
@@ -149,10 +158,12 @@ export default function CreatePage() {
               }
             : undefined,
           creatorAddress: address,
+          onProgress: (phase, completed, total) => {
+            setUploadProgress({ phase, completed, total });
+          },
         },
         walletClient,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        publicClient as any
+        publicClient
       );
 
       if (result.success && result.coinAddress) {
@@ -283,12 +294,14 @@ export default function CreatePage() {
                   'application/pdf': ['.pdf'],
                   'model/gltf-binary': ['.glb'],
                   'model/gltf+json': ['.gltf'],
-                  'model/stl': ['.stl'],
-                  'font/otf': ['.otf'],
-                  'font/ttf': ['.ttf'],
-                  'font/woff2': ['.woff2'],
+                  'image/jpeg': ['.jpg', '.jpeg'],
+                  'image/png': ['.png'],
+                  'image/gif': ['.gif'],
+                  'image/webp': ['.webp'],
+                  'image/svg+xml': ['.svg'],
+                  'video/mp4': ['.mp4'],
                 }}
-                hint="PDF, 3D file, or font that will be rendered in the viewer"
+                hint="PDF, 3D model (GLB/GLTF), image, or video for the release viewer"
               />
 
               <div className="border-t border-zdrive-border pt-6">
@@ -342,6 +355,7 @@ export default function CreatePage() {
                 onCollectionTitleChange={setCollectionTitle}
                 orderingIndex={orderingIndex}
                 onOrderingIndexChange={setOrderingIndex}
+                creatorAddress={address}
               />
 
               <div className="border-t border-zdrive-border pt-6">
@@ -371,7 +385,7 @@ export default function CreatePage() {
             <div className="mt-8 space-y-6">
               {isWrongChain && (
                 <div className="border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
-                  Your wallet is on the wrong network. You'll be prompted to switch to Base when creating.
+                  Your wallet is on the wrong network. You&apos;ll be prompted to switch to Base when creating.
                 </div>
               )}
 
@@ -426,13 +440,43 @@ export default function CreatePage() {
                 </dl>
               </div>
 
-              <p className="text-sm text-zdrive-text-secondary">
-                Creating a release will mint a new content coin on Base. This
-                requires a transaction and gas fees.
-              </p>
+              {/* Upload progress */}
+              {isSubmitting && uploadProgress && (
+                <div className="border border-zdrive-border bg-zdrive-bg p-4">
+                  <p className="text-sm font-medium">
+                    {uploadProgress.phase === 'cover' && 'Uploading cover image...'}
+                    {uploadProgress.phase === 'preview' && 'Uploading preview file...'}
+                    {uploadProgress.phase === 'attachments' &&
+                      `Uploading attachments (${uploadProgress.completed}/${uploadProgress.total})...`}
+                    {uploadProgress.phase === 'metadata' && 'Uploading metadata...'}
+                    {uploadProgress.phase === 'coin' && 'Creating coin on Base...'}
+                  </p>
+                  {uploadProgress.total > 1 && (
+                    <div className="mt-2 h-1 bg-zdrive-border">
+                      <div
+                        className="h-1 bg-zdrive-text transition-all"
+                        style={{
+                          width: `${(uploadProgress.completed / uploadProgress.total) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!isSubmitting && (
+                <p className="text-sm text-zdrive-text-secondary">
+                  Creating a release will mint a new content coin on Base. This
+                  requires a transaction and gas fees.
+                </p>
+              )}
 
               <div className="flex justify-between">
-                <Button variant="secondary" onClick={() => setStep('options')}>
+                <Button
+                  variant="secondary"
+                  onClick={() => setStep('options')}
+                  disabled={isSubmitting}
+                >
                   Back
                 </Button>
                 <Button

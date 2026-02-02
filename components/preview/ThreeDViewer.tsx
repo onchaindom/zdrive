@@ -1,15 +1,13 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef } from 'react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { Component, Suspense, useRef, type ReactNode } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Center, useGLTF } from '@react-three/drei';
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 import { ipfsToHttp } from '@/lib/constants';
 
 interface ThreeDViewerProps {
   uri: string;
-  fileType: 'glb' | 'gltf' | 'stl';
   className?: string;
 }
 
@@ -24,51 +22,7 @@ function GLTFModel({ url }: { url: string }) {
   );
 }
 
-// STL Model component
-function STLModel({ url }: { url: string }) {
-  const geometry = useLoader(STLLoader, url);
-
-  const processedGeometry = useMemo(() => {
-    const geom = geometry.clone();
-    // Center and scale the geometry once to avoid cumulative scaling.
-    geom.center();
-    geom.computeBoundingBox();
-    geom.computeVertexNormals();
-
-    const boundingBox = geom.boundingBox;
-    if (boundingBox) {
-      const size = new THREE.Vector3();
-      boundingBox.getSize(size);
-      const maxDim = Math.max(size.x, size.y, size.z);
-      if (maxDim > 0) {
-        const scale = 2 / maxDim;
-        geom.scale(scale, scale, scale);
-      }
-    }
-
-    return geom;
-  }, [geometry]);
-
-  useEffect(() => {
-    return () => {
-      processedGeometry.dispose();
-    };
-  }, [processedGeometry]);
-
-  return (
-    <mesh geometry={processedGeometry}>
-      <meshStandardMaterial
-        color="#a0a0a0"
-        metalness={0.1}
-        roughness={0.5}
-        side={THREE.DoubleSide}
-        flatShading
-      />
-    </mesh>
-  );
-}
-
-// Loading fallback
+// Loading fallback — spinning wireframe cube
 function LoadingFallback() {
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -86,43 +40,80 @@ function LoadingFallback() {
   );
 }
 
-export function ThreeDViewer({ uri, fileType, className }: ThreeDViewerProps) {
+// Error boundary to catch GLB load failures
+interface ErrorBoundaryState {
+  error: string | null;
+}
+
+class GLTFErrorBoundary extends Component<
+  { children: ReactNode; fallback: (error: string) => ReactNode },
+  ErrorBoundaryState
+> {
+  state: ErrorBoundaryState = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error: error.message || 'Failed to load 3D model' };
+  }
+
+  render() {
+    if (this.state.error) {
+      return this.props.fallback(this.state.error);
+    }
+    return this.props.children;
+  }
+}
+
+export function ThreeDViewer({ uri, className }: ThreeDViewerProps) {
   const httpUrl = ipfsToHttp(uri);
 
-  return (
-    <div className={`relative aspect-square bg-zdrive-bg ${className}`}>
-      <Canvas
-        camera={{ position: [3, 3, 3], fov: 50 }}
-        style={{ background: '#fafafa' }}
-      >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <directionalLight position={[-10, -10, -5]} intensity={0.3} />
-
-        <Suspense fallback={<LoadingFallback />}>
-          {fileType === 'stl' ? (
-            <STLModel url={httpUrl} />
-          ) : (
-            <GLTFModel url={httpUrl} />
-          )}
-        </Suspense>
-
-        <OrbitControls
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={true}
-          autoRotate={false}
-          minDistance={1}
-          maxDistance={20}
-        />
-
-        <Environment preset="studio" />
-      </Canvas>
-
-      {/* Controls hint */}
-      <div className="absolute bottom-2 left-2 text-xs text-zdrive-text-muted">
-        Drag to rotate · Scroll to zoom
+  const errorFallback = (
+    <div className={`relative flex aspect-square items-center justify-center bg-zdrive-bg ${className}`}>
+      <div className="text-center px-4">
+        <p className="text-sm text-zdrive-text-muted">Unable to load 3D preview</p>
+        <a
+          href={httpUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-block text-xs text-zdrive-text-secondary hover:underline"
+        >
+          Download GLB file &rarr;
+        </a>
       </div>
     </div>
+  );
+
+  return (
+    <GLTFErrorBoundary fallback={() => errorFallback}>
+      <div className={`relative aspect-square bg-zdrive-bg ${className}`}>
+        <Canvas
+          camera={{ position: [3, 3, 3], fov: 50 }}
+          style={{ background: '#fafafa' }}
+        >
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[10, 10, 5]} intensity={1} />
+          <directionalLight position={[-10, -10, -5]} intensity={0.3} />
+
+          <Suspense fallback={<LoadingFallback />}>
+            <GLTFModel url={httpUrl} />
+          </Suspense>
+
+          <OrbitControls
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={true}
+            autoRotate={false}
+            minDistance={1}
+            maxDistance={20}
+          />
+
+          <Environment preset="studio" />
+        </Canvas>
+
+        {/* Controls hint */}
+        <div className="absolute bottom-2 left-2 text-xs text-zdrive-text-muted">
+          Drag to rotate · Scroll to zoom
+        </div>
+      </div>
+    </GLTFErrorBoundary>
   );
 }

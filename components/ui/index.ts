@@ -4,3 +4,4 @@ export { Textarea, type TextareaProps } from './Textarea';
 export { Modal } from './Modal';
 export { LoadingSpinner, LoadingPage } from './LoadingSpinner';
 export { SearchBar } from './SearchBar';
+export { ErrorBoundary } from './ErrorBoundary';

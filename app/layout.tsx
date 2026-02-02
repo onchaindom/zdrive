@@ -5,7 +5,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Z:Drive - Artist-First Release Platform',
   description:
-    'Publish your creative releases on Zora. PDFs, 3D files, fonts, code, and more.',
+    'Publish your creative releases on Zora. PDFs, 3D files, images, videos, code, and more.',
   keywords: ['zora', 'nft', 'creator', 'artist', 'release', 'web3'],
 };
 

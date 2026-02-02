@@ -24,5 +24,7 @@ export function useRelease(address: string) {
       return release;
     },
     enabled: !!address,
+    retry: 2,
+    staleTime: 30_000, // 30 seconds
   });
 }

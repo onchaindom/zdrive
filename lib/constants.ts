@@ -49,10 +49,12 @@ export const PREVIEWABLE_MIMES = [
   'application/pdf',
   'model/gltf-binary',
   'model/gltf+json',
-  'model/stl',
-  'font/otf',
-  'font/ttf',
-  'font/woff2',
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+  'video/mp4',
 ] as const;
 
 // Supported image types for cover
@@ -64,7 +66,7 @@ export const COVER_IMAGE_MIMES = [
 ] as const;
 
 // IPFS gateway for fetching content
-export const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
+export const IPFS_GATEWAY = 'https://magic.decentralized-content.com/ipfs/';
 
 // Convert IPFS URI to HTTP URL
 export function ipfsToHttp(uri: string): string {
