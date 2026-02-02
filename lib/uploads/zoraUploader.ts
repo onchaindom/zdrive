@@ -2,6 +2,50 @@ import { createZoraUploaderForCreator } from "@zoralabs/coins-sdk";
 import type { Uploader, UploadResult } from "@zoralabs/coins-sdk";
 import type { Address } from "viem";
 
+/**
+ * Extension-to-MIME lookup for file types browsers commonly misidentify as
+ * `application/octet-stream`. Zora's IPFS endpoint rejects octet-stream,
+ * so we correct the MIME before uploading.
+ */
+const EXTENSION_MIME_MAP: Record<string, string> = {
+  ".stl": "model/stl",
+  ".glb": "model/gltf-binary",
+  ".gltf": "model/gltf+json",
+  ".obj": "model/obj",
+  ".zip": "application/zip",
+  ".pdf": "application/pdf",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".json": "application/json",
+};
+
+/**
+ * Re-wrap a File with the correct MIME type if the browser assigned
+ * `application/octet-stream` or left it empty.
+ */
+export function ensureCorrectMime(file: File): File {
+  if (file.type && file.type !== "application/octet-stream") {
+    return file;
+  }
+
+  const dotIndex = file.name.lastIndexOf(".");
+  if (dotIndex === -1) return file;
+
+  const ext = file.name.slice(dotIndex).toLowerCase();
+  const correctMime = EXTENSION_MIME_MAP[ext];
+
+  if (correctMime) {
+    return new File([file], file.name, { type: correctMime });
+  }
+
+  return file;
+}
+
 export interface ZoraUploadFileResult {
   uri: `ipfs://${string}`;
   mimeType: string | undefined;
@@ -141,8 +185,9 @@ export class ZoraUploadService {
     file: File,
     shouldComputeSha256 = false,
   ): Promise<ZoraUploadFileResult> {
+    const correctedFile = ensureCorrectMime(file);
     const [uploadResult, sha256] = await Promise.all([
-      withRetry(() => this.uploader.upload(file)),
+      withRetry(() => this.uploader.upload(correctedFile)),
       shouldComputeSha256 ? computeSha256(file) : undefined,
     ]);
 

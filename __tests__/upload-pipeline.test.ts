@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { computeSha256 } from "@/lib/uploads/zoraUploader";
+import { computeSha256, ensureCorrectMime } from "@/lib/uploads/zoraUploader";
 
 // We test computeSha256 directly since it's a pure function.
 // The ZoraUploadService class depends on the Zora SDK (network calls),
@@ -55,5 +55,73 @@ describe("computeSha256", () => {
     const hash2 = await computeSha256(file2);
 
     expect(hash1).toBe(hash2);
+  });
+});
+
+describe("ensureCorrectMime", () => {
+  it("corrects application/octet-stream for .stl files", () => {
+    const file = new File(["data"], "model.stl", {
+      type: "application/octet-stream",
+    });
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("model/stl");
+    expect(corrected.name).toBe("model.stl");
+  });
+
+  it("corrects empty type for .glb files", () => {
+    const file = new File(["data"], "scene.glb");
+    // File with no type option defaults to ""
+    expect(file.type).toBe("");
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("model/gltf-binary");
+  });
+
+  it("leaves correct MIME types unchanged", () => {
+    const file = new File(["data"], "photo.jpg", { type: "image/jpeg" });
+    const result = ensureCorrectMime(file);
+    // Should return the same object (not re-wrapped)
+    expect(result).toBe(file);
+    expect(result.type).toBe("image/jpeg");
+  });
+
+  it("leaves unknown extensions unchanged", () => {
+    const file = new File(["data"], "file.xyz", {
+      type: "application/octet-stream",
+    });
+    const result = ensureCorrectMime(file);
+    // Can't correct unknown extension, return as-is
+    expect(result.type).toBe("application/octet-stream");
+  });
+
+  it("handles files without extensions", () => {
+    const file = new File(["data"], "README", {
+      type: "application/octet-stream",
+    });
+    const result = ensureCorrectMime(file);
+    expect(result.type).toBe("application/octet-stream");
+  });
+
+  it("corrects .gltf to model/gltf+json", () => {
+    const file = new File(["{}"], "scene.gltf", {
+      type: "application/octet-stream",
+    });
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("model/gltf+json");
+  });
+
+  it("corrects .zip to application/zip", () => {
+    const file = new File(["data"], "archive.zip", {
+      type: "application/octet-stream",
+    });
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("application/zip");
+  });
+
+  it("is case-insensitive for extensions", () => {
+    const file = new File(["data"], "Model.STL", {
+      type: "application/octet-stream",
+    });
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("model/stl");
   });
 });
