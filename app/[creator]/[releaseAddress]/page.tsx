@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Header, Footer } from '@/components/layout';
 import { LoadingPage, ErrorBoundary } from '@/components/ui';
 import { useRelease } from '@/hooks/useRelease';
+import { useCoin } from '@/hooks/useCoin';
 import { useLicenseStatus } from '@/hooks/useLicenseStatus';
 import { PreviewRenderer, DownloadList } from '@/components/preview';
 import { CoinTradeWidget } from '@/components/trade/CoinTradeWidget';
@@ -21,6 +22,7 @@ interface ReleasePageProps {
 export default function ReleasePage({ params }: ReleasePageProps) {
   const { creator, releaseAddress } = params;
   const { data: release, isLoading, error } = useRelease(releaseAddress);
+  const { data: coinStats } = useCoin(releaseAddress);
 
   const licenseStatus = useLicenseStatus(
     releaseAddress,
@@ -129,7 +131,7 @@ export default function ReleasePage({ params }: ReleasePageProps) {
               <CollectButton
                 coinAddress={releaseAddress}
                 coinName={metadata.name}
-                coinSymbol={metadata.name.slice(0, 6).toUpperCase()}
+                coinSymbol={coinStats?.symbol ?? metadata.name.slice(0, 6).toUpperCase()}
                 variant="full"
               />
 

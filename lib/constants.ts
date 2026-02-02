@@ -66,7 +66,7 @@ export const COVER_IMAGE_MIMES = [
 ] as const;
 
 // IPFS gateway for fetching content
-export const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
+export const IPFS_GATEWAY = 'https://magic.decentralized-content.com/ipfs/';
 
 // Convert IPFS URI to HTTP URL
 export function ipfsToHttp(uri: string): string {
