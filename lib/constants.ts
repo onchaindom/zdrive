@@ -49,13 +49,12 @@ export const PREVIEWABLE_MIMES = [
   'application/pdf',
   'model/gltf-binary',
   'model/gltf+json',
-  'model/stl',
   'image/jpeg',
   'image/png',
   'image/gif',
   'image/webp',
+  'image/svg+xml',
   'video/mp4',
-  'video/webm',
 ] as const;
 
 // Supported image types for cover

@@ -41,15 +41,15 @@ describe("buildReleaseMetadata", () => {
     expect(metadata.animation_url).toBe("ipfs://QmPdf123");
   });
 
-  it("includes STL preview file", () => {
+  it("includes GLB preview file", () => {
     const metadata = buildReleaseMetadata({
       ...minimalInput,
-      previewFile: { uri: "ipfs://QmStl123", mime: "model/stl" },
+      previewFile: { uri: "ipfs://QmGlb123", mime: "model/gltf-binary" },
     });
 
     expect(metadata.content).toEqual({
-      mime: "model/stl",
-      uri: "ipfs://QmStl123",
+      mime: "model/gltf-binary",
+      uri: "ipfs://QmGlb123",
     });
   });
 

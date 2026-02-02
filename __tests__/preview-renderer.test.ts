@@ -33,8 +33,8 @@ describe('PreviewRenderer routing logic', () => {
       expect(getFileType('model/gltf-binary')).toBe('glb');
     });
 
-    it('routes STL to ThreeDViewer', () => {
-      expect(getFileType('model/stl')).toBe('stl');
+    it('routes SVG to ImageViewer', () => {
+      expect(getFileType('image/svg+xml')).toBe('image');
     });
 
     it('routes JPEG to ImageViewer', () => {
@@ -49,8 +49,8 @@ describe('PreviewRenderer routing logic', () => {
       expect(getFileType('video/mp4')).toBe('video');
     });
 
-    it('routes WebM to VideoPlayer', () => {
-      expect(getFileType('video/webm')).toBe('video');
+    it('routes unsupported video to fallback', () => {
+      expect(getFileType('video/webm')).toBe('other');
     });
 
     it('routes unknown MIME to fallback', () => {

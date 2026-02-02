@@ -53,7 +53,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
         case 'pdf':
           return contentType === 'pdf';
         case '3d':
-          return ['glb', 'gltf', 'stl'].includes(contentType);
+          return ['glb', 'gltf'].includes(contentType);
         case 'image':
           return contentType === 'image';
         case 'video':
@@ -62,7 +62,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
           return hasGitHub;
         case 'other':
           return (
-            !['pdf', 'glb', 'gltf', 'stl', 'image', 'video'].includes(contentType) && !hasGitHub
+            !['pdf', 'glb', 'gltf', 'image', 'video'].includes(contentType) && !hasGitHub
           );
         default:
           return true;

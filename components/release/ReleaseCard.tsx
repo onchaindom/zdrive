@@ -18,10 +18,8 @@ const fileTypeBadges: Record<string, { label: string; className: string }> = {
   pdf: { label: 'PDF', className: 'bg-red-100 text-red-700' },
   glb: { label: '3D', className: 'bg-purple-100 text-purple-700' },
   gltf: { label: '3D', className: 'bg-purple-100 text-purple-700' },
-  stl: { label: '3D', className: 'bg-purple-100 text-purple-700' },
   font: { label: 'Font', className: 'bg-blue-100 text-blue-700' },
   github: { label: 'GitHub', className: 'bg-gray-100 text-gray-700' },
-  zip: { label: 'ZIP', className: 'bg-amber-100 text-amber-700' },
   other: { label: 'File', className: 'bg-gray-100 text-gray-700' },
 };
 

@@ -88,8 +88,7 @@ function renderByType(
 
     case 'glb':
     case 'gltf':
-    case 'stl':
-      return <ThreeDViewer uri={uri} fileType={fileType} className={className} />;
+      return <ThreeDViewer uri={uri} className={className} />;
 
     case 'image':
       return <ImageViewer uri={uri} alt={metadata.name} className={className} />;

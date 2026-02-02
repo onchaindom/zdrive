@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { computeSha256, ensureCorrectMime } from "@/lib/uploads/zoraUploader";
 
 // We test computeSha256 directly since it's a pure function.
@@ -7,13 +7,10 @@ import { computeSha256, ensureCorrectMime } from "@/lib/uploads/zoraUploader";
 
 describe("computeSha256", () => {
   it("computes correct SHA-256 for known input", async () => {
-    // SHA-256 of "hello world" is well-known
     const file = new File(["hello world"], "test.txt", {
       type: "text/plain",
     });
     const hash = await computeSha256(file);
-
-    // SHA-256("hello world") = b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
     expect(hash).toBe(
       "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
     );
@@ -22,8 +19,6 @@ describe("computeSha256", () => {
   it("computes correct SHA-256 for empty file", async () => {
     const file = new File([""], "empty.txt", { type: "text/plain" });
     const hash = await computeSha256(file);
-
-    // SHA-256("") = e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     expect(hash).toBe(
       "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     );
@@ -32,7 +27,6 @@ describe("computeSha256", () => {
   it("produces 64-character hex string", async () => {
     const file = new File(["test data"], "test.bin");
     const hash = await computeSha256(file);
-
     expect(hash).toHaveLength(64);
     expect(hash).toMatch(/^[0-9a-f]{64}$/);
   });
@@ -40,46 +34,55 @@ describe("computeSha256", () => {
   it("produces different hashes for different content", async () => {
     const file1 = new File(["content A"], "a.txt");
     const file2 = new File(["content B"], "b.txt");
-
     const hash1 = await computeSha256(file1);
     const hash2 = await computeSha256(file2);
-
     expect(hash1).not.toBe(hash2);
   });
 
   it("produces same hash for same content regardless of filename", async () => {
     const file1 = new File(["same content"], "file1.txt");
     const file2 = new File(["same content"], "file2.txt");
-
     const hash1 = await computeSha256(file1);
     const hash2 = await computeSha256(file2);
-
     expect(hash1).toBe(hash2);
   });
 });
 
 describe("ensureCorrectMime", () => {
-  it("corrects application/octet-stream for .stl files", () => {
-    const file = new File(["data"], "model.stl", {
-      type: "application/octet-stream",
-    });
-    const corrected = ensureCorrectMime(file);
-    expect(corrected.type).toBe("model/stl");
-    expect(corrected.name).toBe("model.stl");
-  });
-
   it("corrects empty type for .glb files", () => {
     const file = new File(["data"], "scene.glb");
-    // File with no type option defaults to ""
     expect(file.type).toBe("");
     const corrected = ensureCorrectMime(file);
     expect(corrected.type).toBe("model/gltf-binary");
   });
 
+  it("corrects octet-stream for .gltf files", () => {
+    const file = new File(["{}"], "scene.gltf", {
+      type: "application/octet-stream",
+    });
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("model/gltf+json");
+  });
+
+  it("corrects octet-stream for .pdf files", () => {
+    const file = new File(["data"], "doc.pdf", {
+      type: "application/octet-stream",
+    });
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("application/pdf");
+  });
+
+  it("corrects octet-stream for .svg files", () => {
+    const file = new File(["<svg></svg>"], "icon.svg", {
+      type: "application/octet-stream",
+    });
+    const corrected = ensureCorrectMime(file);
+    expect(corrected.type).toBe("image/svg+xml");
+  });
+
   it("leaves correct MIME types unchanged", () => {
     const file = new File(["data"], "photo.jpg", { type: "image/jpeg" });
     const result = ensureCorrectMime(file);
-    // Should return the same object (not re-wrapped)
     expect(result).toBe(file);
     expect(result.type).toBe("image/jpeg");
   });
@@ -89,7 +92,6 @@ describe("ensureCorrectMime", () => {
       type: "application/octet-stream",
     });
     const result = ensureCorrectMime(file);
-    // Can't correct unknown extension, return as-is
     expect(result.type).toBe("application/octet-stream");
   });
 
@@ -101,27 +103,11 @@ describe("ensureCorrectMime", () => {
     expect(result.type).toBe("application/octet-stream");
   });
 
-  it("corrects .gltf to model/gltf+json", () => {
-    const file = new File(["{}"], "scene.gltf", {
-      type: "application/octet-stream",
-    });
-    const corrected = ensureCorrectMime(file);
-    expect(corrected.type).toBe("model/gltf+json");
-  });
-
-  it("corrects .zip to application/zip", () => {
-    const file = new File(["data"], "archive.zip", {
-      type: "application/octet-stream",
-    });
-    const corrected = ensureCorrectMime(file);
-    expect(corrected.type).toBe("application/zip");
-  });
-
   it("is case-insensitive for extensions", () => {
-    const file = new File(["data"], "Model.STL", {
+    const file = new File(["data"], "Model.GLB", {
       type: "application/octet-stream",
     });
     const corrected = ensureCorrectMime(file);
-    expect(corrected.type).toBe("model/stl");
+    expect(corrected.type).toBe("model/gltf-binary");
   });
 });

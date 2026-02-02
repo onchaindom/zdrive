@@ -1,15 +1,13 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef } from 'react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { Suspense, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Center, useGLTF } from '@react-three/drei';
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 import { ipfsToHttp } from '@/lib/constants';
 
 interface ThreeDViewerProps {
   uri: string;
-  fileType: 'glb' | 'gltf' | 'stl';
   className?: string;
 }
 
@@ -21,50 +19,6 @@ function GLTFModel({ url }: { url: string }) {
     <Center>
       <primitive object={scene} />
     </Center>
-  );
-}
-
-// STL Model component
-function STLModel({ url }: { url: string }) {
-  const geometry = useLoader(STLLoader, url);
-
-  const processedGeometry = useMemo(() => {
-    const geom = geometry.clone();
-    // Center and scale the geometry once to avoid cumulative scaling.
-    geom.center();
-    geom.computeBoundingBox();
-    geom.computeVertexNormals();
-
-    const boundingBox = geom.boundingBox;
-    if (boundingBox) {
-      const size = new THREE.Vector3();
-      boundingBox.getSize(size);
-      const maxDim = Math.max(size.x, size.y, size.z);
-      if (maxDim > 0) {
-        const scale = 2 / maxDim;
-        geom.scale(scale, scale, scale);
-      }
-    }
-
-    return geom;
-  }, [geometry]);
-
-  useEffect(() => {
-    return () => {
-      processedGeometry.dispose();
-    };
-  }, [processedGeometry]);
-
-  return (
-    <mesh geometry={processedGeometry}>
-      <meshStandardMaterial
-        color="#a0a0a0"
-        metalness={0.1}
-        roughness={0.5}
-        side={THREE.DoubleSide}
-        flatShading
-      />
-    </mesh>
   );
 }
 
@@ -86,7 +40,7 @@ function LoadingFallback() {
   );
 }
 
-export function ThreeDViewer({ uri, fileType, className }: ThreeDViewerProps) {
+export function ThreeDViewer({ uri, className }: ThreeDViewerProps) {
   const httpUrl = ipfsToHttp(uri);
 
   return (
@@ -100,11 +54,7 @@ export function ThreeDViewer({ uri, fileType, className }: ThreeDViewerProps) {
         <directionalLight position={[-10, -10, -5]} intensity={0.3} />
 
         <Suspense fallback={<LoadingFallback />}>
-          {fileType === 'stl' ? (
-            <STLModel url={httpUrl} />
-          ) : (
-            <GLTFModel url={httpUrl} />
-          )}
+          <GLTFModel url={httpUrl} />
         </Suspense>
 
         <OrbitControls

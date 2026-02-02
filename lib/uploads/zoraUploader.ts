@@ -3,24 +3,25 @@ import type { Uploader, UploadResult } from "@zoralabs/coins-sdk";
 import type { Address } from "viem";
 
 /**
- * Extension-to-MIME lookup for file types browsers commonly misidentify as
- * `application/octet-stream`. Zora's IPFS endpoint rejects octet-stream,
- * so we correct the MIME before uploading.
+ * Extension-to-MIME lookup for file types browsers commonly misidentify.
+ * Zora's IPFS endpoint does server-side magic-byte sniffing and rejects
+ * `application/octet-stream`. Browsers often fail to detect MIME for
+ * GLB/GLTF files, so we correct before uploading.
+ *
+ * Only includes types empirically proven to work with Zora's endpoint
+ * (tested via scripts/test-zora-upload.mjs).
  */
 const EXTENSION_MIME_MAP: Record<string, string> = {
-  ".stl": "model/stl",
   ".glb": "model/gltf-binary",
   ".gltf": "model/gltf+json",
-  ".obj": "model/obj",
-  ".zip": "application/zip",
   ".pdf": "application/pdf",
   ".mp4": "video/mp4",
-  ".webm": "video/webm",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".png": "image/png",
   ".gif": "image/gif",
   ".webp": "image/webp",
+  ".svg": "image/svg+xml",
   ".json": "application/json",
 };
 
@@ -69,10 +70,6 @@ export interface UploadFileEntry {
 }
 
 /**
- * Compute SHA-256 hash of a file using the Web Crypto API.
- * Returns hex string.
- */
-/**
  * Read a File/Blob as an ArrayBuffer.
  * Falls back to FileReader for environments where arrayBuffer() is unavailable (e.g. jsdom).
  */
@@ -89,6 +86,10 @@ function readAsArrayBuffer(file: File | Blob): Promise<ArrayBuffer> {
   });
 }
 
+/**
+ * Compute SHA-256 hash of a file using the Web Crypto API.
+ * Returns hex string.
+ */
 export async function computeSha256(file: File): Promise<string> {
   const buffer = await readAsArrayBuffer(file);
   const bytes = new Uint8Array(buffer);
@@ -108,6 +109,7 @@ export async function computeSha256(file: File): Promise<string> {
 /**
  * Retry wrapper with exponential backoff.
  * Only retries on network errors or 5xx status codes.
+ * Does NOT retry on 400 (unsupported file type — won't change on retry).
  */
 async function withRetry<T>(
   fn: () => Promise<T>,
@@ -168,8 +170,9 @@ async function withConcurrency<T>(
 }
 
 /**
- * Upload service wrapping the Zora SDK's IPFS uploader.
- * Provides retry logic, SHA256 computation, parallel uploads, and progress tracking.
+ * Upload service using Zora SDK's native IPFS uploader.
+ * All supported file types (images, video, PDF, GLB/GLTF, JSON, text)
+ * have been empirically verified to work with Zora's endpoint.
  */
 export class ZoraUploadService {
   private uploader: Uploader;
@@ -186,6 +189,7 @@ export class ZoraUploadService {
     shouldComputeSha256 = false,
   ): Promise<ZoraUploadFileResult> {
     const correctedFile = ensureCorrectMime(file);
+
     const [uploadResult, sha256] = await Promise.all([
       withRetry(() => this.uploader.upload(correctedFile)),
       shouldComputeSha256 ? computeSha256(file) : undefined,

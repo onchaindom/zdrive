@@ -77,17 +77,14 @@ export interface ZDriveMetadata {
   };
 }
 
-// Supported preview file types
-export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'stl' | 'github' | 'image' | 'video';
-export type DownloadOnlyFileType = 'zip' | 'other';
+// Supported preview file types (all empirically verified with Zora's IPFS endpoint)
+export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'github' | 'image' | 'video';
+export type DownloadOnlyFileType = 'other';
 export type FileType = PreviewableFileType | DownloadOnlyFileType;
 
 // Helper to extract filename from URI or path
 export function getFilenameFromUri(uri: string): string | undefined {
-  // Handle IPFS URIs like ipfs://Qm.../filename.stl
-  // Handle HTTP URLs like https://gateway.ipfs.io/ipfs/Qm.../filename.stl
   const lastSegment = uri.split('/').pop();
-  // Check if it looks like a filename (has an extension)
   if (lastSegment && lastSegment.includes('.')) {
     return lastSegment;
   }
@@ -96,37 +93,27 @@ export function getFilenameFromUri(uri: string): string | undefined {
 
 // Helper to determine file type from MIME or extension
 export function getFileType(mime?: string, filename?: string): FileType {
-  // First check filename extension - most reliable for non-standard MIME types
+  // First check filename extension
   if (filename) {
     const ext = filename.split('.').pop()?.toLowerCase();
     switch (ext) {
       case 'pdf': return 'pdf';
       case 'glb': return 'glb';
       case 'gltf': return 'gltf';
-      case 'stl': return 'stl';
-      case 'zip': return 'zip';
-      case 'jpg': case 'jpeg': case 'png': case 'gif': case 'webp': return 'image';
-      case 'mp4': case 'webm': return 'video';
+      case 'jpg': case 'jpeg': case 'png': case 'gif': case 'webp': case 'svg': return 'image';
+      case 'mp4': return 'video';
     }
   }
 
   if (mime) {
     if (mime === 'application/pdf') return 'pdf';
     if (mime === 'model/gltf-binary' || mime === 'model/gltf+json') return 'glb';
-    // STL has many non-standard MIME types reported by browsers
-    if (
-      mime === 'model/stl' ||
-      mime === 'application/sla' ||
-      mime === 'application/vnd.ms-pki.stl' ||
-      mime === 'model/x.stl-binary' ||
-      mime === 'model/x.stl-ascii'
-    ) return 'stl';
-    if (mime === 'application/zip' || mime === 'application/x-zip-compressed') return 'zip';
     if (
       mime === 'image/jpeg' || mime === 'image/png' ||
-      mime === 'image/gif' || mime === 'image/webp'
+      mime === 'image/gif' || mime === 'image/webp' ||
+      mime === 'image/svg+xml'
     ) return 'image';
-    if (mime === 'video/mp4' || mime === 'video/webm') return 'video';
+    if (mime === 'video/mp4') return 'video';
   }
 
   return 'other';

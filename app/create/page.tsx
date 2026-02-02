@@ -294,15 +294,14 @@ export default function CreatePage() {
                   'application/pdf': ['.pdf'],
                   'model/gltf-binary': ['.glb'],
                   'model/gltf+json': ['.gltf'],
-                  'model/stl': ['.stl'],
                   'image/jpeg': ['.jpg', '.jpeg'],
                   'image/png': ['.png'],
                   'image/gif': ['.gif'],
                   'image/webp': ['.webp'],
+                  'image/svg+xml': ['.svg'],
                   'video/mp4': ['.mp4'],
-                  'video/webm': ['.webm'],
                 }}
-                hint="PDF, 3D file, image, or video that will be rendered in the viewer"
+                hint="PDF, 3D model (GLB/GLTF), image, or video for the release viewer"
               />
 
               <div className="border-t border-zdrive-border pt-6">

@@ -17,7 +17,7 @@ describe("getFileType", () => {
     expect(getFileType(undefined, "document.pdf")).toBe("pdf");
   });
 
-  // 3D
+  // 3D (GLB/GLTF only)
   it("detects GLB by MIME", () => {
     expect(getFileType("model/gltf-binary")).toBe("glb");
   });
@@ -30,25 +30,8 @@ describe("getFileType", () => {
   it("detects GLTF by extension", () => {
     expect(getFileType(undefined, "scene.gltf")).toBe("gltf");
   });
-  it("detects STL by MIME model/stl", () => {
-    expect(getFileType("model/stl")).toBe("stl");
-  });
-  it("detects STL by MIME application/sla", () => {
-    expect(getFileType("application/sla")).toBe("stl");
-  });
-  it("detects STL by extension", () => {
-    expect(getFileType(undefined, "part.stl")).toBe("stl");
-  });
 
-  // ZIP
-  it("detects ZIP by MIME", () => {
-    expect(getFileType("application/zip")).toBe("zip");
-  });
-  it("detects ZIP by extension", () => {
-    expect(getFileType(undefined, "archive.zip")).toBe("zip");
-  });
-
-  // Images (to be added in Phase 2 type update)
+  // Images
   it("detects JPEG by MIME", () => {
     expect(getFileType("image/jpeg")).toBe("image");
   });
@@ -61,19 +44,22 @@ describe("getFileType", () => {
   it("detects WebP by MIME", () => {
     expect(getFileType("image/webp")).toBe("image");
   });
+  it("detects SVG by MIME", () => {
+    expect(getFileType("image/svg+xml")).toBe("image");
+  });
   it("detects JPG by extension", () => {
     expect(getFileType(undefined, "photo.jpg")).toBe("image");
   });
   it("detects PNG by extension", () => {
     expect(getFileType(undefined, "icon.png")).toBe("image");
   });
+  it("detects SVG by extension", () => {
+    expect(getFileType(undefined, "logo.svg")).toBe("image");
+  });
 
-  // Video (to be added in Phase 2 type update)
+  // Video (MP4 only)
   it("detects MP4 by MIME", () => {
     expect(getFileType("video/mp4")).toBe("video");
-  });
-  it("detects WebM by MIME", () => {
-    expect(getFileType("video/webm")).toBe("video");
   });
   it("detects MP4 by extension", () => {
     expect(getFileType(undefined, "clip.mp4")).toBe("video");
@@ -89,10 +75,15 @@ describe("getFileType", () => {
   it("returns other with no input", () => {
     expect(getFileType()).toBe("other");
   });
+  it("returns other for unsupported types (STL, ZIP, WebM)", () => {
+    expect(getFileType("model/stl")).toBe("other");
+    expect(getFileType("application/zip")).toBe("other");
+    expect(getFileType("video/webm")).toBe("other");
+  });
 
   // Extension takes priority
   it("prefers extension over MIME", () => {
-    expect(getFileType("application/octet-stream", "model.stl")).toBe("stl");
+    expect(getFileType("application/octet-stream", "model.glb")).toBe("glb");
   });
 });
 
@@ -153,7 +144,7 @@ describe("parseZDriveMetadata", () => {
           schemaVersion: ZDRIVE_SCHEMA_VERSION,
           release: {
             assets: [
-              { name: "file.zip", mime: "application/zip", uri: "ipfs://Qm1" },
+              { name: "file.glb", mime: "model/gltf-binary", uri: "ipfs://Qm1" },
             ],
           },
         },
@@ -197,13 +188,13 @@ describe("buildCollectionId / parseCollectionId", () => {
   it("returns null for invalid format", () => {
     expect(parseCollectionId("invalid")).toBeNull();
     expect(parseCollectionId("not:enough")).toBeNull();
-    expect(parseCollectionId("abc:0x123:slug")).toBeNull(); // non-numeric chainId
+    expect(parseCollectionId("abc:0x123:slug")).toBeNull();
   });
 });
 
 describe("getFilenameFromUri", () => {
   it("extracts filename from IPFS URI", () => {
-    expect(getFilenameFromUri("ipfs://QmHash/model.stl")).toBe("model.stl");
+    expect(getFilenameFromUri("ipfs://QmHash/model.glb")).toBe("model.glb");
   });
 
   it("extracts filename from HTTP URL", () => {
