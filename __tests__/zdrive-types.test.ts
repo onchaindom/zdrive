@@ -65,6 +65,20 @@ describe("getFileType", () => {
     expect(getFileType(undefined, "clip.mp4")).toBe("video");
   });
 
+  // Markdown / Text
+  it("detects markdown by MIME", () => {
+    expect(getFileType("text/markdown")).toBe("markdown");
+  });
+  it("detects plain text by MIME", () => {
+    expect(getFileType("text/plain")).toBe("markdown");
+  });
+  it("detects markdown by .md extension", () => {
+    expect(getFileType(undefined, "readme.md")).toBe("markdown");
+  });
+  it("detects text by .txt extension", () => {
+    expect(getFileType(undefined, "notes.txt")).toBe("markdown");
+  });
+
   // Fallback
   it("returns other for unknown MIME", () => {
     expect(getFileType("application/octet-stream")).toBe("other");

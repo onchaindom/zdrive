@@ -78,7 +78,7 @@ export interface ZDriveMetadata {
 }
 
 // Supported preview file types (all empirically verified with Zora's IPFS endpoint)
-export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'github' | 'image' | 'video';
+export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'github' | 'image' | 'video' | 'markdown';
 export type DownloadOnlyFileType = 'other';
 export type FileType = PreviewableFileType | DownloadOnlyFileType;
 
@@ -102,6 +102,7 @@ export function getFileType(mime?: string, filename?: string): FileType {
       case 'gltf': return 'gltf';
       case 'jpg': case 'jpeg': case 'png': case 'gif': case 'webp': case 'svg': return 'image';
       case 'mp4': return 'video';
+      case 'md': case 'txt': return 'markdown';
     }
   }
 
@@ -114,6 +115,7 @@ export function getFileType(mime?: string, filename?: string): FileType {
       mime === 'image/svg+xml'
     ) return 'image';
     if (mime === 'video/mp4') return 'video';
+    if (mime === 'text/markdown' || mime === 'text/plain') return 'markdown';
   }
 
   return 'other';

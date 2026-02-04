@@ -20,6 +20,7 @@ const fileTypeBadges: Record<string, { label: string; className: string }> = {
   gltf: { label: '3D', className: 'bg-purple-100 text-purple-700' },
   image: { label: 'Image', className: 'bg-green-100 text-green-700' },
   video: { label: 'Video', className: 'bg-amber-100 text-amber-700' },
+  markdown: { label: 'Text', className: 'bg-blue-100 text-blue-700' },
   github: { label: 'GitHub', className: 'bg-gray-100 text-gray-700' },
   other: { label: 'File', className: 'bg-gray-100 text-gray-700' },
 };
