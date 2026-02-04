@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePrivy } from '@privy-io/react-auth';
 import { Header, Footer } from '@/components/layout';
 import { ReleaseGrid, type ReleaseItem } from '@/components/release';
+import { ReleaseCard, ReleaseCardSkeleton } from '@/components/release/ReleaseCard';
 import { LoadingPage, Button } from '@/components/ui';
 import { useCreatorProfile, useCreatorReleases } from '@/hooks/useCreator';
 import { useHoldings } from '@/hooks/useHoldings';
@@ -29,7 +30,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
   const { data: profile, isLoading: profileLoading } =
     useCreatorProfile(creatorAddress);
-  const { data: releases, isLoading: releasesLoading } =
+  const { data: releases, isLoading: releasesLoading, pendingCount, totalCount } =
     useCreatorReleases(creatorAddress);
   const { holdingPercentage, isHolder } = useHoldings(
     profile?.creatorCoinAddress
@@ -221,15 +222,36 @@ export default function CreatorPage({ params }: CreatorPageProps) {
           </div>
 
           {/* Releases */}
-          <ReleaseGrid
-            releases={releaseItems}
-            isLoading={releasesLoading}
-            emptyMessage={
-              isOwnProfile
-                ? 'You haven\'t created any releases yet.'
-                : 'This creator hasn\'t published any releases yet.'
-            }
-          />
+          {releasesLoading ? (
+            <ReleaseGrid
+              releases={[]}
+              isLoading={true}
+            />
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {releaseItems.map((release) => (
+                <ReleaseCard
+                  key={release.address}
+                  address={release.address}
+                  metadata={release.metadata}
+                  creatorAddress={release.creatorAddress}
+                  creatorName={release.creatorName}
+                />
+              ))}
+              {/* Skeleton cards for coins still loading metadata */}
+              {pendingCount > 0 &&
+                Array.from({ length: pendingCount }).map((_, i) => (
+                  <ReleaseCardSkeleton key={`skeleton-${i}`} />
+                ))}
+              {releaseItems.length === 0 && pendingCount === 0 && (
+                <div className="col-span-full flex min-h-[200px] items-center justify-center text-zdrive-text-secondary">
+                  {isOwnProfile
+                    ? "You haven't created any releases yet."
+                    : "This creator hasn't published any releases yet."}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
 

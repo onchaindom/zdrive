@@ -1,10 +1,12 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import {
   fetchCoinsByCreator,
   adaptCoinToRelease,
   resolveTokenMetadata,
+  type ZoraCoin,
   type ParsedRelease,
 } from '@/lib/zora/queries';
 import { getProfile } from '@zoralabs/coins-sdk';
@@ -56,30 +58,49 @@ export function useCreatorProfile(address: string) {
   });
 }
 
-// Fetch releases created by a creator
-export function useCreatorReleases(address: string) {
+// Fetch the coin list (without metadata) for a creator
+export function useCreatorCoins(address: string) {
   return useQuery({
-    queryKey: ['creator', 'releases', address],
-    queryFn: async (): Promise<ParsedRelease[]> => {
-      // getProfileCoins already returns only coins created by this address
-      const coins = await fetchCoinsByCreator(address);
+    queryKey: ['creator', 'coins', address],
+    queryFn: () => fetchCoinsByCreator(address),
+    enabled: !!address,
+  });
+}
 
-      // Resolve metadata from tokenUri for each coin in parallel
-      await Promise.all(
-        coins.map(async (coin) => {
-          if (!coin.metadata && coin.tokenUri) {
-            coin.metadata = await resolveTokenMetadata(coin.tokenUri);
-          }
-        })
-      );
+// Fetch metadata for each coin individually with useQueries for progressive loading
+export function useCreatorReleases(address: string) {
+  const { data: coins, isLoading: coinsLoading } = useCreatorCoins(address);
 
-      const releases = coins
-        .map(adaptCoinToRelease)
-        .filter((r): r is ParsedRelease => r !== null);
+  // Use useQueries to resolve metadata individually per coin
+  const metadataQueries = useQueries({
+    queries: (coins ?? []).map((coin) => ({
+      queryKey: ['coin', 'metadata', coin.address],
+      queryFn: async (): Promise<ParsedRelease | null> => {
+        // Resolve metadata if not already present
+        let coinWithMetadata: ZoraCoin = coin;
+        if (!coin.metadata && coin.tokenUri) {
+          coinWithMetadata = {
+            ...coin,
+            metadata: await resolveTokenMetadata(coin.tokenUri),
+          };
+        }
+        return adaptCoinToRelease(coinWithMetadata);
+      },
+      staleTime: 300_000, // 5 minutes
+      enabled: !!coin.address,
+    })),
+  });
 
-      // Index for local search
+  // Collect resolved releases progressively
+  const releases = useMemo(() => {
+    const resolved = metadataQueries
+      .map((q) => q.data)
+      .filter((r): r is ParsedRelease => r !== null && r !== undefined);
+
+    // Index for local search whenever we have results
+    if (resolved.length > 0) {
       addManyToIndex(
-        releases.map((r) => ({
+        resolved.map((r) => ({
           coinAddress: r.coinAddress,
           creatorAddress: r.creatorAddress,
           name: r.metadata.name,
@@ -88,9 +109,22 @@ export function useCreatorReleases(address: string) {
           createdAt: r.createdAt,
         }))
       );
+    }
 
-      return releases;
-    },
-    enabled: !!address,
-  });
+    return resolved;
+  }, [metadataQueries]);
+
+  // Overall loading: coins list is loading
+  const isLoading = coinsLoading;
+
+  // Number of coins still resolving metadata
+  const pendingCount = metadataQueries.filter((q) => q.isLoading).length;
+  const totalCount = coins?.length ?? 0;
+
+  return {
+    data: releases,
+    isLoading,
+    pendingCount,
+    totalCount,
+  };
 }
