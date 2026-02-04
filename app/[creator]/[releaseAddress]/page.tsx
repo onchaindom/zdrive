@@ -1,6 +1,8 @@
 'use client';
 
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import { LoadingPage, ErrorBoundary } from '@/components/ui';
 import { useRelease } from '@/hooks/useRelease';
@@ -19,9 +21,29 @@ interface ReleasePageProps {
   };
 }
 
+const POLLING_INTERVAL = 3000; // 3 seconds
+const POLLING_TIMEOUT = 60_000; // 60 seconds
+
 export default function ReleasePage({ params }: ReleasePageProps) {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen flex-col"><Header /><LoadingPage /><Footer /></div>}>
+      <ReleasePageInner params={params} />
+    </Suspense>
+  );
+}
+
+function ReleasePageInner({ params }: ReleasePageProps) {
   const { creator, releaseAddress } = params;
-  const { data: release, isLoading, error } = useRelease(releaseAddress);
+  const searchParams = useSearchParams();
+  const isNewRelease = searchParams.get('new') === '1';
+
+  // Track whether we're still waiting for indexing
+  const [isPolling, setIsPolling] = useState(isNewRelease);
+  const [pollingTimedOut, setPollingTimedOut] = useState(false);
+
+  const { data: release, isLoading, error } = useRelease(releaseAddress, {
+    refetchInterval: isPolling ? POLLING_INTERVAL : false,
+  });
   const { data: coinStats } = useCoin(releaseAddress);
 
   const licenseStatus = useLicenseStatus(
@@ -29,11 +51,75 @@ export default function ReleasePage({ params }: ReleasePageProps) {
     release?.metadata.properties.zdrive.license,
   );
 
-  if (isLoading) {
+  // Stop polling once the release is found
+  useEffect(() => {
+    if (release && isPolling) {
+      setIsPolling(false);
+    }
+  }, [release, isPolling]);
+
+  // Timeout after 60 seconds of polling
+  useEffect(() => {
+    if (!isPolling) return;
+    const timer = setTimeout(() => {
+      setIsPolling(false);
+      setPollingTimedOut(true);
+    }, POLLING_TIMEOUT);
+    return () => clearTimeout(timer);
+  }, [isPolling]);
+
+  if (isLoading && !isPolling) {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
         <LoadingPage />
+        <Footer />
+      </div>
+    );
+  }
+
+  // Show indexing state for newly created releases
+  if ((isPolling || pollingTimedOut) && !release) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex flex-1 items-center justify-center">
+          <div className="text-center">
+            {pollingTimedOut ? (
+              <>
+                <h1 className="text-xl font-light">Taking longer than expected</h1>
+                <p className="mt-2 text-sm text-zdrive-text-secondary">
+                  Your release was created but Zora&apos;s indexer is still processing it.
+                </p>
+                <a
+                  href={`https://basescan.org/address/${releaseAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-block text-sm underline hover:text-zdrive-text-secondary"
+                >
+                  View on Basescan &rarr;
+                </a>
+                <button
+                  onClick={() => {
+                    setPollingTimedOut(false);
+                    setIsPolling(true);
+                  }}
+                  className="mt-2 block mx-auto text-sm text-zdrive-text-muted hover:text-zdrive-text underline"
+                >
+                  Keep waiting
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="mx-auto mb-4 h-6 w-6 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
+                <h1 className="text-xl font-light">Indexing your release&hellip;</h1>
+                <p className="mt-2 text-sm text-zdrive-text-secondary">
+                  Your release was created successfully. Waiting for Zora to index it.
+                </p>
+              </>
+            )}
+          </div>
+        </main>
         <Footer />
       </div>
     );

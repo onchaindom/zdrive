@@ -167,7 +167,7 @@ export default function CreatePage() {
       );
 
       if (result.success && result.coinAddress) {
-        router.push(`/${address}/${result.coinAddress}`);
+        router.push(`/${address}/${result.coinAddress}?new=1`);
       } else {
         setError(result.error || 'Failed to create release');
       }
@@ -383,12 +383,6 @@ export default function CreatePage() {
           {/* Step: Confirm */}
           {step === 'confirm' && (
             <div className="mt-8 space-y-6">
-              {isWrongChain && (
-                <div className="border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
-                  Your wallet is on the wrong network. You&apos;ll be prompted to switch to Base when creating.
-                </div>
-              )}
-
               <div className="border border-zdrive-border bg-zdrive-surface p-6">
                 <h3 className="font-medium">Release Summary</h3>
 

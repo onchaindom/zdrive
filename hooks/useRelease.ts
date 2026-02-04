@@ -4,7 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchCoin, adaptCoinToRelease, type ParsedRelease } from '@/lib/zora/queries';
 import { addToIndex } from '@/lib/search/localIndex';
 
-export function useRelease(address: string) {
+interface UseReleaseOptions {
+  /** Polling interval in ms. Set to poll for newly created releases. */
+  refetchInterval?: number | false;
+}
+
+export function useRelease(address: string, options?: UseReleaseOptions) {
   return useQuery({
     queryKey: ['release', address],
     queryFn: async (): Promise<ParsedRelease | null> => {
@@ -26,5 +31,6 @@ export function useRelease(address: string) {
     enabled: !!address,
     retry: 2,
     staleTime: 30_000, // 30 seconds
+    refetchInterval: options?.refetchInterval,
   });
 }

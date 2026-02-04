@@ -41,8 +41,6 @@ export function CollectionPicker({
   const handleSelectExisting = (collection: ExistingCollection) => {
     setSelectedCollection(collection);
     onCollectionTitleChange(collection.title);
-    // Suggest next ordering index
-    onOrderingIndexChange(collection.maxOrderingIndex + 1);
   };
 
   // When switching to create mode, clear selection
@@ -134,7 +132,7 @@ export function CollectionPicker({
 
               {selectedCollection && (
                 <p className="text-xs text-zdrive-text-muted">
-                  Suggested position: #{selectedCollection.maxOrderingIndex + 1}
+                  {selectedCollection.releaseCount} release{selectedCollection.releaseCount !== 1 ? 's' : ''} in this collection
                 </p>
               )}
             </div>
@@ -156,29 +154,6 @@ export function CollectionPicker({
                 </p>
               )}
             </>
-          )}
-
-          {/* Ordering index (shown in both modes when collection is active) */}
-          {(selectedCollection || (mode === 'create' && collectionTitle)) && (
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                Position in Collection
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={orderingIndex ?? ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  onOrderingIndexChange(val ? parseInt(val, 10) : undefined);
-                }}
-                placeholder="e.g., 1"
-                className="w-24 border border-zdrive-border bg-zdrive-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zdrive-text focus:ring-offset-1"
-              />
-              <p className="mt-1 text-xs text-zdrive-text-muted">
-                Leave empty to append at the end
-              </p>
-            </div>
           )}
 
           {isLoading && (
