@@ -1,4 +1,4 @@
-import { createCoin } from "@zoralabs/coins-sdk";
+import { createCoin, type ContentCoinCurrency } from "@zoralabs/coins-sdk";
 import type { WalletClient, PublicClient } from "viem";
 import { SUPPORTED_CHAIN_ID, ZDRIVE_PLATFORM_REFERRER } from "@/lib/constants";
 import {
@@ -13,6 +13,9 @@ export interface CreateReleaseInput {
   description: string;
   symbol: string;
   creatorAddress: string;
+
+  // Coin pairing currency: "ETH" or "CREATOR_COIN_OR_ZORA"
+  currency?: ContentCoinCurrency;
 
   // Files to upload
   coverImage: File;
@@ -134,7 +137,7 @@ export async function createRelease(
           type: "RAW_URI" as const,
           uri: metadataResult.uri,
         },
-        currency: "ETH" as const,
+        currency: input.currency ?? "ETH",
         chainId: SUPPORTED_CHAIN_ID,
         platformReferrer: ZDRIVE_PLATFORM_REFERRER,
         payoutRecipientOverride: creatorAddress,
