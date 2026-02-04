@@ -373,6 +373,14 @@ All six phases of the initial build plus post-merge fixes are complete and merge
 * Removed STL viewer code, STLLoader import, and all STL/WebM/ZIP references across codebase
 * 90 tests passing, clean production build
 
+## Bucket 3: Trading Fixes + Creator Coin Pairing
+
+* **Quote failure resilience**: `useTradeQuote` now retries 2x with exponential backoff. Quote errors categorized into transient (retrying), quote_unavailable, and unknown. TradePanel shows contextual error messages with a manual Retry button. CTA disabled when no quote available.
+* **Post-creation seed buy**: After successful coin creation, users see a "Seed your coin" prompt offering a 0.0001 ETH buy via `tradeCoin` SDK. Fully skippable — Skip redirects to release page normally.
+* **Creator coin pairing**: `CreateReleaseInput` accepts `currency` field (`ETH` | `CREATOR_COIN_OR_ZORA`). New `CoinPairingPicker` component in Options step with radio toggle. Auto-defaults to creator coin when wallet has one (detected via `useCreatorProfile`). ETH always available as fallback. Shows zora.co link when no creator coin exists.
+* **Error categorization module**: New `lib/trade/quoteErrors.ts` with pattern-based error categorization for trade quote failures.
+* 114 tests passing across 9 test files, clean production build
+
 ---
 
 # Tech Stack
