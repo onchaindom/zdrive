@@ -4,9 +4,10 @@ import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
-import { LoadingPage, ErrorBoundary } from '@/components/ui';
+import { LoadingPage, ErrorBoundary, CollapsibleSection } from '@/components/ui';
 import { useRelease } from '@/hooks/useRelease';
 import { useCoin } from '@/hooks/useCoin';
+import { WidgetTabs } from '@/components/trade/WidgetTabs';
 import { useLicenseStatus } from '@/hooks/useLicenseStatus';
 import { PreviewRenderer, DownloadList } from '@/components/preview';
 import { CollectButton } from '@/components/trade/CollectButton';
@@ -167,8 +168,8 @@ function ReleasePageInner({ params }: ReleasePageProps) {
         <div className="mx-auto max-w-7xl px-4 py-8">
           {/* Two-column layout */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            {/* Main column: Preview + Attachments */}
-            <div className="lg:col-span-2">
+            {/* Main column: Preview + Collapsible sections */}
+            <div className="lg:col-span-2 space-y-6">
               {/* Preview area */}
               <ErrorBoundary>
                 <PreviewRenderer metadata={metadata} />
@@ -176,13 +177,63 @@ function ReleasePageInner({ params }: ReleasePageProps) {
 
               {/* Attachments */}
               {assets.length > 0 && (
-                <div className="mt-8">
-                  <DownloadList assets={assets} />
-                </div>
+                <DownloadList assets={assets} />
               )}
+
+              {/* Coin details collapsible section */}
+              <CollapsibleSection title="Coin Details" defaultOpen>
+                <dl className="space-y-2 text-sm">
+                  {contentType && (
+                    <div className="flex justify-between">
+                      <dt className="text-zdrive-text-muted">Content type</dt>
+                      <dd className="uppercase">{contentType}</dd>
+                    </div>
+                  )}
+                  {metadata.content?.mime && (
+                    <div className="flex justify-between">
+                      <dt className="text-zdrive-text-muted">MIME</dt>
+                      <dd className="font-mono text-xs">{metadata.content.mime}</dd>
+                    </div>
+                  )}
+                  {assets.length > 0 && (
+                    <div className="flex justify-between">
+                      <dt className="text-zdrive-text-muted">Attachments</dt>
+                      <dd>{assets.length} file{assets.length !== 1 ? 's' : ''}</dd>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <dt className="text-zdrive-text-muted">Contract</dt>
+                    <dd>
+                      <a
+                        href={`https://basescan.org/address/${releaseAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-xs hover:underline"
+                      >
+                        {truncateAddress(releaseAddress)}
+                      </a>
+                    </dd>
+                  </div>
+                  {release.createdAt && (
+                    <div className="flex justify-between">
+                      <dt className="text-zdrive-text-muted">Created</dt>
+                      <dd>{new Date(release.createdAt).toLocaleDateString()}</dd>
+                    </div>
+                  )}
+                </dl>
+              </CollapsibleSection>
+
+              {/* Holders & Activity collapsible section */}
+              <CollapsibleSection title="Holders & Activity">
+                <WidgetTabs
+                  coinAddress={releaseAddress}
+                  stats={coinStats ?? null}
+                  defaultTab="holders"
+                />
+              </CollapsibleSection>
             </div>
 
-            {/* Side panel */}
+            {/* Side panel: minimal */}
             <div className="space-y-6">
               {/* Title + Description */}
               <div>
@@ -220,6 +271,21 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                 variant="full"
               />
 
+              {/* Download button */}
+              {metadata.content?.uri && (
+                <a
+                  href={ipfsToHttp(metadata.content.uri)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center gap-2 border border-zdrive-border bg-zdrive-surface px-4 py-2.5 text-sm font-medium hover:bg-zdrive-bg transition-colors"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download
+                </a>
+              )}
+
               {/* License panel */}
               <div className="border border-zdrive-border bg-zdrive-surface p-4">
                 <h3 className="text-sm font-medium">License</h3>
@@ -256,14 +322,24 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                 )}
 
                 {license?.cbe?.textUrl && (
-                  <a
-                    href={ipfsToHttp(license.cbe.textUrl)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-block text-xs text-zdrive-text-muted hover:text-zdrive-text-secondary hover:underline"
-                  >
-                    Read full license text &rarr;
-                  </a>
+                  <div className="mt-2">
+                    <a
+                      href={ipfsToHttp(license.cbe.textUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-xs text-zdrive-text-muted hover:text-zdrive-text-secondary hover:underline"
+                    >
+                      Read full license text &rarr;
+                    </a>
+                    {license.cbe.textUrl.startsWith('ar://') && (
+                      <p className="mt-1 flex items-center gap-1 text-[10px] text-zdrive-text-muted">
+                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
+                        </svg>
+                        Stored on Arweave
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -314,50 +390,6 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                   </div>
                 </div>
               )}
-
-              {/* Release metadata */}
-              <div className="border border-zdrive-border bg-zdrive-surface p-4">
-                <h3 className="text-sm font-medium">Details</h3>
-                <dl className="mt-2 space-y-2 text-sm">
-                  {contentType && (
-                    <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">Content type</dt>
-                      <dd className="uppercase">{contentType}</dd>
-                    </div>
-                  )}
-                  {metadata.content?.mime && (
-                    <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">MIME</dt>
-                      <dd className="font-mono text-xs">{metadata.content.mime}</dd>
-                    </div>
-                  )}
-                  {assets.length > 0 && (
-                    <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">Attachments</dt>
-                      <dd>{assets.length} file{assets.length !== 1 ? 's' : ''}</dd>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <dt className="text-zdrive-text-muted">Contract</dt>
-                    <dd>
-                      <a
-                        href={`https://basescan.org/address/${releaseAddress}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-mono text-xs hover:underline"
-                      >
-                        {truncateAddress(releaseAddress)}
-                      </a>
-                    </dd>
-                  </div>
-                  {release.createdAt && (
-                    <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">Created</dt>
-                      <dd>{new Date(release.createdAt).toLocaleDateString()}</dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
             </div>
           </div>
         </div>

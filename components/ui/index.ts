@@ -5,3 +5,4 @@ export { Modal } from './Modal';
 export { LoadingSpinner, LoadingPage } from './LoadingSpinner';
 export { SearchBar } from './SearchBar';
 export { ErrorBoundary } from './ErrorBoundary';
+export { CollapsibleSection } from './CollapsibleSection';
