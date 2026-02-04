@@ -14,21 +14,22 @@ interface PDFViewerProps {
   className?: string;
 }
 
+const ZOOM_LEVELS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+const DEFAULT_ZOOM_INDEX = 2; // 1.0 = 100%
+
 export function PDFViewer({ uri, className }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [containerWidth, setContainerWidth] = useState<number>(600);
+  const [zoomIndex, setZoomIndex] = useState(DEFAULT_ZOOM_INDEX);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const fullscreenScrollRef = useRef<HTMLDivElement>(null);
-  const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-  const fullscreenPageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-
   const httpUrl = ipfsToHttp(uri);
+
+  const zoom = ZOOM_LEVELS[zoomIndex];
+  const pageWidth = (containerWidth - 48) * zoom; // 48px padding
 
   // Responsive width via ResizeObserver
   useEffect(() => {
@@ -48,46 +49,6 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
     return () => observer.disconnect();
   }, []);
 
-  // Scroll-based page tracking with IntersectionObserver
-  useEffect(() => {
-    if (numPages === 0) return;
-
-    const scrollContainer = isFullscreen
-      ? fullscreenScrollRef.current
-      : scrollContainerRef.current;
-    const refs = isFullscreen ? fullscreenPageRefs : pageRefs;
-
-    if (!scrollContainer) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find the most visible page
-        let maxRatio = 0;
-        let visiblePage = currentPage;
-        for (const entry of entries) {
-          const pageNum = Number(entry.target.getAttribute('data-page'));
-          if (entry.intersectionRatio > maxRatio) {
-            maxRatio = entry.intersectionRatio;
-            visiblePage = pageNum;
-          }
-        }
-        if (maxRatio > 0) {
-          setCurrentPage(visiblePage);
-        }
-      },
-      {
-        root: scrollContainer,
-        threshold: [0, 0.25, 0.5, 0.75, 1],
-      }
-    );
-
-    refs.current.forEach((el) => {
-      observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [numPages, isFullscreen, currentPage]);
-
   const onDocumentLoadSuccess = useCallback(
     ({ numPages }: { numPages: number }) => {
       setNumPages(numPages);
@@ -102,143 +63,130 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
     setIsLoading(false);
   }, []);
 
-  const setPageRef = useCallback(
-    (pageNum: number, el: HTMLDivElement | null, fullscreen: boolean) => {
-      const refs = fullscreen ? fullscreenPageRefs : pageRefs;
-      if (el) {
-        refs.current.set(pageNum, el);
-      } else {
-        refs.current.delete(pageNum);
-      }
-    },
-    []
-  );
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, numPages)));
+  };
 
-  const pages = Array.from({ length: numPages }, (_, i) => i + 1);
+  const zoomIn = () => {
+    setZoomIndex((i) => Math.min(i + 1, ZOOM_LEVELS.length - 1));
+  };
 
-  const renderPages = (width: number, fullscreen: boolean) => (
-    <Document
-      file={httpUrl}
-      onLoadSuccess={onDocumentLoadSuccess}
-      onLoadError={onDocumentLoadError}
-      loading=""
-    >
-      {pages.map((pageNum) => (
-        <div
-          key={pageNum}
-          ref={(el) => setPageRef(pageNum, el, fullscreen)}
-          data-page={pageNum}
-          className="mb-4 last:mb-0"
-        >
-          <Page
-            pageNumber={pageNum}
-            renderTextLayer={true}
-            renderAnnotationLayer={true}
-            className="mx-auto"
-            width={width}
-          />
-        </div>
-      ))}
-    </Document>
-  );
+  const zoomOut = () => {
+    setZoomIndex((i) => Math.max(i - 1, 0));
+  };
+
+  const resetZoom = () => {
+    setZoomIndex(DEFAULT_ZOOM_INDEX);
+  };
 
   return (
-    <>
-      <div ref={containerRef} className={className}>
-        {/* PDF Document - scrollable container with all pages */}
-        <div className="relative bg-zdrive-bg">
-          {isLoading && (
-            <div className="flex min-h-[400px] items-center justify-center">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
-            </div>
-          )}
+    <div ref={containerRef} className={className}>
+      <div className="relative bg-zdrive-bg">
+        {/* Loading state */}
+        {isLoading && (
+          <div className="flex min-h-[400px] items-center justify-center">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
+          </div>
+        )}
 
-          {error && (
-            <div className="flex min-h-[400px] items-center justify-center text-zdrive-text-secondary">
-              {error}
-            </div>
-          )}
+        {/* Error state */}
+        {error && (
+          <div className="flex min-h-[400px] items-center justify-center text-zdrive-text-secondary">
+            {error}
+          </div>
+        )}
 
-          {!error && (
-            <div
-              ref={scrollContainerRef}
-              className="max-h-[80vh] overflow-y-auto p-4"
+        {/* Single page view */}
+        {!error && (
+          <div className="flex items-center justify-center overflow-auto p-6" style={{ minHeight: '400px' }}>
+            <Document
+              file={httpUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
+              loading=""
             >
-              {renderPages(containerWidth - 32, false)}
-            </div>
-          )}
-        </div>
-
-        {/* Floating page indicator + fullscreen button */}
-        {numPages > 0 && (
-          <div className="flex items-center justify-between border-t border-zdrive-border bg-zdrive-surface px-4 py-2">
-            <span className="text-sm text-zdrive-text-secondary">
-              {currentPage} / {numPages}
-            </span>
-            <button
-              onClick={() => setIsFullscreen(true)}
-              className="flex items-center gap-1 text-sm text-zdrive-text-secondary hover:text-zdrive-text"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-              </svg>
-              Fullscreen
-            </button>
+              <Page
+                pageNumber={currentPage}
+                renderTextLayer={true}
+                renderAnnotationLayer={true}
+                width={pageWidth}
+                loading={
+                  <div className="flex min-h-[400px] items-center justify-center">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
+                  </div>
+                }
+              />
+            </Document>
           </div>
         )}
       </div>
 
-      {/* Fullscreen overlay */}
-      {isFullscreen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black/90">
-          {/* Fullscreen header */}
-          <div className="flex items-center justify-between bg-zdrive-surface px-4 py-2">
-            <span className="text-sm text-zdrive-text-secondary">
+      {/* Controls toolbar */}
+      {numPages > 0 && (
+        <div className="flex items-center justify-between border-t border-zdrive-border bg-zdrive-surface px-3 py-2">
+          {/* Page navigation */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30 disabled:hover:bg-transparent"
+              aria-label="Previous page"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <span className="min-w-[80px] text-center text-sm text-zdrive-text-secondary">
               {currentPage} / {numPages}
             </span>
+
             <button
-              onClick={() => setIsFullscreen(false)}
-              className="flex items-center gap-1 text-sm text-zdrive-text-secondary hover:text-zdrive-text"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage >= numPages}
+              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30 disabled:hover:bg-transparent"
+              aria-label="Next page"
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              Close
             </button>
           </div>
 
-          {/* Scrollable fullscreen content */}
-          <div
-            ref={fullscreenScrollRef}
-            className="flex-1 overflow-y-auto p-8"
-          >
-            <div className="mx-auto max-w-4xl">
-              <Document
-                file={httpUrl}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadError}
-                loading=""
-              >
-                {pages.map((pageNum) => (
-                  <div
-                    key={pageNum}
-                    ref={(el) => setPageRef(pageNum, el, true)}
-                    data-page={pageNum}
-                    className="mb-6 last:mb-0"
-                  >
-                    <Page
-                      pageNumber={pageNum}
-                      renderTextLayer={true}
-                      renderAnnotationLayer={true}
-                      className="mx-auto"
-                    />
-                  </div>
-                ))}
-              </Document>
-            </div>
+          {/* Zoom controls */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={zoomOut}
+              disabled={zoomIndex <= 0}
+              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30"
+              aria-label="Zoom out"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+              </svg>
+            </button>
+
+            <button
+              onClick={resetZoom}
+              className="min-w-[48px] rounded px-1 py-0.5 text-xs text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text"
+              title="Reset zoom"
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+
+            <button
+              onClick={zoomIn}
+              disabled={zoomIndex >= ZOOM_LEVELS.length - 1}
+              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30"
+              aria-label="Zoom in"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

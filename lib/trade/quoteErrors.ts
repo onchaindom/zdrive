@@ -42,6 +42,7 @@ const QUOTE_UNAVAILABLE_PATTERNS = [
   'invalid token',
   'cannot quote',
   'no pool',
+  'quote failed',
 ] as const;
 
 function extractMessage(error: unknown): string {
@@ -71,7 +72,7 @@ export function categorizeQuoteError(error: unknown): CategorizedQuoteError {
     if (msg.includes(pattern)) {
       return {
         category: 'quote_unavailable',
-        userMessage: 'Unable to get quote for this trade \u2014 try a different amount',
+        userMessage: 'Unable to get quote \u2014 the pool may still be initializing. Try again in a moment.',
         raw: error,
       };
     }

@@ -98,7 +98,6 @@ function renderByType(
       return (
         <VideoPlayer
           uri={uri}
-          posterUri={metadata.image}
           mime={mime}
           className={className}
         />

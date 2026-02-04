@@ -57,6 +57,23 @@ export function CoinPairingPicker({
           <input
             type="radio"
             name="currency"
+            value="ZORA"
+            checked={currency === 'ZORA'}
+            onChange={() => onCurrencyChange('ZORA')}
+            className="mt-0.5"
+          />
+          <div>
+            <span className="text-sm font-medium">Pair with ZORA</span>
+            <p className="mt-0.5 text-xs text-zdrive-text-muted">
+              Pair with the ZORA token. Trading flows through ZORA.
+            </p>
+          </div>
+        </label>
+
+        <label className="flex cursor-pointer items-start gap-3 rounded border border-zdrive-border p-3 transition-colors hover:bg-zdrive-bg">
+          <input
+            type="radio"
+            name="currency"
             value="ETH"
             checked={currency === 'ETH'}
             onChange={() => onCurrencyChange('ETH')}

@@ -329,7 +329,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                       rel="noopener noreferrer"
                       className="inline-block text-xs text-zdrive-text-muted hover:text-zdrive-text-secondary hover:underline"
                     >
-                      Read full license text &rarr;
+                      View license (PDF) &rarr;
                     </a>
                     {license.cbe.textUrl.startsWith('ar://') && (
                       <p className="mt-1 flex items-center gap-1 text-[10px] text-zdrive-text-muted">

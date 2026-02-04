@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { type Address, parseEther } from 'viem';
 import { tradeCoin } from '@zoralabs/coins-sdk';
 import { Button } from '@/components/ui';
@@ -8,6 +8,7 @@ import { useTradeWallet } from '@/hooks/useTradeWallet';
 import { ZDRIVE_PLATFORM_REFERRER } from '@/lib/constants';
 
 const SEED_BUY_AMOUNT = '0.0001'; // ETH
+const POOL_WARMUP_SECONDS = 15; // Wait for Zora to index the new coin
 
 interface SeedBuyPromptProps {
   coinAddress: string;
@@ -20,9 +21,21 @@ export function SeedBuyPrompt({ coinAddress, onComplete, onSkip }: SeedBuyPrompt
   const [isBuying, setIsBuying] = useState(false);
   const [buyError, setBuyError] = useState<string | null>(null);
   const [buySuccess, setBuySuccess] = useState(false);
+  const [countdown, setCountdown] = useState(POOL_WARMUP_SECONDS);
+
+  // Countdown timer — pool needs time to initialize after coin creation
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((c) => c - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const isReady = countdown <= 0;
 
   const handleSeedBuy = async () => {
-    if (!address) return;
+    if (!address || !isReady) return;
 
     setIsBuying(true);
     setBuyError(null);
@@ -40,6 +53,12 @@ export function SeedBuyPrompt({ coinAddress, onComplete, onSkip }: SeedBuyPrompt
         referrer: ZDRIVE_PLATFORM_REFERRER as Address,
       };
 
+      console.debug('[SeedBuy] Attempting trade with params:', {
+        coinAddress,
+        amount: SEED_BUY_AMOUNT,
+        sender: address,
+      });
+
       const receipt = await tradeCoin({
         tradeParameters,
         walletClient,
@@ -47,20 +66,42 @@ export function SeedBuyPrompt({ coinAddress, onComplete, onSkip }: SeedBuyPrompt
         account: address,
       });
 
+      console.debug('[SeedBuy] Transaction receipt:', receipt);
+
       if (receipt.status === 'success') {
         setBuySuccess(true);
-        // Short delay to show success message before redirect
         setTimeout(onComplete, 1500);
       } else {
-        setBuyError('Transaction reverted. You can skip and buy later from the release page.');
+        setBuyError(`Transaction reverted (status: ${receipt.status}). You can skip and buy later from the release page.`);
       }
     } catch (err) {
-      console.error('Seed buy error:', err);
-      const msg = err instanceof Error ? err.message : 'Unknown error';
+      console.error('[SeedBuy] Full error:', err);
+
+      // Extract the most useful error info
+      const errorObj = err as Record<string, unknown>;
+      let msg = '';
+
+      if (err instanceof Error) {
+        msg = err.message;
+        // Check for nested cause
+        if ('cause' in err && err.cause) {
+          console.error('[SeedBuy] Error cause:', err.cause);
+          msg += ` (cause: ${err.cause instanceof Error ? err.cause.message : String(err.cause)})`;
+        }
+      } else {
+        msg = String(err);
+      }
+
+      // Log any additional properties
+      if (errorObj.data) console.error('[SeedBuy] Error data:', errorObj.data);
+      if (errorObj.code) console.error('[SeedBuy] Error code:', errorObj.code);
+
       if (msg.toLowerCase().includes('user rejected') || msg.toLowerCase().includes('user denied')) {
         setBuyError('Transaction cancelled. You can try again or skip.');
+      } else if (msg.toLowerCase().includes('quote failed')) {
+        setBuyError('Quote failed — the trading pool may still be initializing. Try again in a moment, or skip and buy from the release page.');
       } else {
-        setBuyError(`Seed buy failed: ${msg.length > 80 ? msg.slice(0, 80) + '...' : msg}`);
+        setBuyError(msg.length > 200 ? msg.slice(0, 200) + '...' : msg);
       }
     } finally {
       setIsBuying(false);
@@ -85,6 +126,13 @@ export function SeedBuyPrompt({ coinAddress, onComplete, onSkip }: SeedBuyPrompt
           This is optional but recommended.
         </p>
 
+        {!isReady && (
+          <div className="mt-3 flex items-center gap-2 text-sm text-zdrive-text-muted">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
+            Pool initializing... {countdown}s
+          </div>
+        )}
+
         {buyError && (
           <div className="mt-3 border border-red-200 bg-red-50 p-3 text-sm text-red-600">
             {buyError}
@@ -100,10 +148,10 @@ export function SeedBuyPrompt({ coinAddress, onComplete, onSkip }: SeedBuyPrompt
         <div className="mt-4 flex gap-3">
           <Button
             onClick={handleSeedBuy}
-            disabled={isBuying || buySuccess}
+            disabled={isBuying || buySuccess || !isReady}
             isLoading={isBuying}
           >
-            {isBuying ? 'Buying...' : `Buy ${SEED_BUY_AMOUNT} ETH`}
+            {isBuying ? 'Buying...' : !isReady ? `Wait ${countdown}s...` : `Buy ${SEED_BUY_AMOUNT} ETH`}
           </Button>
           <Button
             variant="secondary"
