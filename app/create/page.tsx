@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import { createPublicClient, http, type PublicClient } from 'viem';
@@ -17,9 +17,13 @@ import {
 } from '@/components/create';
 import { ConnectButton } from '@/components/wallet/ConnectButton';
 import { createRelease, type UploadPhase } from '@/lib/zora/createRelease';
+import { SeedBuyPrompt } from '@/components/create/SeedBuyPrompt';
+import { CoinPairingPicker } from '@/components/create/CoinPairingPicker';
+import { useCreatorProfile } from '@/hooks/useCreator';
 import type { CBELicenseType, ZDriveExternalLink } from '@/types/zdrive';
+import type { ContentCoinCurrency } from '@zoralabs/coins-sdk';
 
-type CreateStep = 'details' | 'files' | 'options' | 'confirm';
+type CreateStep = 'details' | 'files' | 'options' | 'confirm' | 'seed-buy';
 
 // Cast needed: Base chain includes OP Stack 'deposit' transaction type which
 // is more specific than viem's default PublicClient generic. The Zora SDK
@@ -36,6 +40,9 @@ export default function CreatePage() {
 
   const isWalletReady = authenticated && !!address;
 
+  // Fetch creator profile to check for creator coin
+  const { data: creatorProfile } = useCreatorProfile(address ?? '');
+
   // Form state
   const [step, setStep] = useState<CreateStep>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,10 +53,25 @@ export default function CreatePage() {
     total: number;
   } | null>(null);
 
+  // Created coin info (for seed buy step)
+  const [createdCoinAddress, setCreatedCoinAddress] = useState<string | null>(null);
+
   // Release details
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
+
+  // Coin pairing currency
+  const [currency, setCurrency] = useState<ContentCoinCurrency>('ETH');
+  const [currencyInitialized, setCurrencyInitialized] = useState(false);
+
+  // Default to creator coin pairing when the profile loads and has a creator coin
+  useEffect(() => {
+    if (!currencyInitialized && creatorProfile?.creatorCoinAddress) {
+      setCurrency('CREATOR_COIN_OR_ZORA');
+      setCurrencyInitialized(true);
+    }
+  }, [creatorProfile, currencyInitialized]);
 
   // Files
   const [coverImage, setCoverImage] = useState<File | null>(null);
@@ -157,6 +179,7 @@ export default function CreatePage() {
                   : undefined,
               }
             : undefined,
+          currency,
           creatorAddress: address,
           onProgress: (phase, completed, total) => {
             setUploadProgress({ phase, completed, total });
@@ -167,7 +190,8 @@ export default function CreatePage() {
       );
 
       if (result.success && result.coinAddress) {
-        router.push(`/${address}/${result.coinAddress}?new=1`);
+        setCreatedCoinAddress(result.coinAddress);
+        setStep('seed-buy');
       } else {
         setError(result.error || 'Failed to create release');
       }
@@ -176,6 +200,12 @@ export default function CreatePage() {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSeedBuyComplete = () => {
+    if (address && createdCoinAddress) {
+      router.push(`/${address}/${createdCoinAddress}?new=1`);
     }
   };
 
@@ -212,21 +242,23 @@ export default function CreatePage() {
           </p>
 
           {/* Progress indicator */}
-          <div className="mt-8 flex gap-2">
-            {(['details', 'files', 'options', 'confirm'] as CreateStep[]).map(
-              (s, i) => (
-                <div
-                  key={s}
-                  className={`h-1 flex-1 ${
-                    i <=
-                    ['details', 'files', 'options', 'confirm'].indexOf(step)
-                      ? 'bg-zdrive-text'
-                      : 'bg-zdrive-border'
-                  }`}
-                />
-              )
-            )}
-          </div>
+          {step !== 'seed-buy' && (
+            <div className="mt-8 flex gap-2">
+              {(['details', 'files', 'options', 'confirm'] as const).map(
+                (s, i) => (
+                  <div
+                    key={s}
+                    className={`h-1 flex-1 ${
+                      i <=
+                      ['details', 'files', 'options', 'confirm'].indexOf(step)
+                        ? 'bg-zdrive-text'
+                        : 'bg-zdrive-border'
+                    }`}
+                  />
+                )
+              )}
+            </div>
+          )}
 
           {/* Error display */}
           {error && (
@@ -300,10 +332,8 @@ export default function CreatePage() {
                   'image/webp': ['.webp'],
                   'image/svg+xml': ['.svg'],
                   'video/mp4': ['.mp4'],
-                  'text/markdown': ['.md'],
-                  'text/plain': ['.txt'],
                 }}
-                hint="PDF, 3D model (GLB/GLTF), image, video, or text/markdown for the release viewer"
+                hint="PDF, 3D model (GLB/GLTF), image, or video for the release viewer"
               />
 
               <div className="border-t border-zdrive-border pt-6">
@@ -350,15 +380,24 @@ export default function CreatePage() {
           {/* Step: Options */}
           {step === 'options' && (
             <div className="mt-8 space-y-8">
-              <CollectionPicker
-                enabled={collectionEnabled}
-                onEnabledChange={setCollectionEnabled}
-                collectionTitle={collectionTitle}
-                onCollectionTitleChange={setCollectionTitle}
-                orderingIndex={orderingIndex}
-                onOrderingIndexChange={setOrderingIndex}
-                creatorAddress={address}
+              <CoinPairingPicker
+                currency={currency}
+                onCurrencyChange={setCurrency}
+                hasCreatorCoin={!!creatorProfile?.creatorCoinAddress}
+                creatorCoinSymbol={creatorProfile?.creatorCoinSymbol}
               />
+
+              <div className="border-t border-zdrive-border pt-6">
+                <CollectionPicker
+                  enabled={collectionEnabled}
+                  onEnabledChange={setCollectionEnabled}
+                  collectionTitle={collectionTitle}
+                  onCollectionTitleChange={setCollectionTitle}
+                  orderingIndex={orderingIndex}
+                  onOrderingIndexChange={setOrderingIndex}
+                  creatorAddress={address}
+                />
+              </div>
 
               <div className="border-t border-zdrive-border pt-6">
                 <LicensePicker
@@ -396,6 +435,14 @@ export default function CreatePage() {
                   <div className="flex justify-between">
                     <dt className="text-zdrive-text-secondary">Symbol</dt>
                     <dd>${symbol}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-zdrive-text-secondary">Pairing</dt>
+                    <dd>
+                      {currency === 'CREATOR_COIN_OR_ZORA'
+                        ? `Creator Coin${creatorProfile?.creatorCoinSymbol ? ` ($${creatorProfile.creatorCoinSymbol})` : ''}`
+                        : 'ETH'}
+                    </dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-zdrive-text-secondary">Cover Image</dt>
@@ -484,6 +531,15 @@ export default function CreatePage() {
                 </Button>
               </div>
             </div>
+          )}
+
+          {/* Step: Seed Buy */}
+          {step === 'seed-buy' && createdCoinAddress && (
+            <SeedBuyPrompt
+              coinAddress={createdCoinAddress}
+              onComplete={handleSeedBuyComplete}
+              onSkip={handleSeedBuyComplete}
+            />
           )}
         </div>
       </main>
