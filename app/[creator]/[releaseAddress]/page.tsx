@@ -9,7 +9,6 @@ import { useRelease } from '@/hooks/useRelease';
 import { useCoin } from '@/hooks/useCoin';
 import { useLicenseStatus } from '@/hooks/useLicenseStatus';
 import { PreviewRenderer, DownloadList } from '@/components/preview';
-import { CoinTradeWidget } from '@/components/trade/CoinTradeWidget';
 import { CollectButton } from '@/components/trade/CollectButton';
 import { truncateAddress, ipfsToHttp } from '@/lib/constants';
 import { getFileType } from '@/types/zdrive';
@@ -267,13 +266,6 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                   </a>
                 )}
               </div>
-
-              {/* Trade widget */}
-              <CoinTradeWidget
-                coinAddress={releaseAddress}
-                mode="full"
-                defaultTab="holders"
-              />
 
               {/* Collection context */}
               {collection && (
