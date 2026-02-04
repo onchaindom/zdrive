@@ -30,7 +30,14 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
     setMax,
   } = useTradeForm({ ethBalance, coinBalance });
 
-  const { data: quote, isLoading: quoteLoading } = useTradeQuote({
+  const {
+    quote,
+    isLoading: quoteLoading,
+    isFetching: quoteFetching,
+    isRetrying: quoteRetrying,
+    error: quoteError,
+    refetch: refetchQuote,
+  } = useTradeQuote({
     coinAddress,
     tradeType,
     amountIn,
@@ -139,8 +146,10 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
       {/* Quote Display */}
       {hasAmount && (
         <div className="mt-3 space-y-1 rounded bg-zdrive-bg p-2 text-xs">
-          {quoteLoading ? (
-            <p className="text-zdrive-text-muted">Fetching quote...</p>
+          {quoteLoading || quoteRetrying ? (
+            <p className="text-zdrive-text-muted">
+              {quoteRetrying ? 'Quote service temporarily unavailable \u2014 retrying...' : 'Fetching quote...'}
+            </p>
           ) : quote ? (
             <>
               <div className="flex justify-between">
@@ -152,6 +161,17 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
                 <span>{formatQuoteAmount(quote.minOut)}</span>
               </div>
             </>
+          ) : quoteError ? (
+            <div className="space-y-1.5">
+              <p className="text-red-500">{quoteError.userMessage}</p>
+              <button
+                onClick={refetchQuote}
+                disabled={quoteFetching}
+                className="rounded bg-zdrive-border px-2 py-1 text-xs text-zdrive-text-secondary hover:bg-zdrive-text-muted hover:text-white disabled:opacity-50"
+              >
+                {quoteFetching ? 'Retrying...' : 'Retry'}
+              </button>
+            </div>
           ) : (
             <p className="text-zdrive-text-muted">Unable to quote</p>
           )}
@@ -164,7 +184,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
       {/* CTA Button */}
       <button
         onClick={getCTAAction({ isConnected, isWrongChain, connect, switchToBase, handleTrade })}
-        disabled={getCTADisabled({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading, quoteLoading })}
+        disabled={getCTADisabled({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading, quoteLoading, hasQuote: !!quote })}
         className="mt-3 w-full rounded bg-zdrive-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-zdrive-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {getCTALabel({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading, tradeType, symbol: stats?.symbol, status })}
@@ -255,6 +275,7 @@ function getCTADisabled({
   hasSufficientBalance,
   tradeLoading,
   quoteLoading,
+  hasQuote,
 }: {
   isConnected: boolean;
   isWrongChain: boolean;
@@ -262,12 +283,14 @@ function getCTADisabled({
   hasSufficientBalance: boolean;
   tradeLoading: boolean;
   quoteLoading: boolean;
+  hasQuote: boolean;
 }): boolean {
   if (!isConnected || isWrongChain) return false;
   if (tradeLoading) return true;
   if (!hasAmount) return true;
   if (!hasSufficientBalance) return true;
   if (quoteLoading) return true;
+  if (hasAmount && !hasQuote) return true;
   return false;
 }
 
