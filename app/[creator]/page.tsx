@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePrivy } from '@privy-io/react-auth';
 import { Header, Footer } from '@/components/layout';
 import { ReleaseGrid, type ReleaseItem } from '@/components/release';
+import { ReleaseCard, ReleaseCardSkeleton } from '@/components/release/ReleaseCard';
 import { LoadingPage, Button } from '@/components/ui';
 import { useCreatorProfile, useCreatorReleases } from '@/hooks/useCreator';
 import { useHoldings } from '@/hooks/useHoldings';
@@ -14,6 +15,7 @@ import { getFileType } from '@/types/zdrive';
 import clsx from 'clsx';
 
 type FilterType = 'all' | 'pdf' | '3d' | 'image' | 'video' | 'github' | 'other';
+type ViewMode = 'all' | 'by-collection';
 
 interface CreatorPageProps {
   params: {
@@ -26,10 +28,11 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   const { user } = usePrivy();
   const viewerAddress = user?.wallet?.address;
   const [filter, setFilter] = useState<FilterType>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('all');
 
   const { data: profile, isLoading: profileLoading } =
     useCreatorProfile(creatorAddress);
-  const { data: releases, isLoading: releasesLoading } =
+  const { data: releases, isLoading: releasesLoading, pendingCount, totalCount } =
     useCreatorReleases(creatorAddress);
   const { holdingPercentage, isHolder } = useHoldings(
     profile?.creatorCoinAddress
@@ -95,6 +98,64 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
     return Array.from(collectionMap.values());
   }, [releases]);
+
+  // Group releases by collection for "By Collection" view
+  const groupedReleases = useMemo(() => {
+    if (!filteredReleases.length) return [];
+
+    const groups = new Map<string, { title: string; items: ReleaseItem[] }>();
+    const uncollected: ReleaseItem[] = [];
+
+    for (const release of filteredReleases) {
+      const collection = release.metadata.properties.zdrive.collection;
+      const item: ReleaseItem = {
+        address: release.coinAddress,
+        metadata: release.metadata,
+        creatorAddress: release.creatorAddress,
+        creatorName: profile?.displayName,
+      };
+
+      if (collection?.id) {
+        const existing = groups.get(collection.id);
+        if (existing) {
+          existing.items.push(item);
+        } else {
+          groups.set(collection.id, {
+            title: collection.title,
+            items: [item],
+          });
+        }
+      } else {
+        uncollected.push(item);
+      }
+    }
+
+    // Sort items within each group by created date (newest first)
+    const sortByDate = (a: ReleaseItem, b: ReleaseItem) => {
+      const releaseA = filteredReleases.find((r) => r.coinAddress === a.address);
+      const releaseB = filteredReleases.find((r) => r.coinAddress === b.address);
+      const dateA = releaseA?.createdAt ? new Date(releaseA.createdAt).getTime() : 0;
+      const dateB = releaseB?.createdAt ? new Date(releaseB.createdAt).getTime() : 0;
+      return dateB - dateA;
+    };
+
+    const result: { id: string; title: string; items: ReleaseItem[] }[] = [];
+    for (const [id, group] of groups) {
+      group.items.sort(sortByDate);
+      result.push({ id, title: group.title, items: group.items });
+    }
+
+    // Sort groups alphabetically by title
+    result.sort((a, b) => a.title.localeCompare(b.title));
+
+    // Add uncollected at the bottom
+    if (uncollected.length > 0) {
+      uncollected.sort(sortByDate);
+      result.push({ id: '__uncollected__', title: 'Uncollected', items: uncollected });
+    }
+
+    return result;
+  }, [filteredReleases, profile?.displayName]);
 
   if (profileLoading) {
     return (
@@ -192,44 +253,135 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             </div>
           )}
 
-          {/* Filters */}
-          <div className="mb-6 flex gap-2">
-            {(
-              [
-                { id: 'all', label: 'All' },
-                { id: 'pdf', label: 'PDF' },
-                { id: '3d', label: '3D' },
-                { id: 'image', label: 'Image' },
-                { id: 'video', label: 'Video' },
-                { id: 'github', label: 'GitHub' },
-                { id: 'other', label: 'Other' },
-              ] as { id: FilterType; label: string }[]
-            ).map((f) => (
+          {/* View Toggle + Filters */}
+          <div className="mb-6 flex flex-wrap items-center gap-4">
+            {/* View mode toggle */}
+            <div className="flex border border-zdrive-border">
               <button
-                key={f.id}
-                onClick={() => setFilter(f.id)}
+                onClick={() => setViewMode('all')}
                 className={clsx(
                   'px-3 py-1.5 text-sm transition-colors',
-                  filter === f.id
+                  viewMode === 'all'
                     ? 'bg-zdrive-text text-white'
-                    : 'border border-zdrive-border hover:border-zdrive-border-hover'
+                    : 'hover:bg-zdrive-bg'
                 )}
               >
-                {f.label}
+                All
               </button>
-            ))}
+              <button
+                onClick={() => setViewMode('by-collection')}
+                className={clsx(
+                  'px-3 py-1.5 text-sm transition-colors border-l border-zdrive-border',
+                  viewMode === 'by-collection'
+                    ? 'bg-zdrive-text text-white'
+                    : 'hover:bg-zdrive-bg'
+                )}
+              >
+                By Collection
+              </button>
+            </div>
+
+            {/* Type filters */}
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  { id: 'all', label: 'All' },
+                  { id: 'pdf', label: 'PDF' },
+                  { id: '3d', label: '3D' },
+                  { id: 'image', label: 'Image' },
+                  { id: 'video', label: 'Video' },
+                  { id: 'github', label: 'GitHub' },
+                  { id: 'other', label: 'Other' },
+                ] as { id: FilterType; label: string }[]
+              ).map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setFilter(f.id)}
+                  className={clsx(
+                    'px-3 py-1.5 text-sm transition-colors',
+                    filter === f.id
+                      ? 'bg-zdrive-text text-white'
+                      : 'border border-zdrive-border hover:border-zdrive-border-hover'
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Releases */}
-          <ReleaseGrid
-            releases={releaseItems}
-            isLoading={releasesLoading}
-            emptyMessage={
-              isOwnProfile
-                ? 'You haven\'t created any releases yet.'
-                : 'This creator hasn\'t published any releases yet.'
-            }
-          />
+          {releasesLoading ? (
+            <ReleaseGrid
+              releases={[]}
+              isLoading={true}
+            />
+          ) : viewMode === 'by-collection' ? (
+            // Grouped by collection view
+            <div className="space-y-8">
+              {groupedReleases.map((group) => (
+                <section key={group.id}>
+                  <h3 className="mb-4 text-lg font-medium text-zdrive-text">
+                    {group.title}
+                    <span className="ml-2 text-sm font-normal text-zdrive-text-muted">
+                      ({group.items.length})
+                    </span>
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                    {group.items.map((release) => (
+                      <ReleaseCard
+                        key={release.address}
+                        address={release.address}
+                        metadata={release.metadata}
+                        creatorAddress={release.creatorAddress}
+                        creatorName={release.creatorName}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+              {/* Skeleton cards for pending metadata */}
+              {pendingCount > 0 && (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {Array.from({ length: pendingCount }).map((_, i) => (
+                    <ReleaseCardSkeleton key={`skeleton-${i}`} />
+                  ))}
+                </div>
+              )}
+              {groupedReleases.length === 0 && pendingCount === 0 && (
+                <div className="flex min-h-[200px] items-center justify-center text-zdrive-text-secondary">
+                  {isOwnProfile
+                    ? "You haven't created any releases yet."
+                    : "This creator hasn't published any releases yet."}
+                </div>
+              )}
+            </div>
+          ) : (
+            // Flat grid view (default)
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {releaseItems.map((release) => (
+                <ReleaseCard
+                  key={release.address}
+                  address={release.address}
+                  metadata={release.metadata}
+                  creatorAddress={release.creatorAddress}
+                  creatorName={release.creatorName}
+                />
+              ))}
+              {/* Skeleton cards for coins still loading metadata */}
+              {pendingCount > 0 &&
+                Array.from({ length: pendingCount }).map((_, i) => (
+                  <ReleaseCardSkeleton key={`skeleton-${i}`} />
+                ))}
+              {releaseItems.length === 0 && pendingCount === 0 && (
+                <div className="col-span-full flex min-h-[200px] items-center justify-center text-zdrive-text-secondary">
+                  {isOwnProfile
+                    ? "You haven't created any releases yet."
+                    : "This creator hasn't published any releases yet."}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
 

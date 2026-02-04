@@ -7,6 +7,7 @@ import { ipfsToHttp } from '@/lib/constants';
 import { ImageViewer } from './ImageViewer';
 import { VideoPlayer } from './VideoPlayer';
 import { GitHubPreview } from './GitHubPreview';
+import { MarkdownViewer } from './MarkdownViewer';
 
 // Dynamic imports for heavy components (no SSR)
 const PDFViewer = dynamic(() => import('./PDFViewer').then((m) => ({ default: m.PDFViewer })), {
@@ -102,6 +103,9 @@ function renderByType(
           className={className}
         />
       );
+
+    case 'markdown':
+      return <MarkdownViewer uri={uri} className={className} />;
 
     default:
       // For unrecognized types, fall back to cover image

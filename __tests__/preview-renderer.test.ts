@@ -49,6 +49,14 @@ describe('PreviewRenderer routing logic', () => {
       expect(getFileType('video/mp4')).toBe('video');
     });
 
+    it('routes text/markdown to MarkdownViewer', () => {
+      expect(getFileType('text/markdown')).toBe('markdown');
+    });
+
+    it('routes text/plain to MarkdownViewer', () => {
+      expect(getFileType('text/plain')).toBe('markdown');
+    });
+
     it('routes unsupported video to fallback', () => {
       expect(getFileType('video/webm')).toBe('other');
     });
@@ -99,6 +107,14 @@ describe('PreviewRenderer routing logic', () => {
       // Preview should use content.uri (full image), not image (cover thumbnail)
       expect(meta.content!.uri).not.toBe(meta.image);
       expect(getFileType(meta.content!.mime)).toBe('image');
+    });
+
+    it('markdown release uses content for preview', () => {
+      const meta = makeMetadata({
+        content: { mime: 'text/markdown', uri: 'ipfs://QmReadme' },
+      });
+      expect(meta.content).toBeDefined();
+      expect(getFileType(meta.content!.mime)).toBe('markdown');
     });
 
     it('video release has poster from cover image', () => {
