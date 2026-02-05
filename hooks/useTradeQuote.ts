@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { type Address, parseEther, parseUnits } from 'viem';
 import { createTradeCall } from '@zoralabs/coins-sdk';
-import { ZDRIVE_PLATFORM_REFERRER } from '@/lib/constants';
 import { categorizeQuoteError, type CategorizedQuoteError } from '@/lib/trade/quoteErrors';
 
 interface TradeQuoteParams {
@@ -62,7 +61,6 @@ export function useTradeQuote({
         amountIn: parsedAmount,
         slippage,
         sender: sender as Address,
-        referrer: ZDRIVE_PLATFORM_REFERRER as Address,
       };
 
       console.debug('[useTradeQuote] request:', {

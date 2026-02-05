@@ -5,7 +5,6 @@ import { type Address, parseEther } from 'viem';
 import { tradeCoin } from '@zoralabs/coins-sdk';
 import { Button } from '@/components/ui';
 import { useTradeWallet } from '@/hooks/useTradeWallet';
-import { ZDRIVE_PLATFORM_REFERRER } from '@/lib/constants';
 
 const SEED_BUY_AMOUNT = '0.0001'; // ETH
 const POOL_WARMUP_SECONDS = 15; // Wait for Zora to index the new coin
@@ -50,7 +49,6 @@ export function SeedBuyPrompt({ coinAddress, onComplete, onSkip }: SeedBuyPrompt
         amountIn: parseEther(SEED_BUY_AMOUNT),
         slippage: 0.05, // 5% slippage for small initial buy
         sender: address,
-        referrer: ZDRIVE_PLATFORM_REFERRER as Address,
       };
 
       console.debug('[SeedBuy] Attempting trade with params:', {

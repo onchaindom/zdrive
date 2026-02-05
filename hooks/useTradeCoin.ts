@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type Address, type Hash, parseEther, parseUnits } from 'viem';
 import { tradeCoin } from '@zoralabs/coins-sdk';
 import { useTradeWallet } from './useTradeWallet';
-import { SUPPORTED_CHAIN_ID, ZDRIVE_PLATFORM_REFERRER } from '@/lib/constants';
+import { SUPPORTED_CHAIN_ID } from '@/lib/constants';
 
 export type TradeStatus = 'idle' | 'confirming' | 'submitted' | 'confirmed' | 'failed';
 
@@ -55,7 +55,6 @@ export function useTradeCoin() {
         amountIn: parsedAmount,
         slippage: params.slippage,
         sender: address,
-        referrer: ZDRIVE_PLATFORM_REFERRER as Address,
       };
 
       const walletClient = await getWalletClient();
