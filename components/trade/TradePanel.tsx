@@ -2,7 +2,6 @@
 
 import { useTradeWallet } from '@/hooks/useTradeWallet';
 import { useTradeBalance } from '@/hooks/useTradeBalance';
-import { useTradeQuote } from '@/hooks/useTradeQuote';
 import { useTradeForm } from '@/hooks/useTradeForm';
 import { useTradeCoin, type TradeStatus } from '@/hooks/useTradeCoin';
 import { SlippageControl } from './SlippageControl';
@@ -29,21 +28,6 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
     setPreset,
     setMax,
   } = useTradeForm({ ethBalance, coinBalance });
-
-  const {
-    quote,
-    isLoading: quoteLoading,
-    isFetching: quoteFetching,
-    isRetrying: quoteRetrying,
-    error: quoteError,
-    refetch: refetchQuote,
-  } = useTradeQuote({
-    coinAddress,
-    tradeType,
-    amountIn,
-    slippage,
-    sender: address,
-  });
 
   const { execute, reset, status, txHash, isLoading: tradeLoading, error } = useTradeCoin();
 
@@ -143,48 +127,13 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
         </button>
       </div>
 
-      {/* Quote Display */}
-      {hasAmount && (
-        <div className="mt-3 space-y-1 rounded bg-zdrive-bg p-2 text-xs">
-          {quoteLoading || quoteRetrying ? (
-            <p className="text-zdrive-text-muted">
-              {quoteRetrying ? 'Quote service temporarily unavailable \u2014 retrying...' : 'Fetching quote...'}
-            </p>
-          ) : quote ? (
-            <>
-              <div className="flex justify-between">
-                <span className="text-zdrive-text-muted">Est. receive</span>
-                <span>{formatQuoteAmount(quote.estimatedOut)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zdrive-text-muted">Min. receive</span>
-                <span>{formatQuoteAmount(quote.minOut)}</span>
-              </div>
-            </>
-          ) : quoteError ? (
-            <div className="space-y-1.5">
-              <p className="text-red-500">{quoteError.userMessage}</p>
-              <button
-                onClick={refetchQuote}
-                disabled={quoteFetching}
-                className="rounded bg-zdrive-border px-2 py-1 text-xs text-zdrive-text-secondary hover:bg-zdrive-text-muted hover:text-white disabled:opacity-50"
-              >
-                {quoteFetching ? 'Retrying...' : 'Retry'}
-              </button>
-            </div>
-          ) : (
-            <p className="text-zdrive-text-muted">Unable to quote</p>
-          )}
-        </div>
-      )}
-
       {/* Slippage Control */}
       <SlippageControl slippage={slippage} onSlippageChange={setSlippage} />
 
       {/* CTA Button */}
       <button
         onClick={getCTAAction({ isConnected, isWrongChain, connect, switchToBase, handleTrade })}
-        disabled={getCTADisabled({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading, quoteLoading, hasQuote: !!quote })}
+        disabled={getCTADisabled({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading })}
         className="mt-3 w-full rounded bg-zdrive-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-zdrive-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {getCTALabel({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading, tradeType, symbol: stats?.symbol, status })}
@@ -274,31 +223,17 @@ function getCTADisabled({
   hasAmount,
   hasSufficientBalance,
   tradeLoading,
-  quoteLoading,
-  hasQuote,
 }: {
   isConnected: boolean;
   isWrongChain: boolean;
   hasAmount: boolean;
   hasSufficientBalance: boolean;
   tradeLoading: boolean;
-  quoteLoading: boolean;
-  hasQuote: boolean;
 }): boolean {
   if (!isConnected || isWrongChain) return false;
   if (tradeLoading) return true;
   if (!hasAmount) return true;
   if (!hasSufficientBalance) return true;
-  if (quoteLoading) return true;
-  if (hasAmount && !hasQuote) return true;
   return false;
 }
 
-function formatQuoteAmount(amount: string): string {
-  const num = parseFloat(amount);
-  if (isNaN(num) || num === 0) return '0';
-  if (num < 0.0001) return '<0.0001';
-  if (num < 1) return num.toFixed(6);
-  if (num < 1000) return num.toFixed(4);
-  return num.toFixed(2);
-}

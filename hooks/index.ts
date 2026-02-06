@@ -6,6 +6,5 @@ export { useHoldings } from './useHoldings';
 export { useCoin, useCoinHolders, useCoinSwaps } from './useCoin';
 export { useTradeWallet } from './useTradeWallet';
 export { useTradeBalance } from './useTradeBalance';
-export { useTradeQuote, type TradeQuote, type TradeQuoteResult } from './useTradeQuote';
 export { useTradeForm } from './useTradeForm';
 export { useTradeCoin } from './useTradeCoin';
