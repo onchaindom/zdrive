@@ -61,8 +61,8 @@ export default function CreatePage() {
   const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
 
-  // Coin pairing currency
-  const [currency, setCurrency] = useState<ContentCoinCurrency>('ETH');
+  // Coin pairing currency (default to ZORA, which works with the SDK's tradeCoin)
+  const [currency, setCurrency] = useState<ContentCoinCurrency>('ZORA');
   const [currencyInitialized, setCurrencyInitialized] = useState(false);
 
   // Default to creator coin pairing when the profile loads and has a creator coin
