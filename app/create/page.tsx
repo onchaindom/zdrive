@@ -17,13 +17,12 @@ import {
 } from '@/components/create';
 import { ConnectButton } from '@/components/wallet/ConnectButton';
 import { createRelease, type UploadPhase } from '@/lib/zora/createRelease';
-import { SeedBuyPrompt } from '@/components/create/SeedBuyPrompt';
 import { CoinPairingPicker } from '@/components/create/CoinPairingPicker';
 import { useCreatorProfile } from '@/hooks/useCreator';
 import type { CBELicenseType, ZDriveExternalLink } from '@/types/zdrive';
 import type { ContentCoinCurrency } from '@zoralabs/coins-sdk';
 
-type CreateStep = 'details' | 'files' | 'options' | 'confirm' | 'seed-buy';
+type CreateStep = 'details' | 'files' | 'options' | 'confirm';
 
 // Cast needed: Base chain includes OP Stack 'deposit' transaction type which
 // is more specific than viem's default PublicClient generic. The Zora SDK
@@ -52,9 +51,6 @@ export default function CreatePage() {
     completed: number;
     total: number;
   } | null>(null);
-
-  // Created coin info (for seed buy step)
-  const [createdCoinAddress, setCreatedCoinAddress] = useState<string | null>(null);
 
   // Release details
   const [name, setName] = useState('');
@@ -190,8 +186,8 @@ export default function CreatePage() {
       );
 
       if (result.success && result.coinAddress) {
-        setCreatedCoinAddress(result.coinAddress);
-        setStep('seed-buy');
+        // Redirect directly to the release page
+        router.push(`/${address}/${result.coinAddress}?new=1`);
       } else {
         setError(result.error || 'Failed to create release');
       }
@@ -200,12 +196,6 @@ export default function CreatePage() {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleSeedBuyComplete = () => {
-    if (address && createdCoinAddress) {
-      router.push(`/${address}/${createdCoinAddress}?new=1`);
     }
   };
 
@@ -242,23 +232,21 @@ export default function CreatePage() {
           </p>
 
           {/* Progress indicator */}
-          {step !== 'seed-buy' && (
-            <div className="mt-8 flex gap-2">
-              {(['details', 'files', 'options', 'confirm'] as const).map(
-                (s, i) => (
-                  <div
-                    key={s}
-                    className={`h-1 flex-1 ${
-                      i <=
-                      ['details', 'files', 'options', 'confirm'].indexOf(step)
-                        ? 'bg-zdrive-text'
-                        : 'bg-zdrive-border'
-                    }`}
-                  />
-                )
-              )}
-            </div>
-          )}
+          <div className="mt-8 flex gap-2">
+            {(['details', 'files', 'options', 'confirm'] as const).map(
+              (s, i) => (
+                <div
+                  key={s}
+                  className={`h-1 flex-1 ${
+                    i <=
+                    ['details', 'files', 'options', 'confirm'].indexOf(step)
+                      ? 'bg-zdrive-text'
+                      : 'bg-zdrive-border'
+                  }`}
+                />
+              )
+            )}
+          </div>
 
           {/* Error display */}
           {error && (
@@ -533,15 +521,6 @@ export default function CreatePage() {
                 </Button>
               </div>
             </div>
-          )}
-
-          {/* Step: Seed Buy */}
-          {step === 'seed-buy' && createdCoinAddress && (
-            <SeedBuyPrompt
-              coinAddress={createdCoinAddress}
-              onComplete={handleSeedBuyComplete}
-              onSkip={handleSeedBuyComplete}
-            />
           )}
         </div>
       </main>
