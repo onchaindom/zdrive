@@ -178,6 +178,12 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 * **Server-side MIME sniffing**: Zora ignores client-sent MIME types and detects format from raw bytes. `ensureCorrectMime()` still needed for GLB/GLTF because browsers assign `application/octet-stream` to these, and the multipart form boundary needs a recognizable MIME.
 * **IPFS gateway**: `magic.decentralized-content.com` (Zora's gateway, CORS-friendly for binary files like GLB).
 
+### Why Zora-only (not Pinata)?
+
+Zora's uploader is free but does server-side magic-byte validation, rejecting files it can't identify (STL, binary PLY, SPLAT, ZIP, etc.). Pinata accepts any bytes but costs ~$20+/month.
+
+**MVP decision**: Stay with free Zora uploader. The supported formats (images, video, PDF, GLB/GLTF, ASCII PLY) cover most creator use cases. If user demand for exotic formats (STL, binary point clouds) is validated, add Pinata as a fallback — catch Zora's 400 errors and retry with Pinata.
+
 ---
 
 # Core Pages
