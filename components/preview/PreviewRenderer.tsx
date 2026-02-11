@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { getFileType, type ZDriveMetadata, type FileType } from '@/types/zdrive';
+import { getFileType, getFilenameFromUri, type ZDriveMetadata, type FileType } from '@/types/zdrive';
 import { ipfsToHttp } from '@/lib/constants';
 import { ImageViewer } from './ImageViewer';
 import { VideoPlayer } from './VideoPlayer';
@@ -52,7 +52,8 @@ export function PreviewRenderer({ metadata, className }: PreviewRendererProps) {
 
   // 1. If there's a content file, determine viewer by type
   if (content?.uri && content?.mime) {
-    const fileType = getFileType(content.mime);
+    const filename = getFilenameFromUri(content.uri);
+    const fileType = getFileType(content.mime, filename);
     return renderByType(fileType, content.uri, content.mime, metadata, className);
   }
 
