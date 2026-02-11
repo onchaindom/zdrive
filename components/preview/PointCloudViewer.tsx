@@ -1,5 +1,8 @@
 'use client';
 
+// Polyfill for Promise.withResolvers (Node < 22)
+import '@/lib/polyfills';
+
 import { Component, Suspense, useRef, type ReactNode } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Center } from '@react-three/drei';

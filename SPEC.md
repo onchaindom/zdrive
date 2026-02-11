@@ -77,10 +77,11 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 
 ### Optional but recommended
 
-* `content` for the primary preview target file (image/video/PDF/GLB/GLTF), when applicable:
+* `content` for the primary preview target file (image/video/PDF/GLB/GLTF/PLY), when applicable:
 
   * `content.mime`
   * `content.uri`
+  * `content.name` (original filename — used for extension-based type detection when MIME is unreliable)
 * `properties.zdrive.release.assets[]` for attachments (any file types)
 * `properties.zdrive.release.external[]` for offsite sources (GitHub, etc.)
 * `properties.zdrive.collection` for grouping + ordering
@@ -93,7 +94,7 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
   "name": "Tyrolean Chair Studies #12",
   "description": "Ongoing release series…",
   "image": "ipfs://<cover>",
-  "content": { "mime": "model/gltf-binary", "uri": "ipfs://<glb-file>" },
+  "content": { "mime": "model/gltf-binary", "uri": "ipfs://<glb-file>", "name": "model.glb" },
 
   "properties": {
     "zdrive": {
@@ -156,7 +157,8 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 * **Images**: JPG, PNG, GIF, WebP, SVG — full-size viewer with zoom.
 * **Video**: MP4 — native HTML5 video player.
 * **PDF**: embedded viewer.
-* **3D**: GLB/GLTF — three.js viewer with orbit controls + error boundary.
+* **3D Models**: GLB/GLTF — three.js viewer with orbit controls + error boundary.
+* **Point Clouds**: PLY (ASCII format only) — three.js point cloud viewer with orbit controls.
 * **GitHub**: render README + show repo/ref metadata (external link model).
 
 ## Dropped from MVP (Zora IPFS rejects these)
@@ -164,6 +166,7 @@ Use standard token metadata fields for display + preview, and store Z:Drive-spec
 * **STL**: Zora's IPFS endpoint does server-side magic-byte sniffing; binary STL has no recognizable magic bytes → rejected as `application/octet-stream`. Use GLB/GLTF instead.
 * **WebM**: Failed empirical upload test against live Zora endpoint.
 * **ZIP**: Explicitly blocked by Zora's IPFS endpoint even when correctly detected.
+* **Binary PLY / SPLAT**: Zora rejects binary point cloud formats. Only ASCII PLY (detected as `text/plain`) is accepted.
 
 ## Download-only
 
@@ -380,6 +383,17 @@ All six phases of the initial build plus post-merge fixes are complete and merge
 * **Creator coin pairing**: `CreateReleaseInput` accepts `currency` field (`ETH` | `CREATOR_COIN_OR_ZORA`). New `CoinPairingPicker` component in Options step with radio toggle. Auto-defaults to creator coin when wallet has one (detected via `useCreatorProfile`). ETH always available as fallback. Shows zora.co link when no creator coin exists.
 * **Error categorization module**: New `lib/trade/quoteErrors.ts` with pattern-based error categorization for trade quote failures.
 * 114 tests passing across 9 test files, clean production build
+
+## PLY Point Cloud Support ✅
+
+* **PointCloudViewer component**: New `components/preview/PointCloudViewer.tsx` using Three.js PLYLoader for ASCII PLY files
+* **Empirical testing**: Binary PLY and SPLAT formats rejected by Zora; only ASCII PLY (detected as `text/plain`) works
+* **Filename-based routing**: Added `content.name` field to metadata schema to store original filename for extension-based type detection
+* **MIME fallback chain**: Fixed empty string MIME handling — Zora uploader returns `""` not `undefined`, so changed from `??` to `||` in fallback chain
+* **PreviewRenderer fix**: Now routes by filename extension when MIME is empty/missing
+* **Promise.withResolvers polyfill**: Added for Node 20 compatibility (Three.js 0.169+ requires Node 22 API)
+* Files modified: `createRelease.ts`, `metadata.ts`, `PreviewRenderer.tsx`, `zdrive.ts`, `zoraUploader.ts`, `instrumentation.ts`, `polyfills.ts`
+* 109 tests passing, clean production build
 
 ---
 

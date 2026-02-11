@@ -63,8 +63,13 @@ leverage git heavily. for every large task (like features, bugfixes, refactors),
 ## Upload & File Types
 - **Zora-only uploads**: All file uploads go through Zora's native IPFS uploader. No Pinata.
 - **Empirically verify** any new file type against the live Zora endpoint before adding support. Zora does server-side magic-byte sniffing and ignores client MIME headers.
-- **Supported types**: PNG, JPEG, GIF, WebP, SVG, MP4, PDF, GLB, GLTF, JSON, text, HTML.
-- **Rejected types** (do not add back without Pinata fallback): STL, WebM, ZIP.
+- **Supported types**: PNG, JPEG, GIF, WebP, SVG, MP4, PDF, GLB, GLTF, JSON, text, HTML, PLY (ASCII only).
+- **Rejected types** (do not add back without Pinata fallback): STL, WebM, ZIP, binary PLY, SPLAT.
+
+## MIME Type Handling
+- Zora's uploader may return empty string `""` for MIME type (not `undefined`). Always use truthy checks (`||`) not nullish coalescing (`??`) when falling back.
+- Store original filename in `content.name` for extension-based type detection when MIME is unreliable.
+- PreviewRenderer routes by filename extension when MIME is empty/missing.
 
 ## Testing for Production
 - Dev server is very slow due to Privy (321MB) and Three.js (29MB). Always use `npm run build && npx next start` for manual testing.

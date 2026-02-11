@@ -7,6 +7,31 @@ import {
 } from "./metadata";
 import { ZoraUploadService } from "@/lib/uploads/zoraUploader";
 
+/**
+ * Get MIME type from filename extension.
+ * Used as fallback when uploader doesn't return a MIME type.
+ */
+function getMimeFromFilename(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase();
+  const mimeMap: Record<string, string> = {
+    'ply': 'text/plain',
+    'pdf': 'application/pdf',
+    'glb': 'model/gltf-binary',
+    'gltf': 'model/gltf+json',
+    'mp4': 'video/mp4',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'webp': 'image/webp',
+    'svg': 'image/svg+xml',
+    'json': 'application/json',
+    'md': 'text/markdown',
+    'txt': 'text/plain',
+  };
+  return mimeMap[ext ?? ''] ?? 'application/octet-stream';
+}
+
 export interface CreateReleaseInput {
   // Release details
   name: string;
@@ -76,9 +101,11 @@ export async function createRelease(
     if (input.previewFile) {
       input.onProgress?.("preview", 0, 1);
       const previewResult = await uploadService.uploadFile(input.previewFile);
+      // Use returned MIME, fall back to browser type, fall back to extension-based lookup
+      const mime = previewResult.mimeType || input.previewFile.type || getMimeFromFilename(input.previewFile.name);
       previewFileData = {
         uri: previewResult.uri,
-        mime: previewResult.mimeType ?? input.previewFile.type,
+        mime,
         name: input.previewFile.name, // Store original filename for extension-based type detection
       };
       input.onProgress?.("preview", 1, 1);

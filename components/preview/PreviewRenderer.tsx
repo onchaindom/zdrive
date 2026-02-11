@@ -1,5 +1,8 @@
 'use client';
 
+// Polyfill for Promise.withResolvers (Node < 22) - must be first
+import '@/lib/polyfills';
+
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { getFileType, getFilenameFromUri, type ZDriveMetadata, type FileType } from '@/types/zdrive';
@@ -51,11 +54,13 @@ export function PreviewRenderer({ metadata, className }: PreviewRendererProps) {
   const release = metadata.properties.zdrive.release;
 
   // 1. If there's a content file, determine viewer by type
-  if (content?.uri && content?.mime) {
+  // Check for URI and either MIME or filename (filename allows extension-based routing)
+  if (content?.uri && (content?.mime || content?.name)) {
     // Use stored filename if available, otherwise try to extract from URI
     const filename = content.name ?? getFilenameFromUri(content.uri);
-    const fileType = getFileType(content.mime, filename);
-    return renderByType(fileType, content.uri, content.mime, metadata, className);
+    const fileType = getFileType(content.mime || undefined, filename);
+
+    return renderByType(fileType, content.uri, content.mime || 'application/octet-stream', metadata, className);
   }
 
   // 2. If there's a GitHub external link, show that
