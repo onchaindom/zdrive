@@ -14,6 +14,7 @@ import type { Address } from "viem";
 const EXTENSION_MIME_MAP: Record<string, string> = {
   ".glb": "model/gltf-binary",
   ".gltf": "model/gltf+json",
+  ".ply": "text/plain", // ASCII PLY - Zora detects as text/plain
   ".pdf": "application/pdf",
   ".mp4": "video/mp4",
   ".jpg": "image/jpeg",

@@ -57,6 +57,12 @@ describe('PreviewRenderer routing logic', () => {
       expect(getFileType('text/plain')).toBe('markdown');
     });
 
+    it('routes PLY by extension to PointCloudViewer', () => {
+      // PLY files are detected as text/plain by Zora, so we rely on filename
+      expect(getFileType(undefined, 'scan.ply')).toBe('ply');
+      expect(getFileType('text/plain', 'scan.ply')).toBe('ply');
+    });
+
     it('routes unsupported video to fallback', () => {
       expect(getFileType('video/webm')).toBe('other');
     });
@@ -125,6 +131,16 @@ describe('PreviewRenderer routing logic', () => {
       // VideoPlayer should use metadata.image as poster
       expect(meta.image).toBe('ipfs://QmPoster');
       expect(meta.content!.uri).toBe('ipfs://QmVideo');
+    });
+
+    it('PLY point cloud release uses content for preview', () => {
+      const meta = makeMetadata({
+        content: { mime: 'text/plain', uri: 'ipfs://QmPointCloud.ply' },
+      });
+      // PLY is detected as text/plain but filename should route to PLY viewer
+      expect(meta.content).toBeDefined();
+      // When checking with filename extension
+      expect(getFileType(meta.content!.mime, 'scan.ply')).toBe('ply');
     });
   });
 });

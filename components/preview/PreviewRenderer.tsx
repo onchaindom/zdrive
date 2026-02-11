@@ -20,6 +20,11 @@ const ThreeDViewer = dynamic(() => import('./ThreeDViewer').then((m) => ({ defau
   loading: () => <PreviewSkeleton />,
 });
 
+const PointCloudViewer = dynamic(() => import('./PointCloudViewer').then((m) => ({ default: m.PointCloudViewer })), {
+  ssr: false,
+  loading: () => <PreviewSkeleton />,
+});
+
 interface PreviewRendererProps {
   metadata: ZDriveMetadata;
   className?: string;
@@ -90,6 +95,9 @@ function renderByType(
     case 'glb':
     case 'gltf':
       return <ThreeDViewer uri={uri} className={className} />;
+
+    case 'ply':
+      return <PointCloudViewer uri={uri} className={className} />;
 
     case 'image':
       return <ImageViewer uri={uri} alt={metadata.name} className={className} />;

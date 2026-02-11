@@ -78,7 +78,8 @@ export interface ZDriveMetadata {
 }
 
 // Supported preview file types (all empirically verified with Zora's IPFS endpoint)
-export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'github' | 'image' | 'video' | 'markdown';
+// Note: PLY must be ASCII format; binary PLY is rejected by Zora as octet-stream
+export type PreviewableFileType = 'pdf' | 'glb' | 'gltf' | 'github' | 'image' | 'video' | 'markdown' | 'ply';
 export type DownloadOnlyFileType = 'other';
 export type FileType = PreviewableFileType | DownloadOnlyFileType;
 
@@ -100,6 +101,7 @@ export function getFileType(mime?: string, filename?: string): FileType {
       case 'pdf': return 'pdf';
       case 'glb': return 'glb';
       case 'gltf': return 'gltf';
+      case 'ply': return 'ply';
       case 'jpg': case 'jpeg': case 'png': case 'gif': case 'webp': case 'svg': return 'image';
       case 'mp4': return 'video';
       case 'md': case 'txt': return 'markdown';
@@ -109,6 +111,8 @@ export function getFileType(mime?: string, filename?: string): FileType {
   if (mime) {
     if (mime === 'application/pdf') return 'pdf';
     if (mime === 'model/gltf-binary' || mime === 'model/gltf+json') return 'glb';
+    // PLY files are detected as text/plain by Zora (ASCII format only)
+    // We check extension first, so this won't affect .txt files
     if (
       mime === 'image/jpeg' || mime === 'image/png' ||
       mime === 'image/gif' || mime === 'image/webp' ||

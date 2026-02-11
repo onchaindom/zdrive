@@ -314,16 +314,16 @@ export default function CreatePage() {
                   'application/pdf': ['.pdf'],
                   'model/gltf-binary': ['.glb'],
                   'model/gltf+json': ['.gltf'],
+                  'text/plain': ['.ply'], // ASCII PLY point clouds
                   'image/jpeg': ['.jpg', '.jpeg'],
                   'image/png': ['.png'],
                   'image/gif': ['.gif'],
                   'image/webp': ['.webp'],
                   'image/svg+xml': ['.svg'],
                   'video/mp4': ['.mp4'],
-                  'text/plain': ['.txt'],
                   'text/markdown': ['.md'],
                 }}
-                hint="PDF, 3D model, image, video, or text/markdown for the release viewer"
+                hint="PDF, 3D model, point cloud (PLY), image, video, or markdown for the release viewer"
               />
 
               <div className="border-t border-zdrive-border pt-6">
