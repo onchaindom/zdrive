@@ -72,13 +72,14 @@ export async function createRelease(
     input.onProgress?.("cover", 1, 1);
 
     // 2. Upload preview file if provided
-    let previewFileData: { uri: string; mime: string } | undefined;
+    let previewFileData: { uri: string; mime: string; name?: string } | undefined;
     if (input.previewFile) {
       input.onProgress?.("preview", 0, 1);
       const previewResult = await uploadService.uploadFile(input.previewFile);
       previewFileData = {
         uri: previewResult.uri,
         mime: previewResult.mimeType ?? input.previewFile.type,
+        name: input.previewFile.name, // Store original filename for extension-based type detection
       };
       input.onProgress?.("preview", 1, 1);
     }

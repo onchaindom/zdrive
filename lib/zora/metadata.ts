@@ -19,6 +19,7 @@ export interface CreateReleaseMetadataInput {
   previewFile?: {
     uri: string;
     mime: string;
+    name?: string; // Original filename
   };
 
   // Attachments
@@ -65,6 +66,7 @@ export function buildReleaseMetadata(
     metadata.content = {
       mime: input.previewFile.mime,
       uri: input.previewFile.uri,
+      name: input.previewFile.name,
     };
     metadata.animation_url = input.previewFile.uri;
   }

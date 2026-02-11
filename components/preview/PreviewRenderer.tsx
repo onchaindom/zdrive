@@ -52,7 +52,8 @@ export function PreviewRenderer({ metadata, className }: PreviewRendererProps) {
 
   // 1. If there's a content file, determine viewer by type
   if (content?.uri && content?.mime) {
-    const filename = getFilenameFromUri(content.uri);
+    // Use stored filename if available, otherwise try to extract from URI
+    const filename = content.name ?? getFilenameFromUri(content.uri);
     const fileType = getFileType(content.mime, filename);
     return renderByType(fileType, content.uri, content.mime, metadata, className);
   }

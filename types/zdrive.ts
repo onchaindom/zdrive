@@ -71,6 +71,7 @@ export interface ZDriveMetadata {
   content?: {
     mime: string;
     uri: string;
+    name?: string; // Original filename, used for extension-based type detection
   };
   properties: {
     zdrive: ZDriveProperties;
