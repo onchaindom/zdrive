@@ -240,59 +240,6 @@ function Sparkline({ data, width = 80, height = 24 }: { data: number[]; width?: 
   );
 }
 
-// ─── Candlestick Chart ───────────────────────────────────────────────────────
-
-function CandlestickChart({ data, width = 280, height = 48 }: { data: { o: number; h: number; l: number; c: number }[]; width?: number; height?: number }) {
-  if (data.length === 0) return null;
-
-  const allHigh = data.map((d) => d.h);
-  const allLow = data.map((d) => d.l);
-  const min = Math.min(...allLow);
-  const max = Math.max(...allHigh);
-  const range = max - min || 1;
-  const padding = 2;
-  const bodyWidth = 6;
-  const step = (width - padding * 2) / data.length;
-
-  const scaleY = (v: number) => padding + (1 - (v - min) / range) * (height - padding * 2);
-
-  return (
-    <svg width={width} height={height} className="inline-block align-middle">
-      {data.map((d, i) => {
-        const x = padding + i * step + step / 2;
-        const isUp = d.c >= d.o;
-        const bodyTop = scaleY(Math.max(d.o, d.c));
-        const bodyBottom = scaleY(Math.min(d.o, d.c));
-        const bodyHeight = Math.max(bodyBottom - bodyTop, 1);
-
-        return (
-          <g key={i}>
-            {/* Wick */}
-            <line
-              x1={x}
-              y1={scaleY(d.h)}
-              x2={x}
-              y2={scaleY(d.l)}
-              stroke="currentColor"
-              strokeWidth="1"
-            />
-            {/* Body */}
-            <rect
-              x={x - bodyWidth / 2}
-              y={bodyTop}
-              width={bodyWidth}
-              height={bodyHeight}
-              fill={isUp ? 'none' : 'currentColor'}
-              stroke="currentColor"
-              strokeWidth="1"
-            />
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
 // ─── Disclosure Link ─────────────────────────────────────────────────────────
 
 function DisclosureLink({ label, children }: { label: string; children: React.ReactNode }) {
@@ -337,24 +284,6 @@ const MOCK_RELEASES = [
 
 const SPARKLINE_DATA = [12, 15, 14, 18, 22, 19, 25, 28, 26, 30, 33, 29, 35, 38, 36, 40];
 
-const MOCK_OHLC = [
-  { o: 12, h: 15, l: 11, c: 14 },
-  { o: 14, h: 16, l: 13, c: 15 },
-  { o: 15, h: 18, l: 14, c: 13 },
-  { o: 13, h: 17, l: 12, c: 16 },
-  { o: 16, h: 20, l: 15, c: 19 },
-  { o: 19, h: 22, l: 18, c: 21 },
-  { o: 21, h: 23, l: 17, c: 18 },
-  { o: 18, h: 22, l: 17, c: 21 },
-  { o: 21, h: 25, l: 20, c: 24 },
-  { o: 24, h: 28, l: 23, c: 27 },
-  { o: 27, h: 29, l: 24, c: 25 },
-  { o: 25, h: 30, l: 24, c: 29 },
-  { o: 29, h: 33, l: 28, c: 32 },
-  { o: 32, h: 35, l: 30, c: 31 },
-  { o: 31, h: 36, l: 30, c: 35 },
-  { o: 35, h: 40, l: 34, c: 38 },
-];
 
 // ─── Color Swatch ────────────────────────────────────────────────────────────
 
@@ -800,7 +729,7 @@ export default function DemoPage() {
       {/* ── 8. Detail Page Sidebar ────────────────────────────────────────── */}
       <Section title="Detail Page Sidebar">
         <div className="max-w-xs border border-zd-border bg-zd-surface p-5 space-y-0">
-          {/* Title + Creator + Collection + Description + Candlestick */}
+          {/* Title + Creator + Collection + Description */}
           <div className="pb-4">
             <h3 className="font-display text-xl tracking-tight leading-tight">Emergence</h3>
             <div className="flex items-center gap-2 mt-2">
@@ -814,9 +743,6 @@ export default function DemoPage() {
             <p className="text-sm text-zd-text-secondary mt-3 leading-relaxed">
               An exploration of emergent patterns in generative systems. PDF document with full-color plates.
             </p>
-            <div className="mt-3 text-zd-text-muted">
-              <CandlestickChart data={MOCK_OHLC} width={280} height={48} />
-            </div>
           </div>
           {/* Divider + Collect + Details */}
           <div className="border-t border-zd-border pt-4 pb-4">
@@ -827,6 +753,9 @@ export default function DemoPage() {
               <DisclosureLink label="Details">
                 {/* MARKET */}
                 <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mb-2">Market</p>
+                <div className="text-zd-text-muted mb-2">
+                  <Sparkline data={SPARKLINE_DATA} width={248} height={32} />
+                </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-zd-text-secondary">Market cap</span>
                   <span className="text-zd-text font-mono text-xs">$4,280</span>
@@ -842,41 +771,49 @@ export default function DemoPage() {
                 <a href="#" className="block text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text mt-1.5">View on GeckoTerminal</a>
 
                 {/* COIN */}
-                <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mt-3 mb-2">Coin</p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zd-text-secondary">Symbol</span>
-                  <span className="text-zd-text font-mono text-xs">$EMRG</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zd-text-secondary">Contract</span>
-                  <span className="font-mono text-xs text-zd-text-muted">0x1234...5678</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zd-text-secondary">Created</span>
-                  <span className="text-zd-text font-mono text-xs">Feb 9, 2026</span>
-                </div>
-                <div className="space-y-1.5 mt-1.5">
-                  <a href="#" className="block text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Zora</a>
-                  <a href="#" className="block text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Basescan</a>
+                <div className="border-t border-zd-border mt-3 pt-3">
+                  <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mb-2">Coin</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zd-text-secondary">Symbol</span>
+                      <span className="text-zd-text font-mono text-xs">$EMRG</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zd-text-secondary">Contract</span>
+                      <span className="font-mono text-xs text-zd-text-muted">0x1234...5678</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zd-text-secondary">Created</span>
+                      <span className="text-zd-text font-mono text-xs">Feb 9, 2026</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 mt-1.5">
+                    <a href="#" className="block text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Zora</a>
+                    <a href="#" className="block text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Basescan</a>
+                  </div>
                 </div>
 
                 {/* LICENSE */}
-                <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mt-3 mb-2">License</p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zd-text-secondary">Content type</span>
-                  <span className="text-zd-text font-mono text-xs">PDF</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zd-text-secondary">License</span>
-                  <a href="#" className="font-mono text-xs text-zd-text underline transition-colors duration-150 hover:text-zd-text-secondary">CBE-CC0</a>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zd-text-secondary">Download</span>
-                  <span className="text-zd-text font-mono text-xs">Collect 1</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zd-text-secondary">Commercial use</span>
-                  <span className="text-zd-text font-mono text-xs">Own 100 $EMRG</span>
+                <div className="border-t border-zd-border mt-3 pt-3">
+                  <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mb-2">License</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zd-text-secondary">Content type</span>
+                      <span className="text-zd-text font-mono text-xs">PDF</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zd-text-secondary">License</span>
+                      <a href="#" className="font-mono text-xs text-zd-text underline transition-colors duration-150 hover:text-zd-text-secondary">CBE-CC0</a>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zd-text-secondary">Download</span>
+                      <span className="text-zd-text font-mono text-xs">Collect 1</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zd-text-secondary">Commercial use</span>
+                      <span className="text-zd-text font-mono text-xs">Own 100 $EMRG</span>
+                    </div>
+                  </div>
                 </div>
               </DisclosureLink>
             </div>
