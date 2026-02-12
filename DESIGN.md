@@ -205,12 +205,26 @@ Two-column layout (refined current approach):
 - **Creator** (linked, with small Zorb avatar inline)
 - **Collection** label: "Part of [Collection Name]" (linked)
 - **Description** (body text, `--text-base`)
-- **Sparkline** (full content width ~280px, below description, above divider — primary visual indicator)
+- **Candlestick chart** (full content width ~280px × 48px, below description, above divider). Monochrome, traditional Japanese convention: up candles (close ≥ open) are **hollow** (stroke only), down candles (close < open) are **filled**. Wicks are 1px lines. No axes or grid — just floating candles. Inherits `text-zd-text-muted` from parent for automatic dark mode inversion.
 - 1px divider
 - **Collect button** (full-width of sidebar, primary flat button)
-- **"Details"** single disclosure (DisclosureLink) → reveals: Market cap, Volume, Holders, thin divider, Type, Contract, Created, License, then links: View on Zora / View on Basescan / View on GeckoTerminal
-- 1px divider
-- **Post-collect note**: "Download available after collecting"
+- **"Details"** single disclosure (DisclosureLink) containing three labeled sub-sections:
+
+  **Sub-section headings**: `text-[11px] font-medium text-zd-text-muted uppercase tracking-wide` — quiet organizers, not full headings. `mb-2` below each, `mt-3` above all but first.
+
+  **MARKET**
+  - Market cap, Volume (24h), Holders
+  - Link: View on GeckoTerminal
+
+  **COIN**
+  - Symbol (`$EMRG`), Contract (truncated), Created date
+  - Links: View on Zora, View on Basescan
+
+  **LICENSE** — coin-gated licensing tiers
+  - Content type: what the file physically is (PDF, GLB, image, etc.)
+  - License: identifier rendered as a clickable link (e.g., `CBE-CC0` underlined)
+  - Download: minimum collection threshold to unlock file download (e.g., "Collect 1")
+  - Commercial use: ownership threshold for commercial license rights (e.g., "Own 100 $EMRG")
 
 **DisclosureLink pattern**: Minimal inline disclosure with a 6×8px SVG triangle that rotates 90° when open, paired with underlined text label. Fits the file-explorer ethos.
 
