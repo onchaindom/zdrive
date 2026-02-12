@@ -257,12 +257,18 @@ One scrollable page, no wizard steps. Sections separated by generous spacing (`-
 
 ### 4g. Landing Page
 
-Grounded in the product rather than a marketing splash. Shows what Z:DRIVE actually looks like.
+Grounded in the product rather than a marketing splash. A single animated tagline and two CTAs.
 
 - **BreadcrumbHeader** at top with `segments={[{ label: 'Z:' }]}` — establishes the navigation pattern immediately
-- **Statement**: Left-aligned, `font-display tracking-tighter`, `2rem` (32px). Short and matter-of-fact: "A quiet home for creative work. Share, collect, sustain."
-- **Mini release list**: First 3 rows from the release list (simplified 4-column grid: icon, name, collection, date). Demonstrates the core file-explorer UI as a preview of the product.
-- **Two CTAs** left-aligned below the list: `Explore` and `Create` as flat text buttons
+- **Tagline**: "Let your [cycling phrase] make markets." Left-aligned, `font-display tracking-tighter`, `2rem` (32px).
+- **Vertical Ticker**: The bracketed phrase cycles through a list of quirky work-type descriptions via a vertical slide-up animation:
+  - Phrases: `random sketches`, `pdf manifestos`, `3d models`, `side project repos`, `notes about notes`, `half-finished drafts`, `field recordings`, `weird prototypes`
+  - Interval: 3 seconds between transitions
+  - Animation: 400ms `ease-out` slide-up — outgoing phrase translates up and fades out, incoming phrase slides up from below into position
+  - Container: `overflow-hidden`, height locked to one line (~1.2em) to prevent layout shift
+  - Text styling matches surrounding display text (same font, color, tracking)
+- **No release list** on landing page — the tagline animation is the hero
+- **Two CTAs** left-aligned below tagline (`mt-8`): `Explore` and `Create` as flat text buttons
 - Subtle background: faint Zorb element (6% opacity), positioned bottom-right
 - Dark mode / light mode should both feel beautiful here
 

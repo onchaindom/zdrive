@@ -284,6 +284,65 @@ const MOCK_RELEASES = [
 
 const SPARKLINE_DATA = [12, 15, 14, 18, 22, 19, 25, 28, 26, 30, 33, 29, 35, 38, 36, 40];
 
+const CYCLING_PHRASES = [
+  'random sketches',
+  'pdf manifestos',
+  '3d models',
+  'side project repos',
+  'notes about notes',
+  'half-finished drafts',
+  'field recordings',
+  'weird prototypes',
+];
+
+
+// ─── Vertical Ticker ──────────────────────────────────────────────────────
+
+function VerticalTicker({ phrases, interval = 3000 }: { phrases: string[]; interval?: number }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % phrases.length);
+        setIsTransitioning(false);
+      }, 400);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [phrases.length, interval]);
+
+  const nextIndex = (currentIndex + 1) % phrases.length;
+
+  return (
+    <span
+      className="inline-flex overflow-hidden align-bottom relative"
+      style={{ height: '1.2em', verticalAlign: 'baseline' }}
+    >
+      {/* Outgoing phrase */}
+      <span
+        className="inline-block transition-all duration-[400ms] ease-out whitespace-nowrap"
+        style={{
+          transform: isTransitioning ? 'translateY(-100%)' : 'translateY(0)',
+          opacity: isTransitioning ? 0 : 1,
+        }}
+      >
+        {phrases[currentIndex]}
+      </span>
+      {/* Incoming phrase */}
+      <span
+        className="absolute left-0 inline-block transition-all duration-[400ms] ease-out whitespace-nowrap"
+        style={{
+          transform: isTransitioning ? 'translateY(0)' : 'translateY(100%)',
+          opacity: isTransitioning ? 1 : 0,
+        }}
+      >
+        {phrases[nextIndex]}
+      </span>
+    </span>
+  );
+}
 
 // ─── Color Swatch ────────────────────────────────────────────────────────────
 
@@ -925,33 +984,12 @@ export default function DemoPage() {
           {/* Breadcrumb header */}
           <BreadcrumbHeader segments={[{ label: 'Z:' }]} />
           {/* Content */}
-          <div className="relative px-6 py-8">
+          <div className="relative px-6 py-12">
             <p className="font-display tracking-tighter leading-tight" style={{ fontSize: '2rem', lineHeight: 1.2 }}>
-              A quiet home for creative work.
-              <br />
-              Share, collect, sustain.
+              Let your <VerticalTicker phrases={CYCLING_PHRASES} interval={3000} /> make markets.
             </p>
-            {/* Mini release list */}
-            <div className="mt-6 border border-zd-border">
-              {MOCK_RELEASES.slice(0, 3).map((r) => {
-                const TypeIcon = FILE_TYPE_ICONS[r.type] || IconFile;
-                return (
-                  <div
-                    key={r.name}
-                    className="grid grid-cols-[32px_1fr_140px_80px] items-center h-10 px-3 border-b border-zd-border last:border-b-0 cursor-pointer transition-colors duration-150 hover:bg-zd-surface-hover"
-                  >
-                    <div className="flex justify-center text-zd-text">
-                      <TypeIcon />
-                    </div>
-                    <div className="font-display text-base tracking-tight leading-tight truncate pr-4">{r.name}</div>
-                    <div className="text-sm text-zd-text-muted truncate">{r.collection}</div>
-                    <div className="text-xs text-zd-text-muted text-right">{r.date}</div>
-                  </div>
-                );
-              })}
-            </div>
             {/* CTAs */}
-            <div className="flex items-center gap-4 mt-6">
+            <div className="flex items-center gap-4 mt-8">
               <button className="bg-zd-button-bg text-zd-text text-sm font-medium px-5 py-2.5 transition-colors duration-150 hover:bg-zd-button-bg-hover">
                 Explore
               </button>
