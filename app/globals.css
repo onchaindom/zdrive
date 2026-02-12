@@ -7,6 +7,37 @@
     'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
     'Liberation Mono', monospace;
+  --font-display: system-ui, sans-serif;
+
+  /* Z:DRIVE Design System — Light Mode */
+  --zd-bg: #F7F5F2;
+  --zd-surface: #FDFCFA;
+  --zd-surface-hover: #F0EDE8;
+  --zd-border: #E2DED8;
+  --zd-border-hover: #CCC7BF;
+  --zd-text: #1A1917;
+  --zd-text-secondary: #6B6560;
+  --zd-text-muted: #9C9590;
+  --zd-accent: #1A1917;
+  --zd-accent-hover: #3D3A35;
+  --zd-button-bg: #EAE6E0;
+  --zd-button-bg-hover: #DDD8D0;
+}
+
+/* Z:DRIVE Design System — Dark Mode */
+.dark {
+  --zd-bg: #171615;
+  --zd-surface: #1F1E1C;
+  --zd-surface-hover: #2A2826;
+  --zd-border: #2E2C29;
+  --zd-border-hover: #3E3B37;
+  --zd-text: #EDEAE6;
+  --zd-text-secondary: #9C9590;
+  --zd-text-muted: #6B6560;
+  --zd-accent: #EDEAE6;
+  --zd-accent-hover: #C5C0B8;
+  --zd-button-bg: #2A2826;
+  --zd-button-bg-hover: #3E3B37;
 }
 
 * {

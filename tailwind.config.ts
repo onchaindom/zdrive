@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -21,10 +22,26 @@ const config: Config = {
           accent: '#171717',
           'accent-hover': '#404040',
         },
+        // New design system tokens (CSS custom property driven)
+        zd: {
+          bg: 'var(--zd-bg)',
+          surface: 'var(--zd-surface)',
+          'surface-hover': 'var(--zd-surface-hover)',
+          border: 'var(--zd-border)',
+          'border-hover': 'var(--zd-border-hover)',
+          text: 'var(--zd-text)',
+          'text-secondary': 'var(--zd-text-secondary)',
+          'text-muted': 'var(--zd-text-muted)',
+          accent: 'var(--zd-accent)',
+          'accent-hover': 'var(--zd-accent-hover)',
+          'button-bg': 'var(--zd-button-bg)',
+          'button-bg-hover': 'var(--zd-button-bg-hover)',
+        },
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         '2xs': ['0.625rem', { lineHeight: '0.75rem' }],

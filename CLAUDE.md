@@ -73,6 +73,7 @@ leverage git heavily. for every large task (like features, bugfixes, refactors),
 
 ## Testing for Production
 - Dev server is very slow due to Privy (321MB) and Three.js (29MB). Always use `npm run build && npx next start` for manual testing.
+- **After completing code changes**, rebuild and restart the production server (`npm run build && npx next start`) if it's not running or the changes require it. Don't restart unnecessarily if nothing changed. Kill the old process on port 3000 before starting a new one.
 - Run `npx vitest run`, `npx tsc --noEmit`, and `npm run build` before committing.
 
 ## IPFS Gateway
