@@ -8,6 +8,8 @@ export interface ReleaseItem {
   metadata: ZDriveMetadata;
   creatorAddress: string;
   creatorName?: string;
+  holders?: number;
+  createdAt?: string;
 }
 
 interface ReleaseGridProps {

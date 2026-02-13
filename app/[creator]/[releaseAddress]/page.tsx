@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { BreadcrumbHeader, Footer } from '@/components/layout';
+import { BreadcrumbHeader, HeaderNav, Footer } from '@/components/layout';
 import { LoadingPage, ErrorBoundary, CollapsibleSection, Zorb, DisclosureLink } from '@/components/ui';
 import { useRelease } from '@/hooks/useRelease';
 import { useCoin } from '@/hooks/useCoin';
@@ -11,7 +11,6 @@ import { WidgetTabs } from '@/components/trade/WidgetTabs';
 import { useLicenseStatus } from '@/hooks/useLicenseStatus';
 import { PreviewRenderer, DownloadList } from '@/components/preview';
 import { CollectButton } from '@/components/trade/CollectButton';
-import { ConnectButton } from '@/components/wallet/ConnectButton';
 import { truncateAddress, ipfsToHttp } from '@/lib/constants';
 import { getFileType } from '@/types/zdrive';
 
@@ -33,8 +32,7 @@ function ReleaseBreadcrumb({ creator, releaseName }: { creator: string; releaseN
   ];
   return (
     <BreadcrumbHeader segments={segments}>
-      <Link href="/feed" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</Link>
-      <ConnectButton />
+      <HeaderNav />
     </BreadcrumbHeader>
   );
 }
@@ -195,49 +193,6 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                 <DownloadList assets={assets} />
               )}
 
-              {/* Coin details collapsible section */}
-              <CollapsibleSection title="Coin Details" defaultOpen>
-                <dl className="space-y-2 text-sm">
-                  {contentType && (
-                    <div className="flex justify-between">
-                      <dt className="text-zd-text-muted">Content type</dt>
-                      <dd className="uppercase">{contentType}</dd>
-                    </div>
-                  )}
-                  {metadata.content?.mime && (
-                    <div className="flex justify-between">
-                      <dt className="text-zd-text-muted">MIME</dt>
-                      <dd className="font-mono text-xs">{metadata.content.mime}</dd>
-                    </div>
-                  )}
-                  {assets.length > 0 && (
-                    <div className="flex justify-between">
-                      <dt className="text-zd-text-muted">Attachments</dt>
-                      <dd>{assets.length} file{assets.length !== 1 ? 's' : ''}</dd>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <dt className="text-zd-text-muted">Contract</dt>
-                    <dd>
-                      <a
-                        href={`https://basescan.org/address/${releaseAddress}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-mono text-xs hover:underline"
-                      >
-                        {truncateAddress(releaseAddress)}
-                      </a>
-                    </dd>
-                  </div>
-                  {release.createdAt && (
-                    <div className="flex justify-between">
-                      <dt className="text-zd-text-muted">Created</dt>
-                      <dd>{new Date(release.createdAt).toLocaleDateString()}</dd>
-                    </div>
-                  )}
-                </dl>
-              </CollapsibleSection>
-
               {/* Holders & Activity collapsible section */}
               <CollapsibleSection title="Holders & Activity">
                 <WidgetTabs
@@ -249,7 +204,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
             </div>
 
             {/* Side panel */}
-            <div className="space-y-0">
+            <div className="border border-zd-border bg-zd-surface p-5 space-y-0">
               {/* Title + Creator + Collection + Description */}
               <div className="pb-4">
                 <h1 className="font-display text-xl tracking-tight leading-tight">{metadata.name}</h1>
@@ -356,14 +311,35 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                             <span className="text-zd-text font-mono text-xs">{licenseStatus.licenseName}</span>
                           )}
                         </div>
-                        {licenseStatus.requiresGate && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-zd-text-secondary">Access</span>
-                            <span className="text-zd-text font-mono text-xs">
-                              {licenseStatus.meetsGateRequirement ? 'Unlocked' : 'Collect to unlock'}
-                            </span>
-                          </div>
-                        )}
+                        <div className="flex justify-between text-sm">
+                          <span className="text-zd-text-secondary">Download</span>
+                          <span className="text-zd-text font-mono text-xs">
+                            {licenseStatus.requiresGate ? 'Collect 1' : 'Open'}
+                          </span>
+                        </div>
+                        {license?.cbe && (() => {
+                          const t = license.cbe!.type;
+                          const isCommercial = t === 'CBE_CC0' || t === 'CBE_COMMERCIAL' || t === 'CBE_NONEXCLUSIVE' || t === 'CBE_EXCLUSIVE';
+                          if (!isCommercial) {
+                            return (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-zd-text-secondary">Commercial use</span>
+                                <span className="text-zd-text font-mono text-xs">Not permitted</span>
+                              </div>
+                            );
+                          }
+                          const minBal = license.gate?.minBalance;
+                          const symbol = coinStats?.symbol;
+                          const threshold = minBal ? Math.round(Number(BigInt(minBal)) / 1e18) : 0;
+                          return (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-zd-text-secondary">Commercial use</span>
+                              <span className="text-zd-text font-mono text-xs">
+                                {threshold > 0 && symbol ? `Own ${threshold.toLocaleString()} $${symbol}` : 'Open'}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </DisclosureLink>

@@ -34,6 +34,7 @@ export default function FeedPage() {
     metadata: release.metadata,
     creatorAddress: release.creatorAddress,
     creatorName: release.creatorName,
+    createdAt: release.createdAt,
   }));
 
   return (

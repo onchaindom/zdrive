@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { BreadcrumbHeader, Footer } from '@/components/layout';
-import { ConnectButton } from '@/components/wallet/ConnectButton';
+import { BreadcrumbHeader, HeaderNav, Footer } from '@/components/layout';
 import { ReleaseList, type ReleaseItem } from '@/components/release';
 import { LoadingPage } from '@/components/ui';
 import { useCollection } from '@/hooks/useCollection';
@@ -24,8 +23,7 @@ function CollectionBreadcrumb({ creatorAddress, creatorName, title }: { creatorA
   ];
   return (
     <BreadcrumbHeader segments={segments}>
-      <Link href="/feed" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</Link>
-      <ConnectButton />
+      <HeaderNav />
     </BreadcrumbHeader>
   );
 }
@@ -78,6 +76,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
     metadata: release.metadata,
     creatorAddress: release.creatorAddress,
     creatorName: creatorProfile?.displayName,
+    createdAt: release.createdAt,
   }));
 
   return (

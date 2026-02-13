@@ -87,7 +87,7 @@ export function ThreeDViewer({ uri, className }: ThreeDViewerProps) {
       <div className={`relative aspect-square bg-zd-bg ${className}`}>
         <Canvas
           camera={{ position: [3, 3, 3], fov: 50 }}
-          style={{ background: '#fafafa' }}
+          style={{ background: 'transparent' }}
         >
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />

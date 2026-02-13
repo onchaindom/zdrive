@@ -51,10 +51,10 @@ export function VideoPlayer({ uri, posterUri, mime, className }: VideoPlayerProp
   }
 
   return (
-    <div className={`relative bg-black ${className}`}>
+    <div className={`relative bg-zd-bg ${className}`}>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="h-6 w-6 animate-spin border-2 border-zd-border border-t-white" />
+          <div className="h-6 w-6 animate-spin border-2 border-zd-border border-t-zd-text" />
         </div>
       )}
 

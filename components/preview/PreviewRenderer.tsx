@@ -7,10 +7,20 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { getFileType, getFilenameFromUri, type ZDriveMetadata, type FileType } from '@/types/zdrive';
 import { ipfsToHttp } from '@/lib/constants';
+import { PreviewShell } from './PreviewShell';
 import { ImageViewer } from './ImageViewer';
 import { VideoPlayer } from './VideoPlayer';
 import { GitHubPreview } from './GitHubPreview';
 import { MarkdownViewer } from './MarkdownViewer';
+import {
+  IconPDF,
+  Icon3D,
+  IconImage,
+  IconVideo,
+  IconCode,
+  IconCloud,
+  IconFile,
+} from '@/components/ui/FileTypeIcon';
 
 // Dynamic imports for heavy components (no SSR)
 const PDFViewer = dynamic(() => import('./PDFViewer').then((m) => ({ default: m.PDFViewer })), {
@@ -32,6 +42,17 @@ interface PreviewRendererProps {
   metadata: ZDriveMetadata;
   className?: string;
 }
+
+const FILE_TYPE_ICONS: Record<string, React.FC<{ className?: string }>> = {
+  pdf: IconPDF,
+  glb: Icon3D,
+  gltf: Icon3D,
+  image: IconImage,
+  video: IconVideo,
+  markdown: IconCode,
+  ply: IconCloud,
+  other: IconFile,
+};
 
 function PreviewSkeleton() {
   return (
@@ -59,24 +80,36 @@ export function PreviewRenderer({ metadata, className }: PreviewRendererProps) {
     // Use stored filename if available, otherwise try to extract from URI
     const filename = content.name ?? getFilenameFromUri(content.uri);
     const fileType = getFileType(content.mime || undefined, filename);
+    const TypeIcon = FILE_TYPE_ICONS[fileType] || IconFile;
+    const label = filename || fileType.toUpperCase();
 
-    return renderByType(fileType, content.uri, content.mime || 'application/octet-stream', metadata, className);
+    return (
+      <PreviewShell label={label} icon={<TypeIcon />} contentUri={content.uri}>
+        {renderByType(fileType, content.uri, content.mime || 'application/octet-stream', metadata, className)}
+      </PreviewShell>
+    );
   }
 
   // 2. If there's a GitHub external link, show that
   const githubLink = release?.external?.find((e) => e.type === 'github');
   if (githubLink) {
-    return <GitHubPreview url={githubLink.url} ref={githubLink.ref} className={className} />;
+    return (
+      <PreviewShell label="GitHub Repository" icon={<IconCode />}>
+        <GitHubPreview url={githubLink.url} ref={githubLink.ref} className={className} />
+      </PreviewShell>
+    );
   }
 
   // 3. Fallback: show cover image as the preview
   if (metadata.image) {
     return (
-      <ImageViewer
-        uri={metadata.image}
-        alt={metadata.name}
-        className={className}
-      />
+      <PreviewShell label={metadata.name} icon={<IconImage />} contentUri={metadata.image}>
+        <ImageViewer
+          uri={metadata.image}
+          alt={metadata.name}
+          className={className}
+        />
+      </PreviewShell>
     );
   }
 

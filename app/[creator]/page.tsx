@@ -4,13 +4,12 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePrivy } from '@privy-io/react-auth';
-import { BreadcrumbHeader, Footer } from '@/components/layout';
+import { BreadcrumbHeader, HeaderNav, Footer } from '@/components/layout';
 import { ReleaseList, type ReleaseItem } from '@/components/release';
 import { ReleaseRow, ReleaseRowSkeleton } from '@/components/release/ReleaseRow';
 import { LoadingPage, Button, Zorb } from '@/components/ui';
 import { useCreatorProfile, useCreatorReleases } from '@/hooks/useCreator';
 import { useHoldings } from '@/hooks/useHoldings';
-import { ConnectButton } from '@/components/wallet/ConnectButton';
 import { truncateAddress, ipfsToHttp } from '@/lib/constants';
 import { getFileType } from '@/types/zdrive';
 import clsx from 'clsx';
@@ -80,6 +79,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     metadata: release.metadata,
     creatorAddress: release.creatorAddress,
     creatorName: profile?.displayName,
+    createdAt: release.createdAt,
   }));
 
   // Get unique collections
@@ -114,6 +114,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
         metadata: release.metadata,
         creatorAddress: release.creatorAddress,
         creatorName: profile?.displayName,
+        createdAt: release.createdAt,
       };
 
       if (collection?.id) {
@@ -163,12 +164,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     { label: profile?.displayName || truncateAddress(creatorAddress) },
   ];
 
-  const breadcrumbNav = (
-    <>
-      <Link href="/feed" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</Link>
-      <ConnectButton />
-    </>
-  );
+  const breadcrumbNav = <HeaderNav />;
 
   if (profileLoading) {
     return (
@@ -340,6 +336,8 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                         metadata={release.metadata}
                         creatorAddress={release.creatorAddress}
                         creatorName={release.creatorName}
+                        holders={release.holders}
+                        createdAt={release.createdAt}
                       />
                     ))}
                   </div>

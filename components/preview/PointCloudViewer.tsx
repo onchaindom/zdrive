@@ -118,7 +118,7 @@ export function PointCloudViewer({ uri, className }: PointCloudViewerProps) {
       <div className={`relative aspect-square bg-zd-bg ${className}`}>
         <Canvas
           camera={{ position: [2, 2, 2], fov: 50 }}
-          style={{ background: '#fafafa' }}
+          style={{ background: 'transparent' }}
         >
           <ambientLight intensity={0.8} />
           <directionalLight position={[10, 10, 5]} intensity={0.5} />

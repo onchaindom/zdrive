@@ -49,9 +49,9 @@ export function CollectButton({
       ) : (
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex h-10 w-full items-center justify-center bg-zd-text text-sm font-medium text-white transition-colors hover:bg-zd-accent-hover"
+          className="flex h-10 w-full items-center justify-center bg-zd-accent text-sm font-medium text-zd-bg transition-colors hover:bg-zd-accent-hover"
         >
-          Collect ${coinSymbol}
+          + COLLECT
         </button>
       )}
 
