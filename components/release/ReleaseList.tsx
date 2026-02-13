@@ -62,13 +62,11 @@ export function ReleaseList({
 
 function ReleaseListHeader() {
   return (
-    <div className="grid grid-cols-[40px_1fr_140px_140px_80px_80px] items-center h-9 px-3 border-b border-zd-border text-xs text-zd-text-secondary font-medium">
-      <div className="text-center"></div>
-      <div>Name</div>
-      <div className="hidden sm:block">Collection</div>
-      <div className="hidden sm:block">Contract</div>
-      <div className="text-right hidden sm:block">Holders</div>
-      <div className="text-right hidden sm:block">Created</div>
+    <div className="grid grid-cols-[100px_1fr_60px_32px] sm:grid-cols-[120px_1fr_80px_32px] items-center h-9 px-3 border-b border-zd-border text-xs font-mono text-zd-text-muted">
+      <div>/ DATE</div>
+      <div>/ NAME</div>
+      <div>/ TYPE</div>
+      <div></div>
     </div>
   );
 }

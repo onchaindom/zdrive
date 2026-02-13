@@ -4,6 +4,7 @@ import {
   getCoinSwaps,
   getCoinsNew,
   getCoinsTopVolume24h,
+  getCoinsMostValuable,
   getProfileBalances,
   getProfileCoins,
 } from '@zoralabs/coins-sdk';
@@ -220,6 +221,49 @@ export async function fetchTopVolumeCoins(
     };
   } catch (error) {
     console.error('Error fetching top volume coins:', error);
+    return { coins: [], hasMore: false };
+  }
+}
+
+// Fetch most valuable coins (by market cap)
+export async function fetchMostValuableCoins(
+  count = 20,
+  after?: string
+): Promise<{ coins: ZoraCoin[]; hasMore: boolean; endCursor?: string }> {
+  try {
+    const response = await getCoinsMostValuable({
+      count,
+      after,
+    });
+
+    const edges = response?.data?.exploreList?.edges || [];
+    const pageInfo = response?.data?.exploreList?.pageInfo;
+
+    const coins: ZoraCoin[] = edges
+      .map((edge: { node?: Record<string, unknown> }) => edge.node)
+      .filter((node): node is Record<string, unknown> => !!node?.address)
+      .map((node) => ({
+        address: node.address as string,
+        name: (node.name as string) || '',
+        symbol: (node.symbol as string) || '',
+        description: node.description as string | undefined,
+        totalSupply: node.totalSupply as string | undefined,
+        marketCap: node.marketCap as string | undefined,
+        volume24h: node.volume24h as string | undefined,
+        creatorAddress: (node.creatorAddress as string) || '',
+        createdAt: node.createdAt as string | undefined,
+        mediaContent: extractMediaContent(node.mediaContent),
+        tokenUri: node.tokenUri as string | undefined,
+        metadata: node.metadata,
+      }));
+
+    return {
+      coins,
+      hasMore: pageInfo?.hasNextPage || false,
+      endCursor: pageInfo?.endCursor || undefined,
+    };
+  } catch (error) {
+    console.error('Error fetching most valuable coins:', error);
     return { coins: [], hasMore: false };
   }
 }

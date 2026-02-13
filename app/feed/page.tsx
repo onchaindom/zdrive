@@ -1,24 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
+import { useState, useMemo } from 'react';
 import { Header, Footer } from '@/components/layout';
 import { ReleaseList, type ReleaseItem } from '@/components/release';
 import { Button, LoadingSpinner } from '@/components/ui';
-import { useExplore, type ExploreTab } from '@/hooks/useExplore';
+import { useReleases, type SortOption } from '@/hooks/useExplore';
+import { getFileType } from '@/types/zdrive';
 import clsx from 'clsx';
 
-const tabs: { id: ExploreTab; label: string; requiresAuth?: boolean }[] = [
-  { id: 'feed', label: 'Feed', requiresAuth: true },
-  { id: 'explore', label: 'Explore' },
-  { id: 'markets', label: 'Markets' },
+type FilterType = 'all' | 'pdf' | '3d' | 'image' | 'video' | 'other';
+
+const SORT_OPTIONS: { id: SortOption; label: string }[] = [
+  { id: 'created', label: 'Created' },
+  { id: 'volume', label: 'Volume' },
+  { id: 'marketCap', label: 'Market Cap' },
+];
+
+const TYPE_FILTERS: { id: FilterType; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'pdf', label: 'PDF' },
+  { id: '3d', label: '3D' },
+  { id: 'image', label: 'IMG' },
+  { id: 'video', label: 'VID' },
+  { id: 'other', label: 'Other' },
 ];
 
 export default function FeedPage() {
-  const { authenticated } = usePrivy();
-  const [activeTab, setActiveTab] = useState<ExploreTab>(
-    authenticated ? 'feed' : 'explore'
-  );
+  const [sort, setSort] = useState<SortOption>('created');
+  const [typeFilter, setTypeFilter] = useState<FilterType>('all');
   const {
     releases,
     isLoading,
@@ -26,10 +35,10 @@ export default function FeedPage() {
     hasNextPage,
     fetchNextPage,
     error,
-  } = useExplore(activeTab);
+  } = useReleases(sort);
 
-  // Convert ParsedRelease to ReleaseItem for the grid
-  const releaseItems: ReleaseItem[] = releases.map((release) => ({
+  // Convert ParsedRelease to ReleaseItem
+  const allReleaseItems: ReleaseItem[] = releases.map((release) => ({
     address: release.coinAddress,
     metadata: release.metadata,
     creatorAddress: release.creatorAddress,
@@ -37,61 +46,99 @@ export default function FeedPage() {
     createdAt: release.createdAt,
   }));
 
+  // Client-side type filtering
+  const filteredItems = useMemo(() => {
+    if (typeFilter === 'all') return allReleaseItems;
+
+    return allReleaseItems.filter((item) => {
+      const contentType = getFileType(item.metadata.content?.mime);
+      switch (typeFilter) {
+        case 'pdf':
+          return contentType === 'pdf';
+        case '3d':
+          return ['glb', 'gltf', 'ply'].includes(contentType);
+        case 'image':
+          return contentType === 'image';
+        case 'video':
+          return contentType === 'video';
+        case 'other':
+          return !['pdf', 'glb', 'gltf', 'ply', 'image', 'video'].includes(contentType);
+        default:
+          return true;
+      }
+    });
+  }, [allReleaseItems, typeFilter]);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
 
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8">
-          {/* Page Header */}
+          {/* Header */}
           <div className="mb-8">
-            <h1 className="font-display text-2xl tracking-tighter">Releases</h1>
-            <p className="mt-1 text-sm text-zd-text-secondary">
-              Discover creative releases from independent artists
-            </p>
+            <h1 className="font-display tracking-tighter" style={{ fontSize: 'clamp(2rem, 6vw, 3rem)' }}>
+              Releases
+              {!isLoading && (
+                <sup className="text-lg font-mono text-zd-text-muted ml-1">
+                  ({filteredItems.length})
+                </sup>
+              )}
+            </h1>
           </div>
 
-          {/* Tabs */}
-          <div className="mb-6 flex gap-1 border-b border-zd-border">
-            {tabs.map((tab) => {
-              // Skip auth-required tabs for non-connected users
-              if (tab.requiresAuth && !authenticated) return null;
-
-              return (
+          {/* Sort + Filter Controls */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            {/* Sort controls */}
+            <div className="flex items-center gap-4">
+              <span className="text-xs font-mono text-zd-text-muted">/ SORT BY:</span>
+              {SORT_OPTIONS.map((option) => (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  key={option.id}
+                  onClick={() => setSort(option.id)}
                   className={clsx(
-                    'px-4 py-2 text-sm transition-colors',
-                    activeTab === tab.id
-                      ? 'border-b-2 border-zd-text text-zd-text'
-                      : 'text-zd-text-secondary hover:text-zd-text'
+                    'text-sm pb-0.5 transition-colors',
+                    sort === option.id
+                      ? 'text-zd-text border-b border-zd-text'
+                      : 'text-zd-text-muted hover:text-zd-text-secondary'
                   )}
                 >
-                  {tab.label}
+                  {option.label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
+
+            {/* Type filter */}
+            <div className="flex items-center gap-2">
+              {TYPE_FILTERS.map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setTypeFilter(f.id)}
+                  className={clsx(
+                    'px-2 py-1 text-xs font-mono uppercase transition-colors',
+                    typeFilter === f.id
+                      ? 'text-zd-text border-b border-zd-text'
+                      : 'text-zd-text-muted hover:text-zd-text-secondary'
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Error State */}
           {error && (
-            <div className="mb-6 border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+            <div className="mb-6 border border-red-300 p-4 text-sm text-red-600">
               Failed to load releases. Please try again.
             </div>
           )}
 
           {/* Release List */}
           <ReleaseList
-            releases={releaseItems}
+            releases={filteredItems}
             isLoading={isLoading}
-            emptyMessage={
-              activeTab === 'feed'
-                ? 'Follow creators by collecting their coins.'
-                : activeTab === 'explore'
-                  ? 'No releases yet. Be the first to create one!'
-                  : 'No market data available.'
-            }
+            emptyMessage="No releases yet. Be the first to create one!"
           />
 
           {/* Load More */}
