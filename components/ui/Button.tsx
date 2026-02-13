@@ -31,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'disabled:pointer-events-none disabled:opacity-50',
           {
             // Variants
-            'bg-zd-text text-white hover:bg-zd-accent-hover':
+            'bg-zd-button-bg text-zd-text hover:bg-zd-button-bg-hover':
               variant === 'primary',
             'border border-zd-border bg-zd-surface text-zd-text hover:border-zd-border-hover hover:bg-zd-bg':
               variant === 'secondary',

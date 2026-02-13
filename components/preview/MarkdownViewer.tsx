@@ -67,7 +67,7 @@ export function MarkdownViewer({ uri, className }: MarkdownViewerProps) {
 
   return (
     <div className={`overflow-auto p-6 ${className ?? ''}`}>
-      <div className="prose prose-sm max-w-none prose-headings:font-medium prose-a:text-blue-600">
+      <div className="prose prose-sm max-w-none prose-headings:font-medium prose-a:text-zd-text-secondary prose-a:underline hover:prose-a:text-zd-text">
         <ReactMarkdown>{content ?? ''}</ReactMarkdown>
       </div>
     </div>

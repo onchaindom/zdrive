@@ -1,4 +1,4 @@
-export { useExplore, useExploreReleases, useMarketsReleases } from './useExplore';
+export { useReleases, type SortOption } from './useExplore';
 export { useRelease } from './useRelease';
 export { useLicenseStatus } from './useLicenseStatus';
 export { useCreatorProfile, useCreatorReleases } from './useCreator';

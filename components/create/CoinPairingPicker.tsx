@@ -24,7 +24,7 @@ export function CoinPairingPicker({
 
       <div className="mt-3 space-y-2">
         {hasCreatorCoin && (
-          <label className="flex cursor-pointer items-start gap-3 rounded border border-zd-border p-3 transition-colors hover:bg-zd-bg">
+          <label className="flex cursor-pointer items-start gap-3 border border-zd-border p-3 transition-colors hover:bg-zd-bg">
             <input
               type="radio"
               name="currency"
@@ -42,7 +42,7 @@ export function CoinPairingPicker({
                   </span>
                 )}
               </span>
-              <span className="ml-2 rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700">
+              <span className="ml-2 bg-green-100 px-1.5 py-0.5 text-xs text-green-700">
                 Recommended
               </span>
               <p className="mt-0.5 text-xs text-zd-text-muted">
@@ -53,7 +53,7 @@ export function CoinPairingPicker({
           </label>
         )}
 
-        <label className="flex cursor-pointer items-start gap-3 rounded border border-zd-border p-3 transition-colors hover:bg-zd-bg">
+        <label className="flex cursor-pointer items-start gap-3 border border-zd-border p-3 transition-colors hover:bg-zd-bg">
           <input
             type="radio"
             name="currency"
