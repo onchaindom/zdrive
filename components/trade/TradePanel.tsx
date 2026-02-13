@@ -57,10 +57,10 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
   return (
     <div className="border border-zd-border bg-zd-surface p-4">
       {/* Buy/Sell Toggle */}
-      <div className="flex rounded bg-zd-bg p-0.5">
+      <div className="flex bg-zd-bg p-0.5">
         <button
           onClick={() => { setTradeType('buy'); reset(); }}
-          className={`flex-1 rounded py-1.5 text-sm font-medium transition-colors ${
+          className={`flex-1 py-1.5 text-sm font-medium transition-colors ${
             tradeType === 'buy'
               ? 'bg-zd-surface text-zd-text shadow-sm'
               : 'text-zd-text-muted hover:text-zd-text-secondary'
@@ -70,7 +70,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
         </button>
         <button
           onClick={() => { setTradeType('sell'); reset(); }}
-          className={`flex-1 rounded py-1.5 text-sm font-medium transition-colors ${
+          className={`flex-1 py-1.5 text-sm font-medium transition-colors ${
             tradeType === 'sell'
               ? 'bg-zd-surface text-zd-text shadow-sm'
               : 'text-zd-text-muted hover:text-zd-text-secondary'
@@ -98,7 +98,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
             value={amountIn}
             onChange={(e) => setAmountIn(e.target.value)}
             disabled={tradeLoading}
-            className="w-full rounded border border-zd-border bg-zd-bg px-3 py-2 pr-14 text-sm focus:border-zd-accent focus:outline-none disabled:opacity-50"
+            className="w-full border border-zd-border bg-zd-bg px-3 py-2 pr-14 text-sm focus:border-zd-accent focus:outline-none disabled:opacity-50"
           />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zd-text-muted">
             {tradeType === 'buy' ? 'ETH' : stats?.symbol || ''}
@@ -113,7 +113,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
             key={preset}
             onClick={() => setPreset(preset)}
             disabled={tradeLoading}
-            className="rounded bg-zd-bg px-2 py-1 text-xs text-zd-text-secondary hover:bg-zd-border disabled:opacity-50"
+            className="bg-zd-bg px-2 py-1 text-xs text-zd-text-secondary hover:bg-zd-border disabled:opacity-50"
           >
             {preset}
           </button>
@@ -134,7 +134,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
       <button
         onClick={getCTAAction({ isConnected, isWrongChain, connect, switchToBase, handleTrade })}
         disabled={getCTADisabled({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading })}
-        className="mt-3 w-full rounded bg-zd-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-zd-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-3 w-full bg-zd-accent py-2.5 text-sm font-medium text-zd-bg transition-colors hover:bg-zd-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {getCTALabel({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading, tradeType, symbol: stats?.symbol, status })}
       </button>

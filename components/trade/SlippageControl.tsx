@@ -53,7 +53,7 @@ export function SlippageControl({ slippage, onSlippageChange }: SlippageControlP
                 onSlippageChange(preset.value);
                 setCustomValue('');
               }}
-              className={`rounded px-2 py-1 text-xs transition-colors ${
+              className={`px-2 py-1 text-xs transition-colors ${
                 slippage === preset.value
                   ? 'bg-zd-accent text-white'
                   : 'bg-zd-bg text-zd-text-secondary hover:bg-zd-border'
@@ -68,7 +68,7 @@ export function SlippageControl({ slippage, onSlippageChange }: SlippageControlP
             placeholder="Custom"
             value={isCustom ? (slippage * 100).toString() : customValue}
             onChange={(e) => handleCustomChange(e.target.value)}
-            className="w-14 rounded border border-zd-border bg-zd-bg px-2 py-1 text-xs focus:border-zd-accent focus:outline-none"
+            className="w-14 border border-zd-border bg-zd-bg px-2 py-1 text-xs focus:border-zd-accent focus:outline-none"
           />
           <span className="text-xs text-zd-text-muted">%</span>
         </div>

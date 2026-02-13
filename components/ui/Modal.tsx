@@ -45,14 +45,14 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-zd-bg/80"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div
         className={clsx(
-          'relative z-10 max-h-[90vh] overflow-auto bg-zd-surface',
+          'relative z-10 max-h-[90vh] overflow-auto bg-zd-surface border border-zd-border',
           {
             'w-full max-w-sm': size === 'sm',
             'w-full max-w-lg': size === 'md',
