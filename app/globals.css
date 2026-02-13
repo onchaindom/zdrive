@@ -10,18 +10,18 @@
   --font-display: system-ui, sans-serif;
 
   /* Z:DRIVE Design System — Light Mode */
-  --zd-bg: #F7F5F2;
-  --zd-surface: #FDFCFA;
-  --zd-surface-hover: #F0EDE8;
-  --zd-border: #E2DED8;
-  --zd-border-hover: #CCC7BF;
+  --zd-bg: #FAFAF9;
+  --zd-surface: #FFFFFF;
+  --zd-surface-hover: #F5F5F4;
+  --zd-border: #E5E5E4;
+  --zd-border-hover: #D4D4D3;
   --zd-text: #1A1917;
   --zd-text-secondary: #6B6560;
   --zd-text-muted: #9C9590;
   --zd-accent: #1A1917;
   --zd-accent-hover: #3D3A35;
-  --zd-button-bg: #EAE6E0;
-  --zd-button-bg-hover: #DDD8D0;
+  --zd-button-bg: #F0EFEE;
+  --zd-button-bg-hover: #E5E4E3;
 }
 
 /* Z:DRIVE Design System — Dark Mode */

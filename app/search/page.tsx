@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Header, Footer } from '@/components/layout';
-import { ReleaseGrid, type ReleaseItem } from '@/components/release';
+import { ReleaseList, type ReleaseItem } from '@/components/release';
 import { SearchBar, LoadingPage } from '@/components/ui';
 import {
   fetchNewCoins,
@@ -109,6 +109,7 @@ function SearchPageContent() {
     metadata: release.metadata,
     creatorAddress: release.creatorAddress,
     creatorName: release.creatorName,
+    createdAt: release.createdAt,
   }));
 
   return (
@@ -134,7 +135,7 @@ function SearchPageContent() {
                   : `${releaseItems.length} result${releaseItems.length !== 1 ? 's' : ''} for "${query}"`}
               </p>
 
-              <ReleaseGrid
+              <ReleaseList
                 releases={releaseItems}
                 isLoading={isLoading}
                 emptyMessage={`No releases found for "${query}"`}

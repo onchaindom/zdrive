@@ -1,7 +1,16 @@
 'use client';
 
 import { ReleaseRow, ReleaseRowSkeleton } from './ReleaseRow';
-import type { ReleaseItem } from './ReleaseGrid';
+import type { ZDriveMetadata } from '@/types/zdrive';
+
+export interface ReleaseItem {
+  address: string;
+  metadata: ZDriveMetadata;
+  creatorAddress: string;
+  creatorName?: string;
+  holders?: number;
+  createdAt?: string;
+}
 
 interface ReleaseListProps {
   releases: ReleaseItem[];
