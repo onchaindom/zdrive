@@ -62,7 +62,10 @@ export function HeaderNav() {
           }
         }}
       >
-        <span className="text-sm text-zd-text-muted cursor-pointer select-none">Search</span>
+        <span className={clsx(
+          'text-sm text-zd-text-muted cursor-pointer select-none transition-all duration-200',
+          searchOpen ? 'opacity-0 max-w-0 overflow-hidden' : 'opacity-100 max-w-[60px]'
+        )}>Search</span>
         <div
           className="overflow-hidden transition-all duration-200 ease-out"
           style={{ width: searchOpen ? '180px' : '0px', marginLeft: searchOpen ? '8px' : '0px' }}

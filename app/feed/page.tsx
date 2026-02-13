@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Header, Footer } from '@/components/layout';
-import { ReleaseList, type ReleaseItem } from '@/components/release';
+import { FeedRow, FeedRowSkeleton, type ReleaseItem } from '@/components/release';
 import { Button, LoadingSpinner } from '@/components/ui';
 import { useReleases, type SortOption } from '@/hooks/useExplore';
 import { getFileType } from '@/types/zdrive';
@@ -25,6 +25,19 @@ const TYPE_FILTERS: { id: FilterType; label: string }[] = [
   { id: 'other', label: 'Other' },
 ];
 
+function FeedListHeader() {
+  return (
+    <div className="grid grid-cols-[90px_1fr_40px] sm:grid-cols-[90px_1fr_120px_40px_70px_80px] items-center h-8 px-3 border-b border-zd-border text-xs font-mono text-zd-text-muted uppercase">
+      <div>DATE</div>
+      <div>NAME</div>
+      <div className="hidden sm:block">CREATOR</div>
+      <div className="text-center">TYPE</div>
+      <div className="hidden sm:block text-right">HOLDERS</div>
+      <div className="hidden sm:block text-right">24H VOL</div>
+    </div>
+  );
+}
+
 export default function FeedPage() {
   const [sort, setSort] = useState<SortOption>('created');
   const [typeFilter, setTypeFilter] = useState<FilterType>('all');
@@ -44,6 +57,7 @@ export default function FeedPage() {
     creatorAddress: release.creatorAddress,
     creatorName: release.creatorName,
     createdAt: release.createdAt,
+    volume24h: release.volume24h,
   }));
 
   // Client-side type filtering
@@ -78,12 +92,7 @@ export default function FeedPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="font-display tracking-tighter" style={{ fontSize: 'clamp(2rem, 6vw, 3rem)' }}>
-              Releases
-              {!isLoading && (
-                <sup className="text-lg font-mono text-zd-text-muted ml-1">
-                  ({filteredItems.length})
-                </sup>
-              )}
+              Z:Feed
             </h1>
           </div>
 
@@ -91,7 +100,7 @@ export default function FeedPage() {
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             {/* Sort controls */}
             <div className="flex items-center gap-4">
-              <span className="text-xs font-mono text-zd-text-muted">/ SORT BY:</span>
+              <span className="text-xs font-mono text-zd-text-muted uppercase">SORT BY:</span>
               {SORT_OPTIONS.map((option) => (
                 <button
                   key={option.id}
@@ -134,12 +143,34 @@ export default function FeedPage() {
             </div>
           )}
 
-          {/* Release List */}
-          <ReleaseList
-            releases={filteredItems}
-            isLoading={isLoading}
-            emptyMessage="No releases yet. Be the first to create one!"
-          />
+          {/* Feed List */}
+          {isLoading ? (
+            <div className="border border-zd-border">
+              <FeedListHeader />
+              {Array.from({ length: 6 }).map((_, i) => (
+                <FeedRowSkeleton key={i} />
+              ))}
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="flex min-h-[200px] items-center justify-center text-zd-text-secondary">
+              No releases yet. Be the first to create one!
+            </div>
+          ) : (
+            <div className="border border-zd-border">
+              <FeedListHeader />
+              {filteredItems.map((item) => (
+                <FeedRow
+                  key={item.address}
+                  address={item.address}
+                  metadata={item.metadata}
+                  creatorAddress={item.creatorAddress}
+                  creatorName={item.creatorName}
+                  createdAt={item.createdAt}
+                  volume24h={item.volume24h}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Load More */}
           {hasNextPage && (

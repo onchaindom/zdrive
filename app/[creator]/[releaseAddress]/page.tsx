@@ -24,10 +24,11 @@ interface ReleasePageProps {
 const POLLING_INTERVAL = 3000; // 3 seconds
 const POLLING_TIMEOUT = 60_000; // 60 seconds
 
-function ReleaseBreadcrumb({ creator, releaseName }: { creator: string; releaseName?: string }) {
+function ReleaseBreadcrumb({ creator, releaseName, collection }: { creator: string; releaseName?: string; collection?: { id: string; title: string } }) {
   const segments = [
     { label: 'Z:', href: '/' },
     { label: truncateAddress(creator), href: `/${creator}` },
+    ...(collection ? [{ label: collection.title, href: `/collection/${encodeURIComponent(collection.id)}` }] : []),
     ...(releaseName ? [{ label: releaseName }] : []),
   ];
   return (
@@ -175,7 +176,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <ReleaseBreadcrumb creator={creator} releaseName={metadata.name} />
+      <ReleaseBreadcrumb creator={creator} releaseName={metadata.name} collection={collection ? { id: collection.id, title: collection.title } : undefined} />
 
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8">
@@ -204,7 +205,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
             </div>
 
             {/* Side panel */}
-            <div className="border border-zd-border bg-zd-surface p-5 space-y-0">
+            <div className="border border-zd-border bg-zd-surface p-5 space-y-0 self-start lg:sticky lg:top-16">
               {/* Title + Creator + Collection + Description */}
               <div className="pb-4">
                 <h1 className="font-display text-xl tracking-tight leading-tight">{metadata.name}</h1>
@@ -212,7 +213,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                   <Zorb size={20} seed={release.creatorAddress} />
                   <Link
                     href={`/${release.creatorAddress}`}
-                    className="text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text"
+                    className="text-sm text-zd-text-secondary font-bold transition-colors duration-150 hover:text-zd-text"
                   >
                     {release.creatorName || truncateAddress(release.creatorAddress)}
                   </Link>
@@ -222,7 +223,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                     <span className="text-sm text-zd-text-secondary">Part of </span>
                     <Link
                       href={`/collection/${encodeURIComponent(collection.id)}`}
-                      className="text-sm text-zd-text underline"
+                      className="text-sm text-zd-text font-bold"
                     >
                       {collection.title}
                     </Link>
@@ -246,70 +247,70 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                 <div className="mt-3">
                   <DisclosureLink label="Details">
                     {/* MARKET */}
-                    <p className="text-xs font-mono text-zd-text-muted mb-3">/ MARKET</p>
+                    <p className="text-xs font-mono text-zd-text-muted uppercase mb-3">MARKET</p>
                     {coinStats?.marketCap && (
-                      <div className="flex justify-between items-baseline py-1">
-                        <span className="text-[13px] text-zd-text-secondary">Market cap</span>
+                      <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                        <span className="text-[13px] text-zd-text-secondary uppercase">Market cap</span>
                         <span className="text-[13px] font-mono text-zd-text">{coinStats.marketCap}</span>
                       </div>
                     )}
                     {coinStats?.volume24h && (
-                      <div className="flex justify-between items-baseline py-1">
-                        <span className="text-[13px] text-zd-text-secondary">Volume (24h)</span>
+                      <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                        <span className="text-[13px] text-zd-text-secondary uppercase">Volume (24h)</span>
                         <span className="text-[13px] font-mono text-zd-text">{coinStats.volume24h}</span>
                       </div>
                     )}
                     {coinStats?.uniqueHolders !== undefined && (
-                      <div className="flex justify-between items-baseline py-1">
-                        <span className="text-[13px] text-zd-text-secondary">Holders</span>
+                      <div className="flex justify-between items-baseline py-2.5">
+                        <span className="text-[13px] text-zd-text-secondary uppercase">Holders</span>
                         <span className="text-[13px] font-mono text-zd-text">{coinStats.uniqueHolders.toLocaleString()}</span>
                       </div>
                     )}
 
                     {/* COIN */}
                     <div className="border-t border-zd-border mt-4 pt-4">
-                      <p className="text-xs font-mono text-zd-text-muted mb-3">/ COIN</p>
+                      <p className="text-xs font-mono text-zd-text-muted uppercase mb-3">COIN</p>
                       {coinStats?.symbol && (
-                        <div className="flex justify-between items-baseline py-1">
-                          <span className="text-[13px] text-zd-text-secondary">Symbol</span>
+                        <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                          <span className="text-[13px] text-zd-text-secondary uppercase">Symbol</span>
                           <span className="text-[13px] font-mono text-zd-text">${coinStats.symbol}</span>
                         </div>
                       )}
-                      <div className="flex justify-between items-baseline py-1">
-                        <span className="text-[13px] text-zd-text-secondary">Contract</span>
+                      <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                        <span className="text-[13px] text-zd-text-secondary uppercase">Contract</span>
                         <span className="text-[13px] font-mono text-zd-text-muted">{truncateAddress(releaseAddress)}</span>
                       </div>
                       {release.createdAt && (
-                        <div className="flex justify-between items-baseline py-1">
-                          <span className="text-[13px] text-zd-text-secondary">Created</span>
+                        <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                          <span className="text-[13px] text-zd-text-secondary uppercase">Created</span>
                           <span className="text-[13px] font-mono text-zd-text">{new Date(release.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                       )}
-                      <div className="mt-3 space-y-1.5">
-                        <a href={`https://zora.co/coin/base:${releaseAddress}`} target="_blank" rel="noopener noreferrer" className="block text-[13px] text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Zora</a>
-                        <a href={`https://basescan.org/address/${releaseAddress}`} target="_blank" rel="noopener noreferrer" className="block text-[13px] text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Basescan</a>
+                      <div className="py-2.5">
+                        <a href={`https://zora.co/coin/base:${releaseAddress}`} target="_blank" rel="noopener noreferrer" className="block text-[13px] text-zd-text-secondary font-bold transition-colors duration-150 hover:text-zd-text">View on Zora</a>
+                        <a href={`https://basescan.org/address/${releaseAddress}`} target="_blank" rel="noopener noreferrer" className="block text-[13px] text-zd-text-secondary font-bold transition-colors duration-150 hover:text-zd-text mt-1.5">View on Basescan</a>
                       </div>
                     </div>
 
                     {/* LICENSE */}
                     <div className="border-t border-zd-border mt-4 pt-4">
-                      <p className="text-xs font-mono text-zd-text-muted mb-3">/ LICENSE</p>
+                      <p className="text-xs font-mono text-zd-text-muted uppercase mb-3">LICENSE</p>
                       {contentType && (
-                        <div className="flex justify-between items-baseline py-1">
-                          <span className="text-[13px] text-zd-text-secondary">Content type</span>
+                        <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                          <span className="text-[13px] text-zd-text-secondary uppercase">Content type</span>
                           <span className="text-[13px] font-mono text-zd-text uppercase">{contentType}</span>
                         </div>
                       )}
-                      <div className="flex justify-between items-baseline py-1">
-                        <span className="text-[13px] text-zd-text-secondary">License</span>
+                      <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                        <span className="text-[13px] text-zd-text-secondary uppercase">License</span>
                         {license?.cbe?.textUrl ? (
-                          <a href={ipfsToHttp(license.cbe.textUrl)} target="_blank" rel="noopener noreferrer" className="text-[13px] font-mono text-zd-text underline transition-colors duration-150 hover:text-zd-text-secondary">{licenseStatus.licenseName}</a>
+                          <a href={ipfsToHttp(license.cbe.textUrl)} target="_blank" rel="noopener noreferrer" className="text-[13px] font-mono text-zd-text font-bold transition-colors duration-150 hover:text-zd-text-secondary">{licenseStatus.licenseName}</a>
                         ) : (
                           <span className="text-[13px] font-mono text-zd-text">{licenseStatus.licenseName}</span>
                         )}
                       </div>
-                      <div className="flex justify-between items-baseline py-1">
-                        <span className="text-[13px] text-zd-text-secondary">Download</span>
+                      <div className="flex justify-between items-baseline py-2.5 border-b border-zd-border">
+                        <span className="text-[13px] text-zd-text-secondary uppercase">Download</span>
                         <span className="text-[13px] font-mono text-zd-text">
                           {licenseStatus.requiresGate ? 'Collect 1' : 'Open'}
                         </span>
@@ -319,8 +320,8 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                         const isCommercial = t === 'CBE_CC0' || t === 'CBE_COMMERCIAL' || t === 'CBE_NONEXCLUSIVE' || t === 'CBE_EXCLUSIVE';
                         if (!isCommercial) {
                           return (
-                            <div className="flex justify-between items-baseline py-1">
-                              <span className="text-[13px] text-zd-text-secondary">Commercial use</span>
+                            <div className="flex justify-between items-baseline py-2.5">
+                              <span className="text-[13px] text-zd-text-secondary uppercase">Commercial use</span>
                               <span className="text-[13px] font-mono text-zd-text">Not permitted</span>
                             </div>
                           );
@@ -329,8 +330,8 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                         const symbol = coinStats?.symbol;
                         const threshold = minBal ? Math.round(Number(BigInt(minBal)) / 1e18) : 0;
                         return (
-                          <div className="flex justify-between items-baseline py-1">
-                            <span className="text-[13px] text-zd-text-secondary">Commercial use</span>
+                          <div className="flex justify-between items-baseline py-2.5">
+                            <span className="text-[13px] text-zd-text-secondary uppercase">Commercial use</span>
                             <span className="text-[13px] font-mono text-zd-text">
                               {threshold > 0 && symbol ? `Own ${threshold.toLocaleString()} $${symbol}` : 'Open'}
                             </span>

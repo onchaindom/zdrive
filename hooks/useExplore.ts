@@ -5,7 +5,7 @@ import {
   fetchNewCoins,
   fetchTopVolumeCoins,
   fetchMostValuableCoins,
-  adaptCoinToRelease,
+  filterZDriveReleases,
   type ParsedRelease,
 } from '@/lib/zora/queries';
 
@@ -29,9 +29,7 @@ export function useReleases(sort: SortOption = 'created') {
           break;
       }
 
-      const releases = result.coins
-        .map(adaptCoinToRelease)
-        .filter((r): r is ParsedRelease => r !== null);
+      const releases = filterZDriveReleases(result.coins);
 
       return {
         releases,

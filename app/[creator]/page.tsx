@@ -247,7 +247,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
           {/* Collections */}
           {collections.length > 0 && (
             <div className="mb-8">
-              <h2 className="mb-3 text-sm font-medium text-zd-text-secondary">
+              <h2 className="mb-3 text-sm font-medium text-zd-text-secondary uppercase">
                 Collections
               </h2>
               <div className="flex flex-wrap gap-2">

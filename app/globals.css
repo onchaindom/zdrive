@@ -10,7 +10,7 @@
   --font-display: system-ui, sans-serif;
 
   /* Z:DRIVE Design System — Light Mode */
-  --zd-bg: #FAFAF9;
+  --zd-bg: #FFFFFF;
   --zd-surface: #FFFFFF;
   --zd-surface-hover: #F5F5F4;
   --zd-border: #E5E5E4;
@@ -26,7 +26,7 @@
 
 /* Z:DRIVE Design System — Dark Mode */
 .dark {
-  --zd-bg: #171615;
+  --zd-bg: #1F1E1C;
   --zd-surface: #1F1E1C;
   --zd-surface-hover: #2A2826;
   --zd-border: #2E2C29;

@@ -8,11 +8,11 @@ export function BreadcrumbHeader({ segments, children }: { segments: BreadcrumbS
       <div className="font-display tracking-tight text-lg flex items-center">
         {segments.map((seg, i) => (
           <span key={i} className="flex items-center">
-            {i > 0 && <span className="text-zd-text mx-0.5">/</span>}
+            {i > 0 && <span className="text-zd-text-muted font-light mx-2">/</span>}
             {i < segments.length - 1 && seg.href ? (
-              <Link href={seg.href} className="text-zd-text transition-colors duration-150 hover:text-zd-text-secondary">{seg.label}</Link>
+              <Link href={seg.href} className="text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">{seg.label}</Link>
             ) : (
-              <span className="text-zd-text">{seg.label}</span>
+              <span className="text-zd-text font-semibold">{seg.label}</span>
             )}
           </span>
         ))}

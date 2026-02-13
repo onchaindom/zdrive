@@ -10,6 +10,7 @@ export interface ReleaseItem {
   creatorName?: string;
   holders?: number;
   createdAt?: string;
+  volume24h?: string;
 }
 
 interface ReleaseListProps {
@@ -62,11 +63,10 @@ export function ReleaseList({
 
 function ReleaseListHeader() {
   return (
-    <div className="grid grid-cols-[100px_1fr_60px_32px] sm:grid-cols-[120px_1fr_80px_32px] items-center h-9 px-3 border-b border-zd-border text-xs font-mono text-zd-text-muted">
-      <div>/ DATE</div>
-      <div>/ NAME</div>
-      <div>/ TYPE</div>
-      <div></div>
+    <div className="grid grid-cols-[100px_1fr_60px] sm:grid-cols-[120px_1fr_80px] items-center h-8 px-3 border-b border-zd-border text-xs font-mono text-zd-text-muted uppercase">
+      <div>DATE</div>
+      <div>NAME</div>
+      <div className="text-center">TYPE</div>
     </div>
   );
 }
