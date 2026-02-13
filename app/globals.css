@@ -53,8 +53,8 @@ body {
 }
 
 body {
-  color: #171717;
-  background: #fafafa;
+  color: var(--zd-text);
+  background: var(--zd-bg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

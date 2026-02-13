@@ -24,7 +24,7 @@ export function HoldersTab({
 
   if (holders.length === 0) {
     return (
-      <div className="py-6 text-center text-sm text-zdrive-text-muted">
+      <div className="py-6 text-center text-sm text-zd-text-muted">
         No holders yet
       </div>
     );
@@ -35,7 +35,7 @@ export function HoldersTab({
       {holders.map((holder, index) => (
         <div
           key={holder.holderAddress + index}
-          className="flex items-center justify-between border-b border-zdrive-border px-1 py-2 last:border-b-0"
+          className="flex items-center justify-between border-b border-zd-border px-1 py-2 last:border-b-0"
         >
           <div className="flex items-center gap-2">
             {holder.profile?.avatar ? (
@@ -45,7 +45,7 @@ export function HoldersTab({
                 className="h-5 w-5 rounded-full"
               />
             ) : (
-              <div className="h-5 w-5 rounded-full bg-zdrive-border" />
+              <div className="h-5 w-5 rounded-full bg-zd-border" />
             )}
             <a
               href={`https://basescan.org/address/${holder.holderAddress}`}
@@ -56,7 +56,7 @@ export function HoldersTab({
               {holder.profile?.displayName || truncateAddress(holder.holderAddress)}
             </a>
           </div>
-          <span className="text-xs text-zdrive-text-secondary">
+          <span className="text-xs text-zd-text-secondary">
             {holder.balanceFormatted}
           </span>
         </div>
@@ -66,7 +66,7 @@ export function HoldersTab({
         <button
           onClick={onLoadMore}
           disabled={isFetchingNextPage}
-          className="mt-2 w-full py-2 text-center text-xs text-zdrive-text-secondary hover:text-zdrive-text disabled:opacity-50"
+          className="mt-2 w-full py-2 text-center text-xs text-zd-text-secondary hover:text-zd-text disabled:opacity-50"
         >
           {isFetchingNextPage ? 'Loading...' : 'Load more'}
         </button>
@@ -81,10 +81,10 @@ function TabSkeleton({ rows }: { rows: number }) {
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center justify-between py-2">
           <div className="flex items-center gap-2">
-            <div className="h-5 w-5 rounded-full bg-zdrive-border" />
-            <div className="h-3 w-24 rounded bg-zdrive-border" />
+            <div className="h-5 w-5 rounded-full bg-zd-border" />
+            <div className="h-3 w-24 rounded bg-zd-border" />
           </div>
-          <div className="h-3 w-16 rounded bg-zdrive-border" />
+          <div className="h-3 w-16 rounded bg-zd-border" />
         </div>
       ))}
     </div>

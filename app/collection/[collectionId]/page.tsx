@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Header, Footer } from '@/components/layout';
-import { ReleaseGrid, type ReleaseItem } from '@/components/release';
+import { BreadcrumbHeader, Footer } from '@/components/layout';
+import { ConnectButton } from '@/components/wallet/ConnectButton';
+import { ReleaseList, type ReleaseItem } from '@/components/release';
 import { LoadingPage } from '@/components/ui';
 import { useCollection } from '@/hooks/useCollection';
 import { useCreatorProfile } from '@/hooks/useCreator';
@@ -13,6 +14,20 @@ interface CollectionPageProps {
   params: {
     collectionId: string;
   };
+}
+
+function CollectionBreadcrumb({ creatorAddress, creatorName, title }: { creatorAddress?: string; creatorName?: string; title?: string }) {
+  const segments = [
+    { label: 'Z:', href: '/' },
+    ...(creatorAddress ? [{ label: creatorName || truncateAddress(creatorAddress), href: `/${creatorAddress}` }] : []),
+    ...(title ? [{ label: title }] : []),
+  ];
+  return (
+    <BreadcrumbHeader segments={segments}>
+      <Link href="/feed" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</Link>
+      <ConnectButton />
+    </BreadcrumbHeader>
+  );
 }
 
 export default function CollectionPage({ params }: CollectionPageProps) {
@@ -27,7 +42,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Header />
+        <CollectionBreadcrumb />
         <LoadingPage />
         <Footer />
       </div>
@@ -37,11 +52,11 @@ export default function CollectionPage({ params }: CollectionPageProps) {
   if (error || !collection) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Header />
+        <CollectionBreadcrumb />
         <main className="flex flex-1 items-center justify-center">
           <div className="text-center">
             <h1 className="text-xl font-light">Collection not found</h1>
-            <p className="mt-2 text-zdrive-text-secondary">
+            <p className="mt-2 text-zd-text-secondary">
               This collection may not exist or may have no releases.
             </p>
             <Link
@@ -67,7 +82,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <CollectionBreadcrumb creatorAddress={collection.creatorAddress} creatorName={creatorProfile?.displayName} title={collection.title} />
 
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8">
@@ -75,7 +90,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
           <div className="mb-8 flex flex-col gap-6 sm:flex-row">
             {/* Cover Image */}
             {collection.coverImage && (
-              <div className="relative h-48 w-48 flex-shrink-0 bg-zdrive-bg">
+              <div className="relative h-48 w-48 flex-shrink-0 bg-zd-bg">
                 <Image
                   src={ipfsToHttp(collection.coverImage)}
                   alt={collection.title}
@@ -88,12 +103,12 @@ export default function CollectionPage({ params }: CollectionPageProps) {
 
             {/* Info */}
             <div>
-              <p className="text-sm text-zdrive-text-secondary">Collection</p>
+              <p className="text-sm text-zd-text-secondary">Collection</p>
               <h1 className="mt-1 text-3xl font-light">{collection.title}</h1>
 
               <Link
                 href={`/${collection.creatorAddress}`}
-                className="mt-2 inline-flex items-center gap-2 text-sm text-zdrive-text-secondary hover:text-zdrive-text"
+                className="mt-2 inline-flex items-center gap-2 text-sm text-zd-text-secondary hover:text-zd-text"
               >
                 {creatorProfile?.avatar && (
                   <Image
@@ -108,7 +123,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
                   truncateAddress(collection.creatorAddress)}
               </Link>
 
-              <p className="mt-4 text-sm text-zdrive-text-muted">
+              <p className="mt-4 text-sm text-zd-text-muted">
                 {collection.releases.length} release
                 {collection.releases.length !== 1 ? 's' : ''}
               </p>
@@ -117,10 +132,10 @@ export default function CollectionPage({ params }: CollectionPageProps) {
 
           {/* Releases */}
           <div>
-            <h2 className="mb-4 text-sm font-medium text-zdrive-text-secondary">
+            <h2 className="mb-4 text-sm font-medium text-zd-text-secondary">
               Releases in this collection
             </h2>
-            <ReleaseGrid
+            <ReleaseList
               releases={releaseItems}
               emptyMessage="No releases in this collection yet."
             />

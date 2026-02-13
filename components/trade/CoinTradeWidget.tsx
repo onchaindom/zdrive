@@ -34,7 +34,7 @@ export function CoinTradeWidget({
 
   return (
     <div className="space-y-3">
-      <div className="border border-zdrive-border bg-zdrive-surface p-4">
+      <div className="border border-zd-border bg-zd-surface p-4">
         <WidgetHeader stats={stats ?? null} isLoading={isLoading} />
       </div>
 

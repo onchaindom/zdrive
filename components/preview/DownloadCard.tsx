@@ -117,32 +117,32 @@ export function DownloadCard({ asset, className }: DownloadCardProps) {
   }, [showFiles, zipEntries, isTooLarge, downloadUrl]);
 
   return (
-    <div className={`border border-zdrive-border bg-zdrive-surface ${className}`}>
+    <div className={`border border-zd-border bg-zd-surface ${className}`}>
       {/* Main download row */}
       <a
         href={downloadUrl}
         download={asset.name}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-4 p-4 transition-colors hover:bg-zdrive-bg"
+        className="flex items-center gap-4 p-4 transition-colors hover:bg-zd-bg"
       >
-        <div className="text-zdrive-text-secondary">{getFileIcon(asset.mime)}</div>
+        <div className="text-zd-text-secondary">{getFileIcon(asset.mime)}</div>
 
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">{asset.name}</p>
-          <p className="text-sm text-zdrive-text-muted">
+          <p className="text-sm text-zd-text-muted">
             {asset.mime}
             {sizeDisplay && ` · ${sizeDisplay}`}
           </p>
           {asset.sha256 && (
-            <p className="mt-1 font-mono text-xs text-zdrive-text-muted">
+            <p className="mt-1 font-mono text-xs text-zd-text-muted">
               SHA-256: {asset.sha256.slice(0, 16)}...
             </p>
           )}
         </div>
 
         <svg
-          className="h-5 w-5 flex-shrink-0 text-zdrive-text-secondary"
+          className="h-5 w-5 flex-shrink-0 text-zd-text-secondary"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -158,10 +158,10 @@ export function DownloadCard({ asset, className }: DownloadCardProps) {
 
       {/* ZIP file list toggle */}
       {isZip && (
-        <div className="border-t border-zdrive-border">
+        <div className="border-t border-zd-border">
           <button
             onClick={handleToggleFiles}
-            className="flex w-full items-center justify-between px-4 py-2 text-sm text-zdrive-text-secondary transition-colors hover:bg-zdrive-bg hover:text-zdrive-text"
+            className="flex w-full items-center justify-between px-4 py-2 text-sm text-zd-text-secondary transition-colors hover:bg-zd-bg hover:text-zd-text"
           >
             <span>{showFiles ? 'Hide files' : 'Show files'}</span>
             <svg
@@ -181,9 +181,9 @@ export function DownloadCard({ asset, className }: DownloadCardProps) {
 
           {/* Expanded file list */}
           {showFiles && (
-            <div className="border-t border-zdrive-border bg-zdrive-bg p-4">
+            <div className="border-t border-zd-border bg-zd-bg p-4">
               {isLoading && (
-                <p className="text-sm text-zdrive-text-muted">Loading...</p>
+                <p className="text-sm text-zd-text-muted">Loading...</p>
               )}
 
               {zipError && (
@@ -197,10 +197,10 @@ export function DownloadCard({ asset, className }: DownloadCardProps) {
                       key={entry.name}
                       className="flex items-center justify-between text-sm"
                     >
-                      <span className="min-w-0 flex-1 truncate font-mono text-zdrive-text-secondary">
+                      <span className="min-w-0 flex-1 truncate font-mono text-zd-text-secondary">
                         {entry.name}
                       </span>
-                      <span className="ml-4 flex-shrink-0 text-zdrive-text-muted">
+                      <span className="ml-4 flex-shrink-0 text-zd-text-muted">
                         {formatSize(entry.size)}
                       </span>
                     </div>
@@ -209,7 +209,7 @@ export function DownloadCard({ asset, className }: DownloadCardProps) {
               )}
 
               {zipEntries && zipEntries.length === 0 && (
-                <p className="text-sm text-zdrive-text-muted">
+                <p className="text-sm text-zd-text-muted">
                   ZIP file is empty
                 </p>
               )}
@@ -232,7 +232,7 @@ export function DownloadList({ assets, className }: DownloadListProps) {
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <h3 className="text-sm font-medium text-zdrive-text-secondary">
+      <h3 className="text-sm font-medium text-zd-text-secondary">
         Attachments
       </h3>
       {assets.map((asset, index) => (

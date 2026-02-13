@@ -35,8 +35,8 @@ interface PreviewRendererProps {
 
 function PreviewSkeleton() {
   return (
-    <div className="flex aspect-[4/3] items-center justify-center bg-zdrive-bg">
-      <div className="h-8 w-8 animate-spin border-2 border-zdrive-border border-t-zdrive-text" />
+    <div className="flex aspect-[4/3] items-center justify-center bg-zd-bg">
+      <div className="h-8 w-8 animate-spin border-2 border-zd-border border-t-zd-text" />
     </div>
   );
 }
@@ -82,8 +82,8 @@ export function PreviewRenderer({ metadata, className }: PreviewRendererProps) {
 
   // 4. Nothing to preview
   return (
-    <div className={`flex aspect-[4/3] items-center justify-center bg-zdrive-bg ${className}`}>
-      <p className="text-sm text-zdrive-text-muted">No preview available</p>
+    <div className={`flex aspect-[4/3] items-center justify-center bg-zd-bg ${className}`}>
+      <p className="text-sm text-zd-text-muted">No preview available</p>
     </div>
   );
 }
@@ -134,15 +134,15 @@ function renderByType(
               className="h-auto w-full object-contain"
               unoptimized
             />
-            <p className="mt-2 text-center text-sm text-zdrive-text-muted">
+            <p className="mt-2 text-center text-sm text-zd-text-muted">
               Preview not available for {mime}
             </p>
           </div>
         );
       }
       return (
-        <div className={`flex aspect-[4/3] items-center justify-center bg-zdrive-bg ${className}`}>
-          <p className="text-sm text-zdrive-text-muted">
+        <div className={`flex aspect-[4/3] items-center justify-center bg-zd-bg ${className}`}>
+          <p className="text-sm text-zd-text-muted">
             Preview not available for {mime}
           </p>
         </div>

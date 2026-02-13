@@ -81,17 +81,17 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
 
   return (
     <div ref={containerRef} className={className}>
-      <div className="relative bg-zdrive-bg">
+      <div className="relative bg-zd-bg">
         {/* Loading state */}
         {isLoading && (
           <div className="flex min-h-[400px] items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-zd-border border-t-zd-text" />
           </div>
         )}
 
         {/* Error state */}
         {error && (
-          <div className="flex min-h-[400px] items-center justify-center text-zdrive-text-secondary">
+          <div className="flex min-h-[400px] items-center justify-center text-zd-text-secondary">
             {error}
           </div>
         )}
@@ -112,7 +112,7 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
                 width={pageWidth}
                 loading={
                   <div className="flex min-h-[400px] items-center justify-center">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-zd-border border-t-zd-text" />
                   </div>
                 }
               />
@@ -123,13 +123,13 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
 
       {/* Controls toolbar */}
       {numPages > 0 && (
-        <div className="flex items-center justify-between border-t border-zdrive-border bg-zdrive-surface px-3 py-2">
+        <div className="flex items-center justify-between border-t border-zd-border bg-zd-surface px-3 py-2">
           {/* Page navigation */}
           <div className="flex items-center gap-1">
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage <= 1}
-              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30 disabled:hover:bg-transparent"
+              className="rounded p-1 text-zd-text-secondary hover:bg-zd-bg hover:text-zd-text disabled:opacity-30 disabled:hover:bg-transparent"
               aria-label="Previous page"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,14 +137,14 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
               </svg>
             </button>
 
-            <span className="min-w-[80px] text-center text-sm text-zdrive-text-secondary">
+            <span className="min-w-[80px] text-center text-sm text-zd-text-secondary">
               {currentPage} / {numPages}
             </span>
 
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage >= numPages}
-              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30 disabled:hover:bg-transparent"
+              className="rounded p-1 text-zd-text-secondary hover:bg-zd-bg hover:text-zd-text disabled:opacity-30 disabled:hover:bg-transparent"
               aria-label="Next page"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -158,7 +158,7 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
             <button
               onClick={zoomOut}
               disabled={zoomIndex <= 0}
-              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30"
+              className="rounded p-1 text-zd-text-secondary hover:bg-zd-bg hover:text-zd-text disabled:opacity-30"
               aria-label="Zoom out"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,7 +168,7 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
 
             <button
               onClick={resetZoom}
-              className="min-w-[48px] rounded px-1 py-0.5 text-xs text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text"
+              className="min-w-[48px] rounded px-1 py-0.5 text-xs text-zd-text-secondary hover:bg-zd-bg hover:text-zd-text"
               title="Reset zoom"
             >
               {Math.round(zoom * 100)}%
@@ -177,7 +177,7 @@ export function PDFViewer({ uri, className }: PDFViewerProps) {
             <button
               onClick={zoomIn}
               disabled={zoomIndex >= ZOOM_LEVELS.length - 1}
-              className="rounded p-1 text-zdrive-text-secondary hover:bg-zdrive-bg hover:text-zdrive-text disabled:opacity-30"
+              className="rounded p-1 text-zd-text-secondary hover:bg-zd-bg hover:text-zd-text disabled:opacity-30"
               aria-label="Zoom in"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

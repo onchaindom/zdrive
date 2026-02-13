@@ -27,15 +27,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={clsx(
           'inline-flex items-center justify-center font-medium transition-colors',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zdrive-text focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zd-text focus-visible:ring-offset-2',
           'disabled:pointer-events-none disabled:opacity-50',
           {
             // Variants
-            'bg-zdrive-text text-white hover:bg-zdrive-accent-hover':
+            'bg-zd-text text-white hover:bg-zd-accent-hover':
               variant === 'primary',
-            'border border-zdrive-border bg-zdrive-surface text-zdrive-text hover:border-zdrive-border-hover hover:bg-zdrive-bg':
+            'border border-zd-border bg-zd-surface text-zd-text hover:border-zd-border-hover hover:bg-zd-bg':
               variant === 'secondary',
-            'text-zdrive-text hover:bg-zdrive-bg': variant === 'ghost',
+            'text-zd-text hover:bg-zd-bg': variant === 'ghost',
             // Sizes
             'h-8 px-3 text-sm': size === 'sm',
             'h-10 px-4 text-sm': size === 'md',

@@ -98,14 +98,14 @@ export function PointCloudViewer({ uri, className }: PointCloudViewerProps) {
   const httpUrl = ipfsToHttp(uri);
 
   const errorFallback = (
-    <div className={`relative flex aspect-square items-center justify-center bg-zdrive-bg ${className}`}>
+    <div className={`relative flex aspect-square items-center justify-center bg-zd-bg ${className}`}>
       <div className="text-center px-4">
-        <p className="text-sm text-zdrive-text-muted">Unable to load point cloud</p>
+        <p className="text-sm text-zd-text-muted">Unable to load point cloud</p>
         <a
           href={httpUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-zdrive-text-secondary hover:underline"
+          className="mt-2 inline-block text-xs text-zd-text-secondary hover:underline"
         >
           Download PLY file &rarr;
         </a>
@@ -115,7 +115,7 @@ export function PointCloudViewer({ uri, className }: PointCloudViewerProps) {
 
   return (
     <PLYErrorBoundary fallback={() => errorFallback}>
-      <div className={`relative aspect-square bg-zdrive-bg ${className}`}>
+      <div className={`relative aspect-square bg-zd-bg ${className}`}>
         <Canvas
           camera={{ position: [2, 2, 2], fov: 50 }}
           style={{ background: '#fafafa' }}
@@ -138,7 +138,7 @@ export function PointCloudViewer({ uri, className }: PointCloudViewerProps) {
         </Canvas>
 
         {/* Controls hint */}
-        <div className="absolute bottom-2 left-2 text-xs text-zdrive-text-muted">
+        <div className="absolute bottom-2 left-2 text-xs text-zd-text-muted">
           Drag to rotate · Scroll to zoom
         </div>
       </div>

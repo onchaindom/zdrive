@@ -48,22 +48,22 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
 
   if (isBlocked) {
     return (
-      <div className="border border-zdrive-border bg-zdrive-surface p-4 text-center text-sm text-zdrive-text-muted">
+      <div className="border border-zd-border bg-zd-surface p-4 text-center text-sm text-zd-text-muted">
         Trading is not available for this coin.
       </div>
     );
   }
 
   return (
-    <div className="border border-zdrive-border bg-zdrive-surface p-4">
+    <div className="border border-zd-border bg-zd-surface p-4">
       {/* Buy/Sell Toggle */}
-      <div className="flex rounded bg-zdrive-bg p-0.5">
+      <div className="flex rounded bg-zd-bg p-0.5">
         <button
           onClick={() => { setTradeType('buy'); reset(); }}
           className={`flex-1 rounded py-1.5 text-sm font-medium transition-colors ${
             tradeType === 'buy'
-              ? 'bg-zdrive-surface text-zdrive-text shadow-sm'
-              : 'text-zdrive-text-muted hover:text-zdrive-text-secondary'
+              ? 'bg-zd-surface text-zd-text shadow-sm'
+              : 'text-zd-text-muted hover:text-zd-text-secondary'
           }`}
         >
           Buy
@@ -72,8 +72,8 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
           onClick={() => { setTradeType('sell'); reset(); }}
           className={`flex-1 rounded py-1.5 text-sm font-medium transition-colors ${
             tradeType === 'sell'
-              ? 'bg-zdrive-surface text-zdrive-text shadow-sm'
-              : 'text-zdrive-text-muted hover:text-zdrive-text-secondary'
+              ? 'bg-zd-surface text-zd-text shadow-sm'
+              : 'text-zd-text-muted hover:text-zd-text-secondary'
           }`}
         >
           Sell
@@ -82,7 +82,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
 
       {/* Amount Input */}
       <div className="mt-3">
-        <div className="flex items-center justify-between text-xs text-zdrive-text-muted">
+        <div className="flex items-center justify-between text-xs text-zd-text-muted">
           <span>Amount</span>
           <span>
             Balance: {tradeType === 'buy'
@@ -98,9 +98,9 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
             value={amountIn}
             onChange={(e) => setAmountIn(e.target.value)}
             disabled={tradeLoading}
-            className="w-full rounded border border-zdrive-border bg-zdrive-bg px-3 py-2 pr-14 text-sm focus:border-zdrive-accent focus:outline-none disabled:opacity-50"
+            className="w-full rounded border border-zd-border bg-zd-bg px-3 py-2 pr-14 text-sm focus:border-zd-accent focus:outline-none disabled:opacity-50"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zdrive-text-muted">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zd-text-muted">
             {tradeType === 'buy' ? 'ETH' : stats?.symbol || ''}
           </span>
         </div>
@@ -113,7 +113,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
             key={preset}
             onClick={() => setPreset(preset)}
             disabled={tradeLoading}
-            className="rounded bg-zdrive-bg px-2 py-1 text-xs text-zdrive-text-secondary hover:bg-zdrive-border disabled:opacity-50"
+            className="rounded bg-zd-bg px-2 py-1 text-xs text-zd-text-secondary hover:bg-zd-border disabled:opacity-50"
           >
             {preset}
           </button>
@@ -121,7 +121,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
         <button
           onClick={setMax}
           disabled={tradeLoading}
-          className="rounded bg-zdrive-bg px-2 py-1 text-xs text-zdrive-text-secondary hover:bg-zdrive-border disabled:opacity-50"
+          className="rounded bg-zd-bg px-2 py-1 text-xs text-zd-text-secondary hover:bg-zd-border disabled:opacity-50"
         >
           Max
         </button>
@@ -134,7 +134,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
       <button
         onClick={getCTAAction({ isConnected, isWrongChain, connect, switchToBase, handleTrade })}
         disabled={getCTADisabled({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading })}
-        className="mt-3 w-full rounded bg-zdrive-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-zdrive-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-3 w-full rounded bg-zd-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-zd-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {getCTALabel({ isConnected, isWrongChain, hasAmount, hasSufficientBalance, tradeLoading, tradeType, symbol: stats?.symbol, status })}
       </button>
@@ -146,7 +146,7 @@ export function TradePanel({ coinAddress, stats }: TradePanelProps) {
             href={`https://basescan.org/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-zdrive-text-secondary hover:underline"
+            className="text-zd-text-secondary hover:underline"
           >
             View transaction →
           </a>

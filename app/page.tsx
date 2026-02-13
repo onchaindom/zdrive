@@ -1,80 +1,46 @@
 import Link from 'next/link';
-import { Header } from '@/components/layout';
+import { BreadcrumbHeader } from '@/components/layout';
+import { ZorbWanderingLight, Typewriter, CYCLING_PHRASES } from '@/components/ui';
+import { ConnectButton } from '@/components/wallet/ConnectButton';
 
 export default function Home() {
   return (
-    <>
-      <Header />
-      <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center px-4">
-        <div className="max-w-2xl text-center">
-          {/* Logo/Title */}
-          <h1 className="text-5xl font-light tracking-tight sm:text-6xl">
-            Z:Drive
-          </h1>
+    <div className="min-h-screen bg-zd-bg relative overflow-hidden">
+      {/* Faint zorb background */}
+      <div className="absolute bottom-0 right-0 opacity-[0.06] translate-x-1/4 translate-y-1/4 pointer-events-none">
+        <ZorbWanderingLight size={480} />
+      </div>
 
-          {/* Tagline */}
-          <p className="mt-6 text-lg text-zdrive-text-secondary">
-            An artist-first release platform built on Zora.
-            <br />
-            Publish PDFs, 3D files, code, and more as content coins.
-          </p>
+      {/* Breadcrumb header */}
+      <BreadcrumbHeader segments={[{ label: 'Z:' }]}>
+        <Link href="/feed" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">
+          Feed
+        </Link>
+        <ConnectButton />
+      </BreadcrumbHeader>
 
-          {/* CTAs */}
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link
-              href="/feed"
-              className="inline-flex h-12 items-center justify-center bg-zdrive-text px-8 text-sm font-medium text-white hover:bg-zdrive-accent-hover"
-            >
-              Explore Releases
-            </Link>
-            <Link
-              href="/create"
-              className="inline-flex h-12 items-center justify-center border border-zdrive-border px-8 text-sm font-medium hover:border-zdrive-border-hover hover:bg-zdrive-bg"
-            >
-              Create a Release
-            </Link>
-          </div>
-
-          {/* Features */}
-          <div className="mt-20 grid gap-8 text-left sm:grid-cols-3">
-            <div>
-              <h3 className="font-medium">Publish Anything</h3>
-              <p className="mt-2 text-sm text-zdrive-text-secondary">
-                PDFs, 3D models, images, videos, source code, archives. Native
-                previews for supported formats.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-medium">Creator Coin Flywheel</h3>
-              <p className="mt-2 text-sm text-zdrive-text-secondary">
-                Every release is a tradeable coin. Collectors support your work
-                directly.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-medium">Flexible Licensing</h3>
-              <p className="mt-2 text-sm text-zdrive-text-secondary">
-                Use a16z&apos;s &quot;Can&apos;t Be Evil&quot; licenses with
-                optional holder gates.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer note */}
-        <p className="mt-20 text-sm text-zdrive-text-muted">
-          Built on{' '}
-          <a
-            href="https://zora.co"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-zdrive-text-secondary"
-          >
-            Zora
-          </a>{' '}
-          · Base Network
+      {/* Content */}
+      <main className="relative px-6 py-24 max-w-3xl">
+        <p className="font-display tracking-tighter leading-tight" style={{ fontSize: '2.5rem', lineHeight: 1.15 }}>
+          Let your (<Typewriter texts={CYCLING_PHRASES} initialWord="work" initialDelay={2500} speed={50} deleteSpeed={30} waitTime={2000} />) make markets.
         </p>
+
+        {/* CTAs */}
+        <div className="flex items-center gap-4 mt-10">
+          <Link
+            href="/feed"
+            className="bg-zd-button-bg text-zd-text text-sm font-medium px-5 py-2.5 transition-colors duration-150 hover:bg-zd-button-bg-hover"
+          >
+            Explore
+          </Link>
+          <Link
+            href="/create"
+            className="bg-zd-button-bg text-zd-text text-sm font-medium px-5 py-2.5 transition-colors duration-150 hover:bg-zd-button-bg-hover"
+          >
+            Create
+          </Link>
+        </div>
       </main>
-    </>
+    </div>
   );
 }

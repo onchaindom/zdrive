@@ -29,8 +29,8 @@ export function ImageViewer({ uri, alt = 'Release image', className }: ImageView
 
   if (error) {
     return (
-      <div className={`flex items-center justify-center bg-zdrive-bg p-8 ${className}`}>
-        <p className="text-sm text-zdrive-text-muted">{error}</p>
+      <div className={`flex items-center justify-center bg-zd-bg p-8 ${className}`}>
+        <p className="text-sm text-zd-text-muted">{error}</p>
       </div>
     );
   }
@@ -38,7 +38,7 @@ export function ImageViewer({ uri, alt = 'Release image', className }: ImageView
   return (
     <>
       <div
-        className={`relative cursor-zoom-in bg-zdrive-bg ${className}`}
+        className={`relative cursor-zoom-in bg-zd-bg ${className}`}
         onClick={() => setIsFullscreen(true)}
         role="button"
         tabIndex={0}
@@ -52,7 +52,7 @@ export function ImageViewer({ uri, alt = 'Release image', className }: ImageView
       >
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-6 w-6 animate-spin border-2 border-zdrive-border border-t-zdrive-text" />
+            <div className="h-6 w-6 animate-spin border-2 border-zd-border border-t-zd-text" />
           </div>
         )}
         <Image

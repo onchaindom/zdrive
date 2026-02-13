@@ -49,7 +49,7 @@ export function ReleaseCard({
       className="group block"
     >
       {/* Cover Image */}
-      <div className="relative aspect-square overflow-hidden bg-zdrive-bg">
+      <div className="relative aspect-square overflow-hidden bg-zd-bg">
         <Image
           src={coverUrl}
           alt={metadata.name}
@@ -74,7 +74,7 @@ export function ReleaseCard({
         <h3 className="truncate text-sm font-medium group-hover:underline">
           {metadata.name}
         </h3>
-        <p className="text-xs text-zdrive-text-secondary">
+        <p className="text-xs text-zd-text-secondary">
           {creatorName || truncateAddress(creatorAddress)}
         </p>
       </div>
@@ -86,10 +86,10 @@ export function ReleaseCard({
 export function ReleaseCardSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="aspect-square bg-zdrive-border" />
+      <div className="aspect-square bg-zd-border" />
       <div className="mt-2 space-y-1">
-        <div className="h-4 w-3/4 bg-zdrive-border" />
-        <div className="h-3 w-1/2 bg-zdrive-border" />
+        <div className="h-4 w-3/4 bg-zd-border" />
+        <div className="h-3 w-1/2 bg-zd-border" />
       </div>
     </div>
   );

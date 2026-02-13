@@ -19,7 +19,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-zdrive-text"
+            className="block text-sm font-medium text-zd-text"
           >
             {label}
           </label>
@@ -28,21 +28,21 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={inputId}
           className={clsx(
-            'w-full border bg-zdrive-surface px-3 py-2 text-sm',
-            'placeholder:text-zdrive-text-muted',
-            'focus:outline-none focus:ring-2 focus:ring-zdrive-text focus:ring-offset-1',
+            'w-full border bg-zd-surface px-3 py-2 text-sm',
+            'placeholder:text-zd-text-muted',
+            'focus:outline-none focus:ring-2 focus:ring-zd-text focus:ring-offset-1',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'min-h-[100px] resize-y',
             error
               ? 'border-red-500 focus:ring-red-500'
-              : 'border-zdrive-border',
+              : 'border-zd-border',
             className
           )}
           {...props}
         />
         {error && <p className="text-sm text-red-500">{error}</p>}
         {hint && !error && (
-          <p className="text-sm text-zdrive-text-muted">{hint}</p>
+          <p className="text-sm text-zd-text-muted">{hint}</p>
         )}
       </div>
     );

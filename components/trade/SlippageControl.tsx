@@ -31,7 +31,7 @@ export function SlippageControl({ slippage, onSlippageChange }: SlippageControlP
     <div className="mt-2">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between text-xs text-zdrive-text-muted hover:text-zdrive-text-secondary"
+        className="flex w-full items-center justify-between text-xs text-zd-text-muted hover:text-zd-text-secondary"
       >
         <span>Slippage: {(slippage * 100).toFixed(1)}%</span>
         <svg
@@ -55,8 +55,8 @@ export function SlippageControl({ slippage, onSlippageChange }: SlippageControlP
               }}
               className={`rounded px-2 py-1 text-xs transition-colors ${
                 slippage === preset.value
-                  ? 'bg-zdrive-accent text-white'
-                  : 'bg-zdrive-bg text-zdrive-text-secondary hover:bg-zdrive-border'
+                  ? 'bg-zd-accent text-white'
+                  : 'bg-zd-bg text-zd-text-secondary hover:bg-zd-border'
               }`}
             >
               {preset.label}
@@ -68,9 +68,9 @@ export function SlippageControl({ slippage, onSlippageChange }: SlippageControlP
             placeholder="Custom"
             value={isCustom ? (slippage * 100).toString() : customValue}
             onChange={(e) => handleCustomChange(e.target.value)}
-            className="w-14 rounded border border-zdrive-border bg-zdrive-bg px-2 py-1 text-xs focus:border-zdrive-accent focus:outline-none"
+            className="w-14 rounded border border-zd-border bg-zd-bg px-2 py-1 text-xs focus:border-zd-accent focus:outline-none"
           />
-          <span className="text-xs text-zdrive-text-muted">%</span>
+          <span className="text-xs text-zd-text-muted">%</span>
         </div>
       )}
     </div>

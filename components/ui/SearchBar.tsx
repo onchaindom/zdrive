@@ -35,13 +35,13 @@ export function SearchBar({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
           className={clsx(
-            'w-full border border-zdrive-border bg-zdrive-surface py-2 pl-10 pr-4 text-sm',
-            'placeholder:text-zdrive-text-muted',
-            'focus:border-zdrive-border-hover focus:outline-none focus:ring-1 focus:ring-zdrive-text'
+            'w-full border border-zd-border bg-zd-surface py-2 pl-10 pr-4 text-sm',
+            'placeholder:text-zd-text-muted',
+            'focus:border-zd-border-hover focus:outline-none focus:ring-1 focus:ring-zd-text'
           )}
         />
         <svg
-          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zdrive-text-muted"
+          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zd-text-muted"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

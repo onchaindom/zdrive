@@ -29,7 +29,7 @@ export function CollectButton({
       {variant === 'icon' ? (
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex h-10 w-10 items-center justify-center border border-zdrive-border bg-zdrive-surface text-zdrive-text transition-colors hover:border-zdrive-text hover:bg-zdrive-text hover:text-white"
+          className="flex h-10 w-10 items-center justify-center border border-zd-border bg-zd-surface text-zd-text transition-colors hover:border-zd-text hover:bg-zd-text hover:text-white"
           title="Collect"
         >
           <svg
@@ -49,7 +49,7 @@ export function CollectButton({
       ) : (
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex h-10 w-full items-center justify-center bg-zdrive-text text-sm font-medium text-white transition-colors hover:bg-zdrive-accent-hover"
+          className="flex h-10 w-full items-center justify-center bg-zd-text text-sm font-medium text-white transition-colors hover:bg-zd-accent-hover"
         >
           Collect ${coinSymbol}
         </button>
@@ -65,7 +65,7 @@ export function CollectButton({
         <div className="space-y-4">
           {!authenticated ? (
             <div className="space-y-3">
-              <p className="text-sm text-zdrive-text-secondary">
+              <p className="text-sm text-zd-text-secondary">
                 Connect your wallet to collect this release.
               </p>
               <ConnectButton />
@@ -81,7 +81,7 @@ export function CollectButton({
                 href={zoraTradeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-center text-xs text-zdrive-text-muted hover:text-zdrive-text-secondary"
+                className="block text-center text-xs text-zd-text-muted hover:text-zd-text-secondary"
               >
                 View on Zora &rarr;
               </a>

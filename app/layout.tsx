@@ -1,6 +1,13 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Z:Drive - Artist-First Release Platform',
@@ -15,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-zdrive-bg text-zdrive-text antialiased">
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-screen bg-zd-bg text-zd-text antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

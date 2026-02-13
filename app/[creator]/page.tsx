@@ -4,12 +4,13 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePrivy } from '@privy-io/react-auth';
-import { Header, Footer } from '@/components/layout';
-import { ReleaseGrid, type ReleaseItem } from '@/components/release';
-import { ReleaseCard, ReleaseCardSkeleton } from '@/components/release/ReleaseCard';
-import { LoadingPage, Button } from '@/components/ui';
+import { BreadcrumbHeader, Footer } from '@/components/layout';
+import { ReleaseList, type ReleaseItem } from '@/components/release';
+import { ReleaseRow, ReleaseRowSkeleton } from '@/components/release/ReleaseRow';
+import { LoadingPage, Button, Zorb } from '@/components/ui';
 import { useCreatorProfile, useCreatorReleases } from '@/hooks/useCreator';
 import { useHoldings } from '@/hooks/useHoldings';
+import { ConnectButton } from '@/components/wallet/ConnectButton';
 import { truncateAddress, ipfsToHttp } from '@/lib/constants';
 import { getFileType } from '@/types/zdrive';
 import clsx from 'clsx';
@@ -157,10 +158,22 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     return result;
   }, [filteredReleases, profile?.displayName]);
 
+  const breadcrumbSegments = [
+    { label: 'Z:', href: '/' },
+    { label: profile?.displayName || truncateAddress(creatorAddress) },
+  ];
+
+  const breadcrumbNav = (
+    <>
+      <Link href="/feed" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</Link>
+      <ConnectButton />
+    </>
+  );
+
   if (profileLoading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Header />
+        <BreadcrumbHeader segments={[{ label: 'Z:', href: '/' }, { label: truncateAddress(creatorAddress) }]}>{breadcrumbNav}</BreadcrumbHeader>
         <LoadingPage />
         <Footer />
       </div>
@@ -169,60 +182,52 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <BreadcrumbHeader segments={breadcrumbSegments}>{breadcrumbNav}</BreadcrumbHeader>
 
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8">
           {/* Profile Header */}
-          <div className="mb-8 flex flex-col items-start gap-6 sm:flex-row">
+          <div className="mb-8 flex items-start gap-4">
             {/* Avatar */}
-            <div className="h-24 w-24 flex-shrink-0 overflow-hidden bg-zdrive-bg">
+            <div className="flex-shrink-0">
               {profile?.avatar ? (
                 <Image
                   src={ipfsToHttp(profile.avatar)}
                   alt={profile.displayName || 'Creator'}
-                  width={96}
-                  height={96}
-                  className="h-full w-full object-cover"
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-2xl font-light text-zdrive-text-muted">
-                  {creatorAddress.slice(2, 4).toUpperCase()}
-                </div>
+                <Zorb size={48} seed={creatorAddress} />
               )}
             </div>
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-2xl font-light">
+              <h1 className="font-display text-xl tracking-tight">
                 {profile?.displayName || truncateAddress(creatorAddress)}
               </h1>
-              <a
-                href={`https://basescan.org/address/${creatorAddress}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-zdrive-text-secondary hover:underline"
-              >
-                {truncateAddress(creatorAddress)}
-              </a>
 
               {profile?.bio && (
-                <p className="mt-3 max-w-lg text-sm text-zdrive-text-secondary">
+                <p className="text-sm text-zd-text-secondary mt-1 leading-relaxed">
                   {profile.bio}
                 </p>
               )}
 
-              {/* Creator Coin Info */}
-              {profile?.creatorCoinSymbol && (
-                <div className="mt-4 inline-flex items-center gap-3 border border-zdrive-border bg-zdrive-surface px-3 py-2 text-sm">
-                  <span className="font-medium">${profile.creatorCoinSymbol}</span>
-                  {isHolder && (
-                    <span className="text-zdrive-text-muted">
-                      You hold {holdingPercentage}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div className="flex items-center gap-3 mt-2">
+                {profile?.creatorCoinSymbol && (
+                  <span className="text-xs font-mono text-zd-text-muted">${profile.creatorCoinSymbol}</span>
+                )}
+                <a
+                  href={`https://basescan.org/address/${creatorAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-zd-text-muted underline transition-colors duration-150 hover:text-zd-text-secondary"
+                >
+                  Basescan
+                </a>
+              </div>
             </div>
 
             {/* Actions */}
@@ -236,7 +241,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
           {/* Collections */}
           {collections.length > 0 && (
             <div className="mb-8">
-              <h2 className="mb-3 text-sm font-medium text-zdrive-text-secondary">
+              <h2 className="mb-3 text-sm font-medium text-zd-text-secondary">
                 Collections
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -244,7 +249,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                   <Link
                     key={collection.id}
                     href={`/collection/${encodeURIComponent(collection.id)}`}
-                    className="border border-zdrive-border bg-zdrive-surface px-3 py-1.5 text-sm hover:border-zdrive-border-hover hover:bg-zdrive-bg"
+                    className="border border-zd-border bg-zd-surface px-3 py-1.5 text-sm hover:border-zd-border-hover hover:bg-zd-bg"
                   >
                     {collection.title}
                   </Link>
@@ -256,14 +261,14 @@ export default function CreatorPage({ params }: CreatorPageProps) {
           {/* View Toggle + Filters */}
           <div className="mb-6 flex flex-wrap items-center gap-4">
             {/* View mode toggle */}
-            <div className="flex border border-zdrive-border">
+            <div className="flex border border-zd-border">
               <button
                 onClick={() => setViewMode('all')}
                 className={clsx(
                   'px-3 py-1.5 text-sm transition-colors',
                   viewMode === 'all'
-                    ? 'bg-zdrive-text text-white'
-                    : 'hover:bg-zdrive-bg'
+                    ? 'bg-zd-text text-white'
+                    : 'hover:bg-zd-bg'
                 )}
               >
                 All
@@ -271,10 +276,10 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               <button
                 onClick={() => setViewMode('by-collection')}
                 className={clsx(
-                  'px-3 py-1.5 text-sm transition-colors border-l border-zdrive-border',
+                  'px-3 py-1.5 text-sm transition-colors border-l border-zd-border',
                   viewMode === 'by-collection'
-                    ? 'bg-zdrive-text text-white'
-                    : 'hover:bg-zdrive-bg'
+                    ? 'bg-zd-text text-white'
+                    : 'hover:bg-zd-bg'
                 )}
               >
                 By Collection
@@ -300,8 +305,8 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                   className={clsx(
                     'px-3 py-1.5 text-sm transition-colors',
                     filter === f.id
-                      ? 'bg-zdrive-text text-white'
-                      : 'border border-zdrive-border hover:border-zdrive-border-hover'
+                      ? 'bg-zd-text text-white'
+                      : 'border border-zd-border hover:border-zd-border-hover'
                   )}
                 >
                   {f.label}
@@ -312,7 +317,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
           {/* Releases */}
           {releasesLoading ? (
-            <ReleaseGrid
+            <ReleaseList
               releases={[]}
               isLoading={true}
             />
@@ -321,15 +326,15 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             <div className="space-y-8">
               {groupedReleases.map((group) => (
                 <section key={group.id}>
-                  <h3 className="mb-4 text-lg font-medium text-zdrive-text">
+                  <h3 className="mb-4 font-display text-lg tracking-tight text-zd-text">
                     {group.title}
-                    <span className="ml-2 text-sm font-normal text-zdrive-text-muted">
+                    <span className="ml-2 text-sm font-normal text-zd-text-muted">
                       ({group.items.length})
                     </span>
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  <div className="border border-zd-border">
                     {group.items.map((release) => (
-                      <ReleaseCard
+                      <ReleaseRow
                         key={release.address}
                         address={release.address}
                         metadata={release.metadata}
@@ -340,16 +345,16 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                   </div>
                 </section>
               ))}
-              {/* Skeleton cards for pending metadata */}
+              {/* Skeleton rows for pending metadata */}
               {pendingCount > 0 && (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                <div className="border border-zd-border">
                   {Array.from({ length: pendingCount }).map((_, i) => (
-                    <ReleaseCardSkeleton key={`skeleton-${i}`} />
+                    <ReleaseRowSkeleton key={`skeleton-${i}`} />
                   ))}
                 </div>
               )}
               {groupedReleases.length === 0 && pendingCount === 0 && (
-                <div className="flex min-h-[200px] items-center justify-center text-zdrive-text-secondary">
+                <div className="flex min-h-[200px] items-center justify-center text-zd-text-secondary">
                   {isOwnProfile
                     ? "You haven't created any releases yet."
                     : "This creator hasn't published any releases yet."}
@@ -357,30 +362,25 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               )}
             </div>
           ) : (
-            // Flat grid view (default)
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {releaseItems.map((release) => (
-                <ReleaseCard
-                  key={release.address}
-                  address={release.address}
-                  metadata={release.metadata}
-                  creatorAddress={release.creatorAddress}
-                  creatorName={release.creatorName}
-                />
-              ))}
-              {/* Skeleton cards for coins still loading metadata */}
-              {pendingCount > 0 &&
-                Array.from({ length: pendingCount }).map((_, i) => (
-                  <ReleaseCardSkeleton key={`skeleton-${i}`} />
-                ))}
-              {releaseItems.length === 0 && pendingCount === 0 && (
-                <div className="col-span-full flex min-h-[200px] items-center justify-center text-zdrive-text-secondary">
-                  {isOwnProfile
+            // Flat list view (default)
+            <>
+              <ReleaseList
+                releases={releaseItems}
+                emptyMessage={
+                  isOwnProfile
                     ? "You haven't created any releases yet."
-                    : "This creator hasn't published any releases yet."}
+                    : "This creator hasn't published any releases yet."
+                }
+              />
+              {/* Skeleton rows for coins still loading metadata */}
+              {pendingCount > 0 && (
+                <div className="border border-zd-border border-t-0">
+                  {Array.from({ length: pendingCount }).map((_, i) => (
+                    <ReleaseRowSkeleton key={`skeleton-${i}`} />
+                  ))}
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </main>

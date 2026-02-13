@@ -90,7 +90,7 @@ export function GitHubPreview({ url, ref, className }: GitHubPreviewProps) {
   if (isLoading) {
     return (
       <div className={`animate-pulse ${className}`}>
-        <div className="h-48 bg-zdrive-border" />
+        <div className="h-48 bg-zd-border" />
       </div>
     );
   }
@@ -98,9 +98,9 @@ export function GitHubPreview({ url, ref, className }: GitHubPreviewProps) {
   if (error || !repoInfo) {
     return (
       <div
-        className={`flex items-center justify-center border border-zdrive-border bg-zdrive-surface p-8 ${className}`}
+        className={`flex items-center justify-center border border-zd-border bg-zd-surface p-8 ${className}`}
       >
-        <p className="text-zdrive-text-secondary">{error || 'Unable to load'}</p>
+        <p className="text-zd-text-secondary">{error || 'Unable to load'}</p>
       </div>
     );
   }
@@ -108,11 +108,11 @@ export function GitHubPreview({ url, ref, className }: GitHubPreviewProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Repo Card */}
-      <div className="border border-zdrive-border bg-zdrive-surface p-4">
+      <div className="border border-zd-border bg-zd-surface p-4">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-medium">{repoInfo.name}</h3>
-            <p className="text-sm text-zdrive-text-secondary">
+            <p className="text-sm text-zd-text-secondary">
               {repoInfo.fullName}
             </p>
           </div>
@@ -120,7 +120,7 @@ export function GitHubPreview({ url, ref, className }: GitHubPreviewProps) {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-zdrive-text-secondary hover:text-zdrive-text"
+            className="text-sm text-zd-text-secondary hover:text-zd-text"
           >
             <svg
               className="h-5 w-5"
@@ -133,15 +133,15 @@ export function GitHubPreview({ url, ref, className }: GitHubPreviewProps) {
         </div>
 
         {repoInfo.description && (
-          <p className="mt-3 text-sm text-zdrive-text-secondary">
+          <p className="mt-3 text-sm text-zd-text-secondary">
             {repoInfo.description}
           </p>
         )}
 
-        <div className="mt-4 flex items-center gap-4 text-xs text-zdrive-text-muted">
+        <div className="mt-4 flex items-center gap-4 text-xs text-zd-text-muted">
           {repoInfo.language && (
             <span className="flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-zdrive-text" />
+              <span className="h-2 w-2 rounded-full bg-zd-text" />
               {repoInfo.language}
             </span>
           )}
@@ -158,18 +158,18 @@ export function GitHubPreview({ url, ref, className }: GitHubPreviewProps) {
             {repoInfo.forks}
           </span>
           {ref && (
-            <span className="rounded bg-zdrive-bg px-1.5 py-0.5">{ref}</span>
+            <span className="rounded bg-zd-bg px-1.5 py-0.5">{ref}</span>
           )}
         </div>
       </div>
 
       {/* README Preview */}
       {repoInfo.readme && (
-        <div className="max-h-[400px] overflow-auto border border-zdrive-border bg-zdrive-surface p-4">
-          <h4 className="mb-3 text-sm font-medium text-zdrive-text-secondary">
+        <div className="max-h-[400px] overflow-auto border border-zd-border bg-zd-surface p-4">
+          <h4 className="mb-3 text-sm font-medium text-zd-text-secondary">
             README.md
           </h4>
-          <pre className="whitespace-pre-wrap font-mono text-xs text-zdrive-text">
+          <pre className="whitespace-pre-wrap font-mono text-xs text-zd-text">
             {repoInfo.readme.slice(0, 2000)}
             {repoInfo.readme.length > 2000 && '...'}
           </pre>

@@ -10,7 +10,7 @@ interface DetailsTabProps {
 export function DetailsTab({ stats }: DetailsTabProps) {
   if (!stats) {
     return (
-      <div className="py-6 text-center text-sm text-zdrive-text-muted">
+      <div className="py-6 text-center text-sm text-zd-text-muted">
         No details available
       </div>
     );
@@ -50,12 +50,12 @@ export function DetailsTab({ stats }: DetailsTabProps) {
       </dl>
 
       {/* External Links */}
-      <div className="flex gap-3 border-t border-zdrive-border pt-3">
+      <div className="flex gap-3 border-t border-zd-border pt-3">
         <a
           href={`https://zora.co/coin/base:${stats.address}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-zdrive-text-secondary hover:text-zdrive-text hover:underline"
+          className="text-xs text-zd-text-secondary hover:text-zd-text hover:underline"
         >
           View on Zora →
         </a>
@@ -63,7 +63,7 @@ export function DetailsTab({ stats }: DetailsTabProps) {
           href={`https://basescan.org/token/${stats.address}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-zdrive-text-secondary hover:text-zdrive-text hover:underline"
+          className="text-xs text-zd-text-secondary hover:text-zd-text hover:underline"
         >
           View on Basescan →
         </a>
@@ -83,7 +83,7 @@ function DetailRow({
 }) {
   return (
     <div className="flex justify-between">
-      <dt className="text-zdrive-text-muted">{label}</dt>
+      <dt className="text-zd-text-muted">{label}</dt>
       <dd>
         {href ? (
           <a

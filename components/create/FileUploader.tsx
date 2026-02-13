@@ -57,10 +57,10 @@ export function FileUploader({
         className={clsx(
           'flex min-h-[120px] cursor-pointer flex-col items-center justify-center border-2 border-dashed p-6 transition-colors',
           isDragActive
-            ? 'border-zdrive-text bg-zdrive-bg'
+            ? 'border-zd-text bg-zd-bg'
             : hasError
               ? 'border-red-300 bg-red-50'
-              : 'border-zdrive-border hover:border-zdrive-border-hover hover:bg-zdrive-bg'
+              : 'border-zd-border hover:border-zd-border-hover hover:bg-zd-bg'
         )}
       >
         <input {...getInputProps()} />
@@ -68,17 +68,17 @@ export function FileUploader({
         {currentFile ? (
           <div className="text-center">
             <p className="text-sm font-medium">{currentFile.name}</p>
-            <p className="mt-1 text-xs text-zdrive-text-secondary">
+            <p className="mt-1 text-xs text-zd-text-secondary">
               {(currentFile.size / 1024 / 1024).toFixed(2)} MB
             </p>
-            <p className="mt-2 text-xs text-zdrive-text-muted">
+            <p className="mt-2 text-xs text-zd-text-muted">
               Drop a new file to replace
             </p>
           </div>
         ) : (
           <div className="text-center">
             <svg
-              className="mx-auto h-8 w-8 text-zdrive-text-muted"
+              className="mx-auto h-8 w-8 text-zd-text-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -90,12 +90,12 @@ export function FileUploader({
                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
               />
             </svg>
-            <p className="mt-2 text-sm text-zdrive-text-secondary">
+            <p className="mt-2 text-sm text-zd-text-secondary">
               {isDragActive
                 ? 'Drop the file here'
                 : 'Drag and drop or click to select'}
             </p>
-            <p className="mt-1 text-xs text-zdrive-text-muted">
+            <p className="mt-1 text-xs text-zd-text-muted">
               Max size: {MAX_FILE_SIZE_DISPLAY}
             </p>
           </div>
@@ -106,7 +106,7 @@ export function FileUploader({
         <p className="mt-1.5 text-sm text-red-500">{error || rejectionError}</p>
       )}
       {hint && !error && !rejectionError && (
-        <p className="mt-1.5 text-sm text-zdrive-text-muted">{hint}</p>
+        <p className="mt-1.5 text-sm text-zd-text-muted">{hint}</p>
       )}
     </div>
   );
@@ -160,18 +160,18 @@ export function MultiFileUploader({
           {files.map((file, index) => (
             <li
               key={`${file.name}-${index}`}
-              className="flex items-center justify-between border border-zdrive-border bg-zdrive-surface px-3 py-2"
+              className="flex items-center justify-between border border-zd-border bg-zd-surface px-3 py-2"
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm">{file.name}</p>
-                <p className="text-xs text-zdrive-text-muted">
+                <p className="text-xs text-zd-text-muted">
                   {(file.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => removeFile(index)}
-                className="ml-3 text-zdrive-text-secondary hover:text-red-500"
+                className="ml-3 text-zd-text-secondary hover:text-red-500"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -188,17 +188,17 @@ export function MultiFileUploader({
         className={clsx(
           'flex min-h-[80px] cursor-pointer flex-col items-center justify-center border-2 border-dashed p-4 transition-colors',
           isDragActive
-            ? 'border-zdrive-text bg-zdrive-bg'
-            : 'border-zdrive-border hover:border-zdrive-border-hover hover:bg-zdrive-bg'
+            ? 'border-zd-text bg-zd-bg'
+            : 'border-zd-border hover:border-zd-border-hover hover:bg-zd-bg'
         )}
       >
         <input {...getInputProps()} />
-        <p className="text-sm text-zdrive-text-secondary">
+        <p className="text-sm text-zd-text-secondary">
           {isDragActive ? 'Drop files here' : 'Add more files'}
         </p>
       </div>
 
-      {hint && <p className="mt-1.5 text-sm text-zdrive-text-muted">{hint}</p>}
+      {hint && <p className="mt-1.5 text-sm text-zd-text-muted">{hint}</p>}
     </div>
   );
 }

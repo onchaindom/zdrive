@@ -3,14 +3,15 @@
 import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Header, Footer } from '@/components/layout';
-import { LoadingPage, ErrorBoundary, CollapsibleSection } from '@/components/ui';
+import { BreadcrumbHeader, Footer } from '@/components/layout';
+import { LoadingPage, ErrorBoundary, CollapsibleSection, Zorb, DisclosureLink } from '@/components/ui';
 import { useRelease } from '@/hooks/useRelease';
 import { useCoin } from '@/hooks/useCoin';
 import { WidgetTabs } from '@/components/trade/WidgetTabs';
 import { useLicenseStatus } from '@/hooks/useLicenseStatus';
 import { PreviewRenderer, DownloadList } from '@/components/preview';
 import { CollectButton } from '@/components/trade/CollectButton';
+import { ConnectButton } from '@/components/wallet/ConnectButton';
 import { truncateAddress, ipfsToHttp } from '@/lib/constants';
 import { getFileType } from '@/types/zdrive';
 
@@ -24,9 +25,23 @@ interface ReleasePageProps {
 const POLLING_INTERVAL = 3000; // 3 seconds
 const POLLING_TIMEOUT = 60_000; // 60 seconds
 
+function ReleaseBreadcrumb({ creator, releaseName }: { creator: string; releaseName?: string }) {
+  const segments = [
+    { label: 'Z:', href: '/' },
+    { label: truncateAddress(creator), href: `/${creator}` },
+    ...(releaseName ? [{ label: releaseName }] : []),
+  ];
+  return (
+    <BreadcrumbHeader segments={segments}>
+      <Link href="/feed" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</Link>
+      <ConnectButton />
+    </BreadcrumbHeader>
+  );
+}
+
 export default function ReleasePage({ params }: ReleasePageProps) {
   return (
-    <Suspense fallback={<div className="flex min-h-screen flex-col"><Header /><LoadingPage /><Footer /></div>}>
+    <Suspense fallback={<div className="flex min-h-screen flex-col"><ReleaseBreadcrumb creator={params.creator} /><LoadingPage /><Footer /></div>}>
       <ReleasePageInner params={params} />
     </Suspense>
   );
@@ -71,7 +86,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
   if (isLoading && !isPolling) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Header />
+        <ReleaseBreadcrumb creator={creator} />
         <LoadingPage />
         <Footer />
       </div>
@@ -82,20 +97,20 @@ function ReleasePageInner({ params }: ReleasePageProps) {
   if ((isPolling || pollingTimedOut) && !release) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Header />
+        <ReleaseBreadcrumb creator={creator} />
         <main className="flex flex-1 items-center justify-center">
           <div className="text-center">
             {pollingTimedOut ? (
               <>
                 <h1 className="text-xl font-light">Taking longer than expected</h1>
-                <p className="mt-2 text-sm text-zdrive-text-secondary">
+                <p className="mt-2 text-sm text-zd-text-secondary">
                   Your release was created but Zora&apos;s indexer is still processing it.
                 </p>
                 <a
                   href={`https://basescan.org/address/${releaseAddress}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-block text-sm underline hover:text-zdrive-text-secondary"
+                  className="mt-4 inline-block text-sm underline hover:text-zd-text-secondary"
                 >
                   View on Basescan &rarr;
                 </a>
@@ -104,16 +119,16 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                     setPollingTimedOut(false);
                     setIsPolling(true);
                   }}
-                  className="mt-2 block mx-auto text-sm text-zdrive-text-muted hover:text-zdrive-text underline"
+                  className="mt-2 block mx-auto text-sm text-zd-text-muted hover:text-zd-text underline"
                 >
                   Keep waiting
                 </button>
               </>
             ) : (
               <>
-                <div className="mx-auto mb-4 h-6 w-6 animate-spin rounded-full border-2 border-zdrive-border border-t-zdrive-text" />
+                <div className="mx-auto mb-4 h-6 w-6 animate-spin rounded-full border-2 border-zd-border border-t-zd-text" />
                 <h1 className="text-xl font-light">Indexing your release&hellip;</h1>
-                <p className="mt-2 text-sm text-zdrive-text-secondary">
+                <p className="mt-2 text-sm text-zd-text-secondary">
                   Your release was created successfully. Waiting for Zora to index it.
                 </p>
               </>
@@ -128,16 +143,16 @@ function ReleasePageInner({ params }: ReleasePageProps) {
   if (error || !release) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Header />
+        <ReleaseBreadcrumb creator={creator} />
         <main className="flex flex-1 items-center justify-center">
           <div className="text-center">
             <h1 className="text-xl font-light">Release not found</h1>
-            <p className="mt-2 text-sm text-zdrive-text-secondary">
+            <p className="mt-2 text-sm text-zd-text-secondary">
               This release may have been removed or the address is invalid.
             </p>
             <Link
               href="/"
-              className="mt-4 inline-block text-sm underline hover:text-zdrive-text-secondary"
+              className="mt-4 inline-block text-sm underline hover:text-zd-text-secondary"
             >
               Go home
             </Link>
@@ -162,7 +177,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <ReleaseBreadcrumb creator={creator} releaseName={metadata.name} />
 
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8">
@@ -185,24 +200,24 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                 <dl className="space-y-2 text-sm">
                   {contentType && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">Content type</dt>
+                      <dt className="text-zd-text-muted">Content type</dt>
                       <dd className="uppercase">{contentType}</dd>
                     </div>
                   )}
                   {metadata.content?.mime && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">MIME</dt>
+                      <dt className="text-zd-text-muted">MIME</dt>
                       <dd className="font-mono text-xs">{metadata.content.mime}</dd>
                     </div>
                   )}
                   {assets.length > 0 && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">Attachments</dt>
+                      <dt className="text-zd-text-muted">Attachments</dt>
                       <dd>{assets.length} file{assets.length !== 1 ? 's' : ''}</dd>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <dt className="text-zdrive-text-muted">Contract</dt>
+                    <dt className="text-zd-text-muted">Contract</dt>
                     <dd>
                       <a
                         href={`https://basescan.org/address/${releaseAddress}`}
@@ -216,7 +231,7 @@ function ReleasePageInner({ params }: ReleasePageProps) {
                   </div>
                   {release.createdAt && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-muted">Created</dt>
+                      <dt className="text-zd-text-muted">Created</dt>
                       <dd>{new Date(release.createdAt).toLocaleDateString()}</dd>
                     </div>
                   )}
@@ -233,163 +248,127 @@ function ReleasePageInner({ params }: ReleasePageProps) {
               </CollapsibleSection>
             </div>
 
-            {/* Side panel: minimal */}
-            <div className="space-y-6">
-              {/* Title + Description */}
-              <div>
-                <h1 className="text-2xl font-medium">{metadata.name}</h1>
+            {/* Side panel */}
+            <div className="space-y-0">
+              {/* Title + Creator + Collection + Description */}
+              <div className="pb-4">
+                <h1 className="font-display text-xl tracking-tight leading-tight">{metadata.name}</h1>
+                <div className="flex items-center gap-2 mt-2">
+                  <Zorb size={20} seed={release.creatorAddress} />
+                  <Link
+                    href={`/${release.creatorAddress}`}
+                    className="text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text"
+                  >
+                    {release.creatorName || truncateAddress(release.creatorAddress)}
+                  </Link>
+                </div>
+                {collection && (
+                  <div className="mt-2">
+                    <span className="text-sm text-zd-text-secondary">Part of </span>
+                    <Link
+                      href={`/collection/${encodeURIComponent(collection.id)}`}
+                      className="text-sm text-zd-text underline"
+                    >
+                      {collection.title}
+                    </Link>
+                  </div>
+                )}
                 {metadata.description && (
-                  <p className="mt-2 text-sm text-zdrive-text-secondary">
+                  <p className="text-sm text-zd-text-secondary mt-3 leading-relaxed">
                     {metadata.description}
                   </p>
                 )}
               </div>
 
-              {/* Creator */}
-              <div className="flex items-center gap-3">
-                <Link
-                  href={`/${release.creatorAddress}`}
-                  className="flex items-center gap-3 hover:opacity-80"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center bg-zdrive-bg text-xs font-light text-zdrive-text-muted">
-                    {release.creatorAddress.slice(2, 4).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">
-                      {release.creatorName || truncateAddress(release.creatorAddress)}
-                    </p>
-                    <p className="text-xs text-zdrive-text-muted">Creator</p>
-                  </div>
-                </Link>
-              </div>
-
-              {/* Collect CTA */}
-              <CollectButton
-                coinAddress={releaseAddress}
-                coinName={metadata.name}
-                coinSymbol={coinStats?.symbol ?? metadata.name.slice(0, 6).toUpperCase()}
-                variant="full"
-              />
-
-              {/* Download button */}
-              {metadata.content?.uri && (
-                <a
-                  href={ipfsToHttp(metadata.content.uri)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 border border-zdrive-border bg-zdrive-surface px-4 py-2.5 text-sm font-medium hover:bg-zdrive-bg transition-colors"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Download
-                </a>
-              )}
-
-              {/* License panel */}
-              <div className="border border-zdrive-border bg-zdrive-surface p-4">
-                <h3 className="text-sm font-medium">License</h3>
-                <p className="mt-1 text-sm">{licenseStatus.licenseName}</p>
-
-                {licenseStatus.requiresGate && (
-                  <div className="mt-3 border-t border-zdrive-border pt-3">
-                    {licenseStatus.meetsGateRequirement ? (
-                      <div className="flex items-center gap-2 text-sm text-green-600">
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span>License unlocked</span>
+              {/* Divider + Collect + Details */}
+              <div className="border-t border-zd-border pt-4 pb-4">
+                <CollectButton
+                  coinAddress={releaseAddress}
+                  coinName={metadata.name}
+                  coinSymbol={coinStats?.symbol ?? metadata.name.slice(0, 6).toUpperCase()}
+                  variant="full"
+                />
+                <div className="mt-3">
+                  <DisclosureLink label="Details">
+                    {/* MARKET */}
+                    <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mb-2">Market</p>
+                    {coinStats?.marketCap && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-zd-text-secondary">Market cap</span>
+                        <span className="text-zd-text font-mono text-xs">{coinStats.marketCap}</span>
                       </div>
-                    ) : (
-                      <div className="text-sm text-zdrive-text-muted">
-                        <p>Token-gated license</p>
-                        <p className="mt-1">
-                          Collect this release to unlock {licenseStatus.licenseName.toLowerCase()} rights.
-                        </p>
+                    )}
+                    {coinStats?.volume24h && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-zd-text-secondary">Volume (24h)</span>
+                        <span className="text-zd-text font-mono text-xs">{coinStats.volume24h}</span>
+                      </div>
+                    )}
+                    {coinStats?.uniqueHolders !== undefined && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-zd-text-secondary">Holders</span>
+                        <span className="text-zd-text font-mono text-xs">{coinStats.uniqueHolders.toLocaleString()}</span>
                       </div>
                     )}
 
-                    {licenseStatus.holdingPercentage !== '0%' && (
-                      <p className="mt-2 text-xs text-zdrive-text-muted">
-                        You hold {licenseStatus.holdingPercentage} of supply
-                      </p>
-                    )}
-                  </div>
-                )}
+                    {/* COIN */}
+                    <div className="border-t border-zd-border mt-3 pt-3">
+                      <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mb-2">Coin</p>
+                      <div className="space-y-2">
+                        {coinStats?.symbol && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-zd-text-secondary">Symbol</span>
+                            <span className="text-zd-text font-mono text-xs">${coinStats.symbol}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-sm">
+                          <span className="text-zd-text-secondary">Contract</span>
+                          <span className="font-mono text-xs text-zd-text-muted">{truncateAddress(releaseAddress)}</span>
+                        </div>
+                        {release.createdAt && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-zd-text-secondary">Created</span>
+                            <span className="text-zd-text font-mono text-xs">{new Date(release.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-1.5 mt-1.5">
+                        <a href={`https://zora.co/coin/base:${releaseAddress}`} target="_blank" rel="noopener noreferrer" className="block text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Zora</a>
+                        <a href={`https://basescan.org/address/${releaseAddress}`} target="_blank" rel="noopener noreferrer" className="block text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text">View on Basescan</a>
+                      </div>
+                    </div>
 
-                {license?.cbe?.textUrl && (
-                  <div className="mt-2">
-                    <a
-                      href={ipfsToHttp(license.cbe.textUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block text-xs text-zdrive-text-muted hover:text-zdrive-text-secondary hover:underline"
-                    >
-                      View license (PDF) &rarr;
-                    </a>
-                    {license.cbe.textUrl.startsWith('ar://') && (
-                      <p className="mt-1 flex items-center gap-1 text-[10px] text-zdrive-text-muted">
-                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
-                        </svg>
-                        Stored on Arweave
-                      </p>
-                    )}
-                  </div>
-                )}
+                    {/* LICENSE */}
+                    <div className="border-t border-zd-border mt-3 pt-3">
+                      <p className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide mb-2">License</p>
+                      <div className="space-y-2">
+                        {contentType && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-zd-text-secondary">Content type</span>
+                            <span className="text-zd-text font-mono text-xs uppercase">{contentType}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-sm">
+                          <span className="text-zd-text-secondary">License</span>
+                          {license?.cbe?.textUrl ? (
+                            <a href={ipfsToHttp(license.cbe.textUrl)} target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-zd-text underline transition-colors duration-150 hover:text-zd-text-secondary">{licenseStatus.licenseName}</a>
+                          ) : (
+                            <span className="text-zd-text font-mono text-xs">{licenseStatus.licenseName}</span>
+                          )}
+                        </div>
+                        {licenseStatus.requiresGate && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-zd-text-secondary">Access</span>
+                            <span className="text-zd-text font-mono text-xs">
+                              {licenseStatus.meetsGateRequirement ? 'Unlocked' : 'Collect to unlock'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </DisclosureLink>
+                </div>
               </div>
-
-              {/* Collection context */}
-              {collection && (
-                <div className="border border-zdrive-border bg-zdrive-surface p-4">
-                  <h3 className="text-sm font-medium">Collection</h3>
-                  <Link
-                    href={`/collection/${encodeURIComponent(collection.id)}`}
-                    className="mt-1 block text-sm hover:underline"
-                  >
-                    {collection.title}
-                  </Link>
-                  {collection.ordering && (
-                    <p className="mt-1 text-xs text-zdrive-text-muted">
-                      #{collection.ordering.index} in series
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* External links */}
-              {externalLinks.length > 0 && (
-                <div className="border border-zdrive-border bg-zdrive-surface p-4">
-                  <h3 className="text-sm font-medium">Links</h3>
-                  <div className="mt-2 space-y-2">
-                    {externalLinks.map((link, i) => (
-                      <a
-                        key={i}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-zdrive-text-secondary hover:text-zdrive-text hover:underline"
-                      >
-                        {link.type === 'github' && (
-                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                          </svg>
-                        )}
-                        <span>{link.url.replace('https://github.com/', '')}</span>
-                        {link.ref && (
-                          <span className="text-xs text-zdrive-text-muted">
-                            @ {link.ref}
-                          </span>
-                        )}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

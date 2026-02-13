@@ -16,14 +16,14 @@ export function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-zdrive-border bg-zdrive-surface">
+    <div className="border border-zd-border bg-zd-surface">
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium hover:bg-zdrive-bg transition-colors"
+        className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium hover:bg-zd-bg transition-colors"
       >
         <span>{title}</span>
         <svg
-          className={`h-4 w-4 text-zdrive-text-muted transition-transform duration-200 ${
+          className={`h-4 w-4 text-zd-text-muted transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}
           fill="none"
@@ -43,7 +43,7 @@ export function CollapsibleSection({
           isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="border-t border-zdrive-border px-4 py-3">
+        <div className="border-t border-zd-border px-4 py-3">
           {children}
         </div>
       </div>

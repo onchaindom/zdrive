@@ -33,7 +33,7 @@ export function ReleaseGrid({
 
   if (releases.length === 0) {
     return (
-      <div className="flex min-h-[200px] items-center justify-center text-zdrive-text-secondary">
+      <div className="flex min-h-[200px] items-center justify-center text-zd-text-secondary">
         {emptyMessage}
       </div>
     );

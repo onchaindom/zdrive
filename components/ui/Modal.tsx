@@ -52,7 +52,7 @@ export function Modal({
       {/* Modal */}
       <div
         className={clsx(
-          'relative z-10 max-h-[90vh] overflow-auto bg-zdrive-surface',
+          'relative z-10 max-h-[90vh] overflow-auto bg-zd-surface',
           {
             'w-full max-w-sm': size === 'sm',
             'w-full max-w-lg': size === 'md',
@@ -63,11 +63,11 @@ export function Modal({
       >
         {/* Header */}
         {title && (
-          <div className="sticky top-0 flex items-center justify-between border-b border-zdrive-border bg-zdrive-surface px-6 py-4">
+          <div className="sticky top-0 flex items-center justify-between border-b border-zd-border bg-zd-surface px-6 py-4">
             <h2 className="text-lg font-medium">{title}</h2>
             <button
               onClick={onClose}
-              className="text-zdrive-text-secondary hover:text-zdrive-text"
+              className="text-zd-text-secondary hover:text-zd-text"
             >
               <svg
                 className="h-5 w-5"

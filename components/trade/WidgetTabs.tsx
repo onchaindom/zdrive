@@ -54,17 +54,17 @@ export function WidgetTabs({ coinAddress, stats, defaultTab = 'holders' }: Widge
   const swaps = swapsData?.pages.flatMap((p) => p.items) ?? [];
 
   return (
-    <div className="border border-zdrive-border bg-zdrive-surface">
+    <div className="border border-zd-border bg-zd-surface">
       {/* Tab Navigation */}
-      <div className="flex border-b border-zdrive-border">
+      <div className="flex border-b border-zd-border">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
             className={`flex-1 py-2 text-xs font-medium transition-colors ${
               activeTab === tab.id
-                ? 'border-b-2 border-zdrive-accent text-zdrive-text'
-                : 'text-zdrive-text-muted hover:text-zdrive-text-secondary'
+                ? 'border-b-2 border-zd-accent text-zd-text'
+                : 'text-zd-text-muted hover:text-zd-text-secondary'
             }`}
           >
             {tab.label}

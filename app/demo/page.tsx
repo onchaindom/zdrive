@@ -1,6 +1,23 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import {
+  Zorb,
+  ZorbWanderingLight,
+  IconPDF,
+  Icon3D,
+  IconImage,
+  IconVideo,
+  IconCode,
+  IconCloud,
+  IconFile,
+  FILE_TYPE_ICONS,
+  Sparkline,
+  DisclosureLink,
+  Typewriter,
+  CYCLING_PHRASES,
+} from '@/components/ui';
+import { BreadcrumbHeader, type BreadcrumbSegment } from '@/components/layout';
 
 // ─── Dark Mode Toggle ────────────────────────────────────────────────────────
 
@@ -8,7 +25,7 @@ function ThemeToggle() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('zdrive-demo-theme');
+    const saved = localStorage.getItem('zd-demo-theme');
     if (saved === 'dark') {
       setDark(true);
       document.documentElement.classList.add('dark');
@@ -19,7 +36,7 @@ function ThemeToggle() {
     const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('zdrive-demo-theme', next ? 'dark' : 'light');
+    localStorage.setItem('zd-demo-theme', next ? 'dark' : 'light');
   };
 
   return (
@@ -45,232 +62,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-// ─── File type icons (inline SVGs, 16px, 1.25px stroke) ─────────────────────
-
-function IconPDF({ className = '' }: { className?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M4 1h5.5L13 4.5V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" />
-      <path d="M9 1v4h4" />
-      <path d="M5 9h6" />
-      <path d="M5 11.5h4" />
-    </svg>
-  );
-}
-
-function Icon3D({ className = '' }: { className?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M8 1 L14 4.5 L14 11.5 L8 15 L2 11.5 L2 4.5 Z" />
-      <path d="M8 1 L8 8" />
-      <path d="M8 8 L14 4.5" />
-      <path d="M8 8 L2 4.5" />
-      <path d="M8 8 L8 15" />
-    </svg>
-  );
-}
-
-function IconImage({ className = '' }: { className?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="2" y="2" width="12" height="12" rx="1" />
-      <circle cx="5.5" cy="5.5" r="1" />
-      <path d="M14 10.5 L11 7.5 L6 12.5" />
-      <path d="M8.5 11 L7 9.5 L2 14" />
-    </svg>
-  );
-}
-
-function IconVideo({ className = '' }: { className?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="2" y="3" width="12" height="10" rx="1" />
-      <path d="M6.5 6.5 L10.5 8 L6.5 9.5 Z" />
-    </svg>
-  );
-}
-
-function IconCode({ className = '' }: { className?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M5.5 4.5 L2 8 L5.5 11.5" />
-      <path d="M10.5 4.5 L14 8 L10.5 11.5" />
-      <path d="M9 3 L7 13" />
-    </svg>
-  );
-}
-
-function IconCloud({ className = '' }: { className?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <circle cx="5" cy="6" r="0.75" />
-      <circle cx="8" cy="4" r="0.75" />
-      <circle cx="11" cy="5.5" r="0.75" />
-      <circle cx="6" cy="9" r="0.75" />
-      <circle cx="10" cy="8" r="0.75" />
-      <circle cx="4" cy="12" r="0.75" />
-      <circle cx="8" cy="11.5" r="0.75" />
-      <circle cx="12" cy="11" r="0.75" />
-      <circle cx="7" cy="7" r="0.75" />
-      <circle cx="11" cy="13" r="0.75" />
-      <circle cx="3.5" cy="9.5" r="0.75" />
-      <circle cx="13" cy="8.5" r="0.75" />
-    </svg>
-  );
-}
-
-function IconFile({ className = '' }: { className?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M4 1h5.5L13 4.5V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" />
-      <path d="M9 1v4h4" />
-    </svg>
-  );
-}
-
-const FILE_TYPE_ICONS: Record<string, React.FC<{ className?: string }>> = {
-  PDF: IconPDF,
-  '3D': Icon3D,
-  IMG: IconImage,
-  VID: IconVideo,
-  MD: IconCode,
-  PLY: IconCloud,
-  FILE: IconFile,
-};
-
-// ─── Zorb (gradient sphere SVG) ──────────────────────────────────────────────
-
-function Zorb({ size = 32, seed = '0x0000' }: { size?: number; seed?: string }) {
-  const hash = seed.split('').reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
-  const h1 = Math.abs(hash % 360);
-  const h2 = (h1 + 40) % 360;
-  const h3 = (h1 + 180) % 360;
-  const id = `zorb-${seed.replace(/[^a-zA-Z0-9]/g, '')}`;
-
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100">
-      <defs>
-        <radialGradient id={id} cx="30%" cy="30%" r="70%">
-          <stop offset="0%" stopColor={`hsl(${h1}, 70%, 72%)`} />
-          <stop offset="50%" stopColor={`hsl(${h2}, 60%, 58%)`} />
-          <stop offset="100%" stopColor={`hsl(${h3}, 50%, 40%)`} />
-        </radialGradient>
-      </defs>
-      <circle cx="50" cy="50" r="48" fill={`url(#${id})`} />
-    </svg>
-  );
-}
-
-// ─── Zorb Loader Concepts ────────────────────────────────────────────────────
-
-// 1. WANDERING LIGHT — Rotating gradient with focal point near the upper-left
-//    edge. The whole orb rotates clockwise with ease-in-out. Colors cycle
-//    through the full hue wheel in sync, maintaining a 115° arc:
-//    highlight (sat 75%, light 72%) → midtone (-45°, sat 60%, light 55%)
-//    → shadow (-115°, sat 50%, light 35%).
-
-function ZorbWanderingLight({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100">
-      <defs>
-        <radialGradient id="z-wander" cx="30%" cy="30%" r="65%">
-          {/* Highlight: base hue, high sat/light. One 60° shift per 2s rotation, full cycle in 12s */}
-          <stop offset="0%" stopColor="hsl(35,75%,72%)">
-            <animate attributeName="stop-color"
-              values="hsl(35,75%,72%);hsl(95,75%,72%);hsl(155,75%,72%);hsl(215,75%,72%);hsl(275,75%,72%);hsl(335,75%,72%);hsl(35,75%,72%)"
-              dur="12s" repeatCount="indefinite" />
-          </stop>
-          {/* Midtone: base-45°, medium sat/light */}
-          <stop offset="55%" stopColor="hsl(350,60%,55%)">
-            <animate attributeName="stop-color"
-              values="hsl(350,60%,55%);hsl(50,60%,55%);hsl(110,60%,55%);hsl(170,60%,55%);hsl(230,60%,55%);hsl(290,60%,55%);hsl(350,60%,55%)"
-              dur="12s" repeatCount="indefinite" />
-          </stop>
-          {/* Shadow: base-115°, low sat/light */}
-          <stop offset="100%" stopColor="hsl(280,50%,35%)">
-            <animate attributeName="stop-color"
-              values="hsl(280,50%,35%);hsl(340,50%,35%);hsl(40,50%,35%);hsl(100,50%,35%);hsl(160,50%,35%);hsl(220,50%,35%);hsl(280,50%,35%)"
-              dur="12s" repeatCount="indefinite" />
-          </stop>
-        </radialGradient>
-      </defs>
-      <g>
-        <animateTransform
-          attributeName="transform"
-          type="rotate"
-          values="0 50 50;360 50 50"
-          dur="2s"
-          repeatCount="indefinite"
-          calcMode="spline"
-          keyTimes="0;1"
-          keySplines="0.42 0 0.58 1"
-        />
-        <circle cx="50" cy="50" r="48" fill="url(#z-wander)" />
-      </g>
-    </svg>
-  );
-}
-
-// ─── Sparkline ───────────────────────────────────────────────────────────────
-
-function Sparkline({ data, width = 80, height = 24 }: { data: number[]; width?: number; height?: number }) {
-  if (data.length < 2) return null;
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const points = data
-    .map((v, i) => {
-      const x = (i / (data.length - 1)) * width;
-      const y = height - ((v - min) / range) * (height - 2) - 1;
-      return `${x},${y}`;
-    })
-    .join(' ');
-
-  return (
-    <svg width={width} height={height} className="inline-block align-middle">
-      <polyline
-        points={points}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-// ─── Disclosure Link ─────────────────────────────────────────────────────────
-
-function DisclosureLink({ label, children }: { label: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-sm text-zd-text-secondary hover:text-zd-text transition-colors duration-150 group"
-      >
-        <svg
-          width="6"
-          height="8"
-          viewBox="0 0 6 8"
-          fill="currentColor"
-          className={`transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
-        >
-          <path d="M0 0L6 4L0 8Z" />
-        </svg>
-        <span className="underline">{label}</span>
-      </button>
-      {open && (
-        <div className="mt-2 space-y-2">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Mock data ───────────────────────────────────────────────────────────────
 
 const MOCK_RELEASES = [
@@ -283,81 +74,6 @@ const MOCK_RELEASES = [
 ];
 
 const SPARKLINE_DATA = [12, 15, 14, 18, 22, 19, 25, 28, 26, 30, 33, 29, 35, 38, 36, 40];
-
-const CYCLING_PHRASES = [
-  'random sketches',
-  'pdf manifestos',
-  '3d models',
-  'side project repos',
-  'notes about notes',
-  'half-finished drafts',
-  'field recordings',
-  'weird prototypes',
-];
-
-
-// ─── Typewriter ───────────────────────────────────────────────────────────
-// Adapted from fancycomponents.dev/docs/components/text/typewriter
-// No motion dependency — uses pure CSS for cursor blink.
-
-function Typewriter({
-  texts,
-  speed = 50,
-  deleteSpeed = 30,
-  waitTime = 2000,
-  className = '',
-}: {
-  texts: string[];
-  speed?: number;
-  deleteSpeed?: number;
-  waitTime?: number;
-  className?: string;
-}) {
-  const [displayText, setDisplayText] = useState('');
-  const [charIndex, setCharIndex] = useState(0);
-  const [textIndex, setTextIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    const current = texts[textIndex];
-    let timeout: ReturnType<typeof setTimeout>;
-
-    if (isDeleting) {
-      if (displayText === '') {
-        setIsDeleting(false);
-        setTextIndex((prev) => (prev + 1) % texts.length);
-        setCharIndex(0);
-      } else {
-        timeout = setTimeout(() => {
-          setDisplayText((prev) => prev.slice(0, -1));
-        }, deleteSpeed);
-      }
-    } else {
-      if (charIndex < current.length) {
-        timeout = setTimeout(() => {
-          setDisplayText((prev) => prev + current[charIndex]);
-          setCharIndex((prev) => prev + 1);
-        }, speed);
-      } else if (texts.length > 1) {
-        timeout = setTimeout(() => {
-          setIsDeleting(true);
-        }, waitTime);
-      }
-    }
-
-    return () => clearTimeout(timeout);
-  }, [charIndex, displayText, isDeleting, speed, deleteSpeed, waitTime, texts, textIndex]);
-
-  return (
-    <span className={className}>
-      {displayText}
-      <span
-        className="inline-block w-[2px] h-[0.9em] bg-current align-middle ml-[1px]"
-        style={{ animation: 'cursor-blink 0.8s step-end infinite' }}
-      />
-    </span>
-  );
-}
 
 // ─── Color Swatch ────────────────────────────────────────────────────────────
 
@@ -376,34 +92,16 @@ function Swatch({ name, cssVar }: { name: string; cssVar: string }) {
   );
 }
 
-// ─── Breadcrumb Header ───────────────────────────────────────────────────────
+// ─── Breadcrumb Variants ─────────────────────────────────────────────────────
 
-type BreadcrumbSegment = { label: string; href?: string };
-
-function BreadcrumbHeader({ segments }: { segments: BreadcrumbSegment[] }) {
-  return (
-    <div className="h-12 border-b border-zd-border bg-zd-bg flex items-center px-6 gap-6">
-      <div className="font-display tracking-tight text-lg flex items-center">
-        {segments.map((seg, i) => (
-          <span key={i} className="flex items-center">
-            {i > 0 && <span className="text-zd-text mx-0.5">/</span>}
-            {i < segments.length - 1 ? (
-              <a href={seg.href || '#'} className="text-zd-text transition-colors duration-150 hover:text-zd-text-secondary">{seg.label}</a>
-            ) : (
-              <span className="text-zd-text">{seg.label}</span>
-            )}
-          </span>
-        ))}
-      </div>
-      <nav className="flex items-center gap-5 ml-auto">
-        <a href="#" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</a>
-        <button className="bg-zd-button-bg text-zd-text text-sm px-3 py-1 transition-colors duration-150 hover:bg-zd-button-bg-hover">
-          Connect
-        </button>
-      </nav>
-    </div>
-  );
-}
+const BREADCRUMB_NAV = (
+  <>
+    <a href="#" className="text-sm text-zd-text-secondary transition-colors duration-150 hover:text-zd-text">Feed</a>
+    <button className="bg-zd-button-bg text-zd-text text-sm px-3 py-1 transition-colors duration-150 hover:bg-zd-button-bg-hover">
+      Connect
+    </button>
+  </>
+);
 
 const BREADCRUMB_VARIANTS: { label: string; segments: BreadcrumbSegment[] }[] = [
   {
@@ -793,7 +491,7 @@ export default function DemoPage() {
             <div key={v.label}>
               <p className="text-xs text-zd-text-muted font-mono mb-1">{v.label}</p>
               <div className="border border-zd-border">
-                <BreadcrumbHeader segments={v.segments} />
+                <BreadcrumbHeader segments={v.segments}>{BREADCRUMB_NAV}</BreadcrumbHeader>
               </div>
             </div>
           ))}
@@ -997,11 +695,11 @@ export default function DemoPage() {
             <ZorbWanderingLight size={320} />
           </div>
           {/* Breadcrumb header */}
-          <BreadcrumbHeader segments={[{ label: 'Z:' }]} />
+          <BreadcrumbHeader segments={[{ label: 'Z:' }]}>{BREADCRUMB_NAV}</BreadcrumbHeader>
           {/* Content */}
           <div className="relative px-6 py-12">
             <p className="font-display tracking-tighter leading-tight" style={{ fontSize: '2rem', lineHeight: 1.2 }}>
-              Let your (<Typewriter texts={CYCLING_PHRASES} speed={50} deleteSpeed={30} waitTime={2000} />) make markets.
+              Let your (<Typewriter texts={CYCLING_PHRASES} initialWord="work" initialDelay={2500} speed={50} deleteSpeed={30} waitTime={2000} />) make markets.
             </p>
             {/* CTAs */}
             <div className="flex items-center gap-4 mt-8">

@@ -42,12 +42,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div className="flex min-h-[200px] items-center justify-center">
           <div className="text-center">
             <h2 className="text-lg font-light">Something went wrong</h2>
-            <p className="mt-2 text-sm text-zdrive-text-secondary">
+            <p className="mt-2 text-sm text-zd-text-secondary">
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             <button
               onClick={this.handleRetry}
-              className="mt-4 border border-zdrive-border px-4 py-2 text-sm transition-colors hover:border-zdrive-text hover:bg-zdrive-text hover:text-white"
+              className="mt-4 border border-zd-border px-4 py-2 text-sm transition-colors hover:border-zd-text hover:bg-zd-text hover:text-white"
             >
               Try again
             </button>

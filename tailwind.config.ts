@@ -10,19 +10,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Minimal palette inspired by Are.na/Cosmos.so
-        zdrive: {
-          bg: '#fafafa',
-          surface: '#ffffff',
-          border: '#e5e5e5',
-          'border-hover': '#d4d4d4',
-          text: '#171717',
-          'text-secondary': '#737373',
-          'text-muted': '#a3a3a3',
-          accent: '#171717',
-          'accent-hover': '#404040',
-        },
-        // New design system tokens (CSS custom property driven)
         zd: {
           bg: 'var(--zd-bg)',
           surface: 'var(--zd-surface)',

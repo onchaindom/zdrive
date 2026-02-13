@@ -51,15 +51,15 @@ export function MarkdownViewer({ uri, className }: MarkdownViewerProps) {
 
   if (isLoading) {
     return (
-      <div className={`flex min-h-[200px] items-center justify-center bg-zdrive-bg ${className ?? ''}`}>
-        <div className="h-8 w-8 animate-spin border-2 border-zdrive-border border-t-zdrive-text" />
+      <div className={`flex min-h-[200px] items-center justify-center bg-zd-bg ${className ?? ''}`}>
+        <div className="h-8 w-8 animate-spin border-2 border-zd-border border-t-zd-text" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={`flex min-h-[200px] items-center justify-center bg-zdrive-bg ${className ?? ''}`}>
+      <div className={`flex min-h-[200px] items-center justify-center bg-zd-bg ${className ?? ''}`}>
         <p className="text-sm text-red-500">{error}</p>
       </div>
     );

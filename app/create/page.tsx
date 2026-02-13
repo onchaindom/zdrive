@@ -207,7 +207,7 @@ export default function CreatePage() {
         <main className="flex flex-1 items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-light">Create a Release</h1>
-            <p className="mt-2 text-zdrive-text-secondary">
+            <p className="mt-2 text-zd-text-secondary">
               Connect your wallet to get started
             </p>
             <div className="mt-6">
@@ -227,7 +227,7 @@ export default function CreatePage() {
       <main className="flex-1">
         <div className="mx-auto max-w-2xl px-4 py-8">
           <h1 className="text-2xl font-light">Create a Release</h1>
-          <p className="mt-1 text-sm text-zdrive-text-secondary">
+          <p className="mt-1 text-sm text-zd-text-secondary">
             Publish your work as a content coin on Zora
           </p>
 
@@ -240,8 +240,8 @@ export default function CreatePage() {
                   className={`h-1 flex-1 ${
                     i <=
                     ['details', 'files', 'options', 'confirm'].indexOf(step)
-                      ? 'bg-zdrive-text'
-                      : 'bg-zdrive-border'
+                      ? 'bg-zd-text'
+                      : 'bg-zd-border'
                   }`}
                 />
               )
@@ -326,7 +326,7 @@ export default function CreatePage() {
                 hint="PDF, 3D model, point cloud (PLY), image, video, or markdown for the release viewer"
               />
 
-              <div className="border-t border-zdrive-border pt-6">
+              <div className="border-t border-zd-border pt-6">
                 <h3 className="mb-4 text-sm font-medium">
                   GitHub Link (Optional)
                 </h3>
@@ -377,7 +377,7 @@ export default function CreatePage() {
                 creatorCoinSymbol={creatorProfile?.creatorCoinSymbol}
               />
 
-              <div className="border-t border-zdrive-border pt-6">
+              <div className="border-t border-zd-border pt-6">
                 <CollectionPicker
                   enabled={collectionEnabled}
                   onEnabledChange={setCollectionEnabled}
@@ -389,7 +389,7 @@ export default function CreatePage() {
                 />
               </div>
 
-              <div className="border-t border-zdrive-border pt-6">
+              <div className="border-t border-zd-border pt-6">
                 <LicensePicker
                   selectedLicense={selectedLicense}
                   onLicenseChange={setSelectedLicense}
@@ -414,20 +414,20 @@ export default function CreatePage() {
           {/* Step: Confirm */}
           {step === 'confirm' && (
             <div className="mt-8 space-y-6">
-              <div className="border border-zdrive-border bg-zdrive-surface p-6">
+              <div className="border border-zd-border bg-zd-surface p-6">
                 <h3 className="font-medium">Release Summary</h3>
 
                 <dl className="mt-4 space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <dt className="text-zdrive-text-secondary">Name</dt>
+                    <dt className="text-zd-text-secondary">Name</dt>
                     <dd>{name}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-zdrive-text-secondary">Symbol</dt>
+                    <dt className="text-zd-text-secondary">Symbol</dt>
                     <dd>${symbol}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-zdrive-text-secondary">Pairing</dt>
+                    <dt className="text-zd-text-secondary">Pairing</dt>
                     <dd>
                       {currency === 'CREATOR_COIN_OR_ZORA'
                         ? `Creator Coin${creatorProfile?.creatorCoinSymbol ? ` ($${creatorProfile.creatorCoinSymbol})` : ''}`
@@ -435,35 +435,35 @@ export default function CreatePage() {
                     </dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-zdrive-text-secondary">Cover Image</dt>
+                    <dt className="text-zd-text-secondary">Cover Image</dt>
                     <dd>{coverImage?.name}</dd>
                   </div>
                   {previewFile && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-secondary">Preview</dt>
+                      <dt className="text-zd-text-secondary">Preview</dt>
                       <dd>{previewFile.name}</dd>
                     </div>
                   )}
                   {attachments.length > 0 && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-secondary">Attachments</dt>
+                      <dt className="text-zd-text-secondary">Attachments</dt>
                       <dd>{attachments.length} file(s)</dd>
                     </div>
                   )}
                   {githubUrl && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-secondary">GitHub</dt>
+                      <dt className="text-zd-text-secondary">GitHub</dt>
                       <dd className="truncate max-w-[200px]">{githubUrl}</dd>
                     </div>
                   )}
                   {collectionEnabled && collectionTitle && (
                     <div className="flex justify-between">
-                      <dt className="text-zdrive-text-secondary">Collection</dt>
+                      <dt className="text-zd-text-secondary">Collection</dt>
                       <dd>{collectionTitle}</dd>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <dt className="text-zdrive-text-secondary">License</dt>
+                    <dt className="text-zd-text-secondary">License</dt>
                     <dd>
                       {selectedLicense
                         ? selectedLicense.replace('CBE_', '').replace('_', ' ')
@@ -475,7 +475,7 @@ export default function CreatePage() {
 
               {/* Upload progress */}
               {isSubmitting && uploadProgress && (
-                <div className="border border-zdrive-border bg-zdrive-bg p-4">
+                <div className="border border-zd-border bg-zd-bg p-4">
                   <p className="text-sm font-medium">
                     {uploadProgress.phase === 'cover' && 'Uploading cover image...'}
                     {uploadProgress.phase === 'preview' && 'Uploading preview file...'}
@@ -485,9 +485,9 @@ export default function CreatePage() {
                     {uploadProgress.phase === 'coin' && 'Creating coin on Base...'}
                   </p>
                   {uploadProgress.total > 1 && (
-                    <div className="mt-2 h-1 bg-zdrive-border">
+                    <div className="mt-2 h-1 bg-zd-border">
                       <div
-                        className="h-1 bg-zdrive-text transition-all"
+                        className="h-1 bg-zd-text transition-all"
                         style={{
                           width: `${(uploadProgress.completed / uploadProgress.total) * 100}%`,
                         }}
@@ -498,7 +498,7 @@ export default function CreatePage() {
               )}
 
               {!isSubmitting && (
-                <p className="text-sm text-zdrive-text-secondary">
+                <p className="text-sm text-zd-text-secondary">
                   Creating a release will mint a new content coin on Base. This
                   requires a transaction and gas fees.
                 </p>

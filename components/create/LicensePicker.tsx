@@ -41,7 +41,7 @@ export function LicensePicker({
         <label className="mb-1.5 block text-sm font-medium">
           License Type
         </label>
-        <p className="mb-3 text-sm text-zdrive-text-secondary">
+        <p className="mb-3 text-sm text-zd-text-secondary">
           Select a &quot;Can&apos;t Be Evil&quot; license for your release
         </p>
 
@@ -51,8 +51,8 @@ export function LicensePicker({
             className={clsx(
               'flex cursor-pointer items-start gap-3 border p-3 transition-colors',
               selectedLicense === null
-                ? 'border-zdrive-text bg-zdrive-bg'
-                : 'border-zdrive-border hover:border-zdrive-border-hover'
+                ? 'border-zd-text bg-zd-bg'
+                : 'border-zd-border hover:border-zd-border-hover'
             )}
           >
             <input
@@ -64,7 +64,7 @@ export function LicensePicker({
             />
             <div>
               <p className="text-sm font-medium">All Rights Reserved</p>
-              <p className="text-xs text-zdrive-text-secondary">
+              <p className="text-xs text-zd-text-secondary">
                 No license granted. Standard copyright applies.
               </p>
             </div>
@@ -77,8 +77,8 @@ export function LicensePicker({
               className={clsx(
                 'flex cursor-pointer items-start gap-3 border p-3 transition-colors',
                 selectedLicense === license
-                  ? 'border-zdrive-text bg-zdrive-bg'
-                  : 'border-zdrive-border hover:border-zdrive-border-hover'
+                  ? 'border-zd-text bg-zd-bg'
+                  : 'border-zd-border hover:border-zd-border-hover'
               )}
             >
               <input
@@ -92,7 +92,7 @@ export function LicensePicker({
                 <p className="text-sm font-medium">
                   {CBE_LICENSE_NAMES[license]}
                 </p>
-                <p className="text-xs text-zdrive-text-secondary">
+                <p className="text-xs text-zd-text-secondary">
                   {CBE_LICENSE_DESCRIPTIONS[license]}
                 </p>
               </div>
@@ -103,7 +103,7 @@ export function LicensePicker({
 
       {/* Gate configuration - only show if a license is selected */}
       {selectedLicense && (
-        <div className="border-t border-zdrive-border pt-4">
+        <div className="border-t border-zd-border pt-4">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -114,7 +114,7 @@ export function LicensePicker({
               Require minimum token balance
             </span>
           </label>
-          <p className="ml-5 mt-1 text-xs text-zdrive-text-secondary">
+          <p className="ml-5 mt-1 text-xs text-zd-text-secondary">
             Only show license to holders above the threshold
           </p>
 

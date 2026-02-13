@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import { Header, Footer } from '@/components/layout';
-import { ReleaseGrid, type ReleaseItem } from '@/components/release';
+import { ReleaseList, type ReleaseItem } from '@/components/release';
 import { Button, LoadingSpinner } from '@/components/ui';
 import { useExplore, type ExploreTab } from '@/hooks/useExplore';
 import clsx from 'clsx';
@@ -44,14 +44,14 @@ export default function FeedPage() {
         <div className="mx-auto max-w-7xl px-4 py-8">
           {/* Page Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-light">Releases</h1>
-            <p className="mt-1 text-sm text-zdrive-text-secondary">
+            <h1 className="font-display text-2xl tracking-tighter">Releases</h1>
+            <p className="mt-1 text-sm text-zd-text-secondary">
               Discover creative releases from independent artists
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="mb-6 flex gap-1 border-b border-zdrive-border">
+          <div className="mb-6 flex gap-1 border-b border-zd-border">
             {tabs.map((tab) => {
               // Skip auth-required tabs for non-connected users
               if (tab.requiresAuth && !authenticated) return null;
@@ -63,8 +63,8 @@ export default function FeedPage() {
                   className={clsx(
                     'px-4 py-2 text-sm transition-colors',
                     activeTab === tab.id
-                      ? 'border-b-2 border-zdrive-text text-zdrive-text'
-                      : 'text-zdrive-text-secondary hover:text-zdrive-text'
+                      ? 'border-b-2 border-zd-text text-zd-text'
+                      : 'text-zd-text-secondary hover:text-zd-text'
                   )}
                 >
                   {tab.label}
@@ -80,8 +80,8 @@ export default function FeedPage() {
             </div>
           )}
 
-          {/* Release Grid */}
-          <ReleaseGrid
+          {/* Release List */}
+          <ReleaseList
             releases={releaseItems}
             isLoading={isLoading}
             emptyMessage={

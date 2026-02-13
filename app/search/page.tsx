@@ -128,7 +128,7 @@ function SearchPageContent() {
           {/* Results */}
           {query && (
             <div>
-              <p className="mb-4 text-sm text-zdrive-text-secondary">
+              <p className="mb-4 text-sm text-zd-text-secondary">
                 {isLoading
                   ? 'Searching...'
                   : `${releaseItems.length} result${releaseItems.length !== 1 ? 's' : ''} for "${query}"`}
@@ -143,7 +143,7 @@ function SearchPageContent() {
           )}
 
           {!query && (
-            <p className="text-zdrive-text-secondary">
+            <p className="text-zd-text-secondary">
               Search by release name, description, or creator address.
             </p>
           )}

@@ -27,7 +27,7 @@ export function ConnectButton() {
       <div className="relative">
         <button
           onClick={() => setShowMenu(!showMenu)}
-          className="flex items-center gap-2 border border-zdrive-border px-3 py-1.5 text-sm hover:border-zdrive-border-hover"
+          className="flex items-center gap-2 border border-zd-border px-3 py-1.5 text-sm hover:border-zd-border-hover"
         >
           <span className="h-2 w-2 rounded-full bg-green-500" />
           {truncateAddress(address)}
@@ -39,10 +39,10 @@ export function ConnectButton() {
               className="fixed inset-0 z-40"
               onClick={() => setShowMenu(false)}
             />
-            <div className="absolute right-0 top-full z-50 mt-1 w-48 border border-zdrive-border bg-zdrive-surface py-1 shadow-sm">
+            <div className="absolute right-0 top-full z-50 mt-1 w-48 border border-zd-border bg-zd-surface py-1 shadow-sm">
               <a
                 href={`/${address}`}
-                className="block px-4 py-2 text-sm hover:bg-zdrive-bg"
+                className="block px-4 py-2 text-sm hover:bg-zd-bg"
               >
                 My Studio
               </a>
@@ -51,7 +51,7 @@ export function ConnectButton() {
                   logout();
                   setShowMenu(false);
                 }}
-                className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-zdrive-bg"
+                className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-zd-bg"
               >
                 Disconnect
               </button>
