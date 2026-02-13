@@ -296,50 +296,65 @@ const CYCLING_PHRASES = [
 ];
 
 
-// ─── Vertical Ticker ──────────────────────────────────────────────────────
+// ─── Typewriter ───────────────────────────────────────────────────────────
+// Adapted from fancycomponents.dev/docs/components/text/typewriter
+// No motion dependency — uses pure CSS for cursor blink.
 
-function VerticalTicker({ phrases, interval = 3000 }: { phrases: string[]; interval?: number }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+function Typewriter({
+  texts,
+  speed = 50,
+  deleteSpeed = 30,
+  waitTime = 2000,
+  className = '',
+}: {
+  texts: string[];
+  speed?: number;
+  deleteSpeed?: number;
+  waitTime?: number;
+  className?: string;
+}) {
+  const [displayText, setDisplayText] = useState('');
+  const [charIndex, setCharIndex] = useState(0);
+  const [textIndex, setTextIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % phrases.length);
-        setIsTransitioning(false);
-      }, 400);
-    }, interval);
-    return () => clearInterval(timer);
-  }, [phrases.length, interval]);
+    const current = texts[textIndex];
+    let timeout: ReturnType<typeof setTimeout>;
 
-  const nextIndex = (currentIndex + 1) % phrases.length;
+    if (isDeleting) {
+      if (displayText === '') {
+        setIsDeleting(false);
+        setTextIndex((prev) => (prev + 1) % texts.length);
+        setCharIndex(0);
+      } else {
+        timeout = setTimeout(() => {
+          setDisplayText((prev) => prev.slice(0, -1));
+        }, deleteSpeed);
+      }
+    } else {
+      if (charIndex < current.length) {
+        timeout = setTimeout(() => {
+          setDisplayText((prev) => prev + current[charIndex]);
+          setCharIndex((prev) => prev + 1);
+        }, speed);
+      } else if (texts.length > 1) {
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, waitTime);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, displayText, isDeleting, speed, deleteSpeed, waitTime, texts, textIndex]);
 
   return (
-    <span
-      className="inline-flex overflow-hidden align-bottom relative"
-      style={{ height: '1.2em', verticalAlign: 'baseline' }}
-    >
-      {/* Outgoing phrase */}
+    <span className={className}>
+      {displayText}
       <span
-        className="inline-block transition-all duration-[400ms] ease-out whitespace-nowrap"
-        style={{
-          transform: isTransitioning ? 'translateY(-100%)' : 'translateY(0)',
-          opacity: isTransitioning ? 0 : 1,
-        }}
-      >
-        {phrases[currentIndex]}
-      </span>
-      {/* Incoming phrase */}
-      <span
-        className="absolute left-0 inline-block transition-all duration-[400ms] ease-out whitespace-nowrap"
-        style={{
-          transform: isTransitioning ? 'translateY(0)' : 'translateY(100%)',
-          opacity: isTransitioning ? 1 : 0,
-        }}
-      >
-        {phrases[nextIndex]}
-      </span>
+        className="inline-block w-[2px] h-[0.9em] bg-current align-middle ml-[1px]"
+        style={{ animation: 'cursor-blink 0.8s step-end infinite' }}
+      />
     </span>
   );
 }
@@ -986,7 +1001,7 @@ export default function DemoPage() {
           {/* Content */}
           <div className="relative px-6 py-12">
             <p className="font-display tracking-tighter leading-tight" style={{ fontSize: '2rem', lineHeight: 1.2 }}>
-              Let your <VerticalTicker phrases={CYCLING_PHRASES} interval={3000} /> make markets.
+              Let your (<Typewriter texts={CYCLING_PHRASES} speed={50} deleteSpeed={30} waitTime={2000} />) make markets.
             </p>
             {/* CTAs */}
             <div className="flex items-center gap-4 mt-8">
