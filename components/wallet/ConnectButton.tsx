@@ -3,7 +3,7 @@
 import { usePrivy } from '@privy-io/react-auth';
 import { useState } from 'react';
 import { getAddress, isAddress } from 'viem';
-import { Button } from '@/components/ui';
+import { Button, Zorb } from '@/components/ui';
 import { truncateAddress } from '@/lib/constants';
 
 export function ConnectButton() {
@@ -29,7 +29,7 @@ export function ConnectButton() {
           onClick={() => setShowMenu(!showMenu)}
           className="flex items-center gap-2 border border-zd-border px-3 py-1.5 text-sm hover:border-zd-border-hover"
         >
-          <span className="h-2 w-2 rounded-full bg-green-500" />
+          <Zorb size={16} seed={address} />
           {truncateAddress(address)}
         </button>
 

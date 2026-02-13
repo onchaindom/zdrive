@@ -59,7 +59,7 @@ export function FileUploader({
           isDragActive
             ? 'border-zd-text bg-zd-bg'
             : hasError
-              ? 'border-red-300 bg-red-50'
+              ? 'border-red-300'
               : 'border-zd-border hover:border-zd-border-hover hover:bg-zd-bg'
         )}
       >

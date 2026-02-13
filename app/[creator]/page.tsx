@@ -228,9 +228,19 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
             {/* Actions */}
             {isOwnProfile && (
-              <Link href="/create">
-                <Button>New Release</Button>
-              </Link>
+              <div className="flex items-center gap-3">
+                <a
+                  href={`https://zora.co/${creatorAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-zd-text-secondary underline transition-colors duration-150 hover:text-zd-text"
+                >
+                  Edit Profile on Zora
+                </a>
+                <Link href="/create">
+                  <Button>New Release</Button>
+                </Link>
+              </div>
             )}
           </div>
 
@@ -263,7 +273,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                 className={clsx(
                   'px-3 py-1.5 text-sm transition-colors',
                   viewMode === 'all'
-                    ? 'bg-zd-text text-white'
+                    ? 'bg-zd-button-bg text-zd-text'
                     : 'hover:bg-zd-bg'
                 )}
               >
@@ -274,7 +284,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                 className={clsx(
                   'px-3 py-1.5 text-sm transition-colors border-l border-zd-border',
                   viewMode === 'by-collection'
-                    ? 'bg-zd-text text-white'
+                    ? 'bg-zd-button-bg text-zd-text'
                     : 'hover:bg-zd-bg'
                 )}
               >
@@ -301,7 +311,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                   className={clsx(
                     'px-3 py-1.5 text-sm transition-colors',
                     filter === f.id
-                      ? 'bg-zd-text text-white'
+                      ? 'bg-zd-button-bg text-zd-text'
                       : 'border border-zd-border hover:border-zd-border-hover'
                   )}
                 >
