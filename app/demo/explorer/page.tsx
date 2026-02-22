@@ -5,14 +5,14 @@ import { DemoClassicExplorer } from './DemoClassicExplorer';
 import { DemoTerminal } from './DemoTerminal';
 import { DemoModernFM } from './DemoModernFM';
 import { DemoFinder } from './DemoFinder';
-import { DemoIndex } from './DemoIndex';
+import { DemoExplorerRefined } from './DemoIndex';
 
 const DEMOS = [
   { id: 'classic', label: 'A: Classic Explorer', component: DemoClassicExplorer },
   { id: 'terminal', label: 'B: Terminal', component: DemoTerminal },
   { id: 'modern', label: 'C: Modern FM', component: DemoModernFM },
   { id: 'finder', label: 'D: Finder', component: DemoFinder },
-  { id: 'index', label: 'E: Index', component: DemoIndex },
+  { id: 'refined', label: 'E: Refined', component: DemoExplorerRefined },
 ] as const;
 
 export default function ExplorerDemoPage() {
