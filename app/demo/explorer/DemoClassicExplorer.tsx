@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { MOCK_FILES, MOCK_COLLECTIONS, formatDate, formatHolders, type MockFile } from './mockdata';
+import { MOCK_FILES, MOCK_FOLDERS, formatDate, formatHolders, type MockFile } from './mockdata';
 
 /**
  * Demo A: Classic Explorer
  *
  * Inspiration: Windows Explorer / macOS Finder
  * - Pure white background, black text
- * - Sidebar with folder/collection tree
+ * - Sidebar with folder tree
  * - Toolbar with view + sort controls
  * - Columnar file list with sortable headers
  * - Status bar at bottom
@@ -47,7 +47,7 @@ export function DemoClassicExplorer() {
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [sidebarCollection, setSidebarCollection] = useState<string | null>(null);
+  const [sidebarFolder, setSidebarFolder] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'details'>('details');
 
   const handleSort = (key: SortKey) => {
@@ -59,8 +59,8 @@ export function DemoClassicExplorer() {
     }
   };
 
-  const filteredFiles = sidebarCollection
-    ? MOCK_FILES.filter((f) => f.collection === sidebarCollection)
+  const filteredFiles = sidebarFolder
+    ? MOCK_FILES.filter((f) => f.folder === sidebarFolder)
     : MOCK_FILES;
 
   const sorted = sortFiles(filteredFiles, sortKey, sortDir);
@@ -97,7 +97,7 @@ export function DemoClassicExplorer() {
         <div className="flex-1 flex items-center border border-gray-300 bg-white px-2 h-6">
           <span className="text-xs text-gray-500">Z:\</span>
           <span className="text-xs">
-            {sidebarCollection ? `${sidebarCollection.replace(/ /g, '_')}\\` : ''}
+            {sidebarFolder ? `${sidebarFolder.replace(/ /g, '_')}\\` : ''}
           </span>
         </div>
 
@@ -123,29 +123,29 @@ export function DemoClassicExplorer() {
         {/* Sidebar */}
         <div className="w-52 border-r border-black bg-gray-50 overflow-y-auto shrink-0">
           <div className="px-3 py-2 text-xs text-gray-500 border-b border-gray-200">
-            COLLECTIONS
+            FOLDERS
           </div>
           <button
-            onClick={() => setSidebarCollection(null)}
+            onClick={() => setSidebarFolder(null)}
             className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 flex items-center gap-2 ${
-              !sidebarCollection ? 'bg-black text-white hover:bg-gray-800' : ''
+              !sidebarFolder ? 'bg-black text-white hover:bg-gray-800' : ''
             }`}
           >
             <span>{'>'}</span>
             <span>All Files</span>
             <span className="ml-auto text-gray-400">{MOCK_FILES.length}</span>
           </button>
-          {MOCK_COLLECTIONS.map((col) => (
+          {MOCK_FOLDERS.map((col) => (
             <button
               key={col.name}
-              onClick={() => setSidebarCollection(col.name)}
+              onClick={() => setSidebarFolder(col.name)}
               className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 flex items-center gap-2 ${
-                sidebarCollection === col.name ? 'bg-black text-white hover:bg-gray-800' : ''
+                sidebarFolder === col.name ? 'bg-black text-white hover:bg-gray-800' : ''
               }`}
             >
               <span>[+]</span>
               <span className="truncate">{col.name}</span>
-              <span className={`ml-auto ${sidebarCollection === col.name ? 'text-gray-300' : 'text-gray-400'}`}>
+              <span className={`ml-auto ${sidebarFolder === col.name ? 'text-gray-300' : 'text-gray-400'}`}>
                 {col.count}
               </span>
             </button>
@@ -267,7 +267,7 @@ export function DemoClassicExplorer() {
               {/* Properties grid */}
               <div className="space-y-2 text-xs">
                 <PropRow label="Creator" value={selected.creator} />
-                <PropRow label="Collection" value={selected.collection || '(none)'} />
+                <PropRow label="Folder" value={selected.folder || '(none)'} />
                 <PropRow label="Date" value={formatDate(selected.date)} />
                 <PropRow label="Size" value={selected.size} />
                 <PropRow label="Holders" value={formatHolders(selected.holders)} />

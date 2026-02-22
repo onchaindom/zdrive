@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MOCK_FILES, MOCK_COLLECTIONS, formatDate, formatHolders, type MockFile } from './mockdata';
+import { MOCK_FILES, MOCK_FOLDERS, formatDate, formatHolders, type MockFile } from './mockdata';
 
 /**
  * Demo B: Terminal
@@ -36,7 +36,7 @@ export function DemoTerminal() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const filteredFiles = currentDir
-    ? MOCK_FILES.filter((f) => f.collection === currentDir)
+    ? MOCK_FILES.filter((f) => f.folder === currentDir)
     : MOCK_FILES;
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function DemoTerminal() {
       newHistory.push('Z:\\>');
     } else if (trimmed.startsWith('cd ')) {
       const dir = trimmed.slice(3).trim();
-      const match = MOCK_COLLECTIONS.find(
+      const match = MOCK_FOLDERS.find(
         (c) => c.name.toLowerCase().replace(/ /g, '_') === dir || c.name.toLowerCase() === dir
       );
       if (match) {
@@ -88,7 +88,7 @@ export function DemoTerminal() {
         newHistory.push(`  Name:       ${file.name}${file.ext}`);
         newHistory.push(`  Type:       ${file.type}`);
         newHistory.push(`  Creator:    ${file.creator} (${file.creatorAddr})`);
-        newHistory.push(`  Collection: ${file.collection || '(none)'}`);
+        newHistory.push(`  Folder:     ${file.folder || '(none)'}`);
         newHistory.push(`  Date:       ${formatDate(file.date)}`);
         newHistory.push(`  Size:       ${file.size}`);
         newHistory.push(`  Holders:    ${formatHolders(file.holders)}`);
@@ -128,7 +128,7 @@ export function DemoTerminal() {
           >
             {'>'} Z:\
           </button>
-          {MOCK_COLLECTIONS.map((col) => (
+          {MOCK_FOLDERS.map((col) => (
             <button
               key={col.name}
               onClick={() => { setCurrentDir(col.name); setSelectedIdx(-1); }}
@@ -261,7 +261,7 @@ function TermDetail({ file }: { file: MockFile }) {
       <div><span className="text-green-700">type:       </span>{file.type}</div>
       <div><span className="text-green-700">size:       </span>{file.size}</div>
       <div><span className="text-green-700">creator:    </span>{file.creator} ({file.creatorAddr})</div>
-      <div><span className="text-green-700">collection: </span>{file.collection || '(none)'}</div>
+      <div><span className="text-green-700">folder:     </span>{file.folder || '(none)'}</div>
       <div><span className="text-green-700">date:       </span>{formatDate(file.date)}</div>
       <div><span className="text-green-700">holders:    </span>{formatHolders(file.holders)}</div>
       <div><span className="text-green-700">market_cap: </span>{file.marketCap}</div>

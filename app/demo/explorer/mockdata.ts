@@ -6,7 +6,7 @@ export interface MockFile {
   ext: string;
   creator: string;
   creatorAddr: string;
-  collection: string | null;
+  folder: string | null;
   date: string;
   holders: number;
   marketCap: string;
@@ -23,7 +23,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.pdf',
     creator: 'morph.eth',
     creatorAddr: '0xA3f2...1B4c',
-    collection: 'Morphic Studies',
+    folder: 'Morphic Studies',
     date: '2026-02-20',
     holders: 1247,
     marketCap: '$4,280',
@@ -38,7 +38,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.glb',
     creator: 'morph.eth',
     creatorAddr: '0xA3f2...1B4c',
-    collection: 'Morphic Studies',
+    folder: 'Morphic Studies',
     date: '2026-02-15',
     holders: 847,
     marketCap: '$2,100',
@@ -53,7 +53,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.png',
     creator: 'campo.eth',
     creatorAddr: '0xB8c4...3E7f',
-    collection: 'Field Notes',
+    folder: 'Field Notes',
     date: '2026-01-12',
     holders: 2100,
     marketCap: '$8,750',
@@ -68,7 +68,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.mp4',
     creator: 'wave.eth',
     creatorAddr: '0x2Da9...6F1b',
-    collection: null,
+    folder: null,
     date: '2026-01-08',
     holders: 562,
     marketCap: '$1,340',
@@ -83,7 +83,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.md',
     creator: 'dev.eth',
     creatorAddr: '0xC5e7...4A2d',
-    collection: 'Research',
+    folder: 'Research',
     date: '2025-12-29',
     holders: 189,
     marketCap: '$420',
@@ -98,7 +98,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.ply',
     creator: 'scan.eth',
     creatorAddr: '0x9Fb3...8C5e',
-    collection: 'Scans',
+    folder: 'Scans',
     date: '2025-12-15',
     holders: 93,
     marketCap: '$180',
@@ -113,7 +113,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.png',
     creator: 'color.eth',
     creatorAddr: '0xD4e8...2F9a',
-    collection: 'Chromatic Studies',
+    folder: 'Chromatic Studies',
     date: '2025-12-10',
     holders: 421,
     marketCap: '$1,890',
@@ -128,7 +128,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.pdf',
     creator: 'dev.eth',
     creatorAddr: '0xC5e7...4A2d',
-    collection: 'Research',
+    folder: 'Research',
     date: '2025-12-01',
     holders: 312,
     marketCap: '$780',
@@ -143,7 +143,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.mp4',
     creator: 'wave.eth',
     creatorAddr: '0x2Da9...6F1b',
-    collection: null,
+    folder: null,
     date: '2025-11-20',
     holders: 734,
     marketCap: '$3,200',
@@ -158,7 +158,7 @@ export const MOCK_FILES: MockFile[] = [
     ext: '.svg',
     creator: 'morph.eth',
     creatorAddr: '0xA3f2...1B4c',
-    collection: 'Morphic Studies',
+    folder: 'Morphic Studies',
     date: '2025-11-15',
     holders: 1560,
     marketCap: '$5,400',
@@ -169,7 +169,7 @@ export const MOCK_FILES: MockFile[] = [
   },
 ];
 
-export const MOCK_COLLECTIONS = [
+export const MOCK_FOLDERS = [
   { name: 'Morphic Studies', creator: 'morph.eth', count: 3 },
   { name: 'Field Notes', creator: 'campo.eth', count: 1 },
   { name: 'Research', creator: 'dev.eth', count: 2 },

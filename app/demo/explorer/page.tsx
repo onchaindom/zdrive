@@ -4,16 +4,20 @@ import { useState } from 'react';
 import { DemoClassicExplorer } from './DemoClassicExplorer';
 import { DemoTerminal } from './DemoTerminal';
 import { DemoModernFM } from './DemoModernFM';
+import { DemoFinder } from './DemoFinder';
+import { DemoIndex } from './DemoIndex';
 
 const DEMOS = [
   { id: 'classic', label: 'A: Classic Explorer', component: DemoClassicExplorer },
   { id: 'terminal', label: 'B: Terminal', component: DemoTerminal },
-  { id: 'modern', label: 'C: Modern File Manager', component: DemoModernFM },
+  { id: 'modern', label: 'C: Modern FM', component: DemoModernFM },
+  { id: 'finder', label: 'D: Finder', component: DemoFinder },
+  { id: 'index', label: 'E: Index', component: DemoIndex },
 ] as const;
 
 export default function ExplorerDemoPage() {
-  const [activeDemo, setActiveDemo] = useState<string>('classic');
-  const ActiveComponent = DEMOS.find((d) => d.id === activeDemo)?.component ?? DemoClassicExplorer;
+  const [activeDemo, setActiveDemo] = useState<string>('finder');
+  const ActiveComponent = DEMOS.find((d) => d.id === activeDemo)?.component ?? DemoFinder;
 
   return (
     <div className="min-h-screen bg-neutral-900">

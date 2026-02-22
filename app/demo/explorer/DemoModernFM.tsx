@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MOCK_FILES, MOCK_COLLECTIONS, formatDate, formatDateShort, formatHolders, type MockFile } from './mockdata';
+import { MOCK_FILES, MOCK_FOLDERS, formatDate, formatDateShort, formatHolders, type MockFile } from './mockdata';
 
 /**
  * Demo C: Modern File Manager
@@ -19,18 +19,18 @@ import { MOCK_FILES, MOCK_COLLECTIONS, formatDate, formatDateShort, formatHolder
 type ViewMode = 'table' | 'grid';
 
 export function DemoModernFM() {
-  const [currentCollection, setCurrentCollection] = useState<string | null>(null);
+  const [currentFolder, setCurrentCollection] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<MockFile | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
 
-  const filteredByCollection = currentCollection
-    ? MOCK_FILES.filter((f) => f.collection === currentCollection)
+  const filteredByFolder = currentFolder
+    ? MOCK_FILES.filter((f) => f.folder === currentFolder)
     : MOCK_FILES;
 
   const filteredFiles = typeFilter === 'ALL'
-    ? filteredByCollection
-    : filteredByCollection.filter((f) => f.type === typeFilter);
+    ? filteredByFolder
+    : filteredByFolder.filter((f) => f.type === typeFilter);
 
   const types = ['ALL', ...Array.from(new Set(MOCK_FILES.map((f) => f.type)))];
 
@@ -62,14 +62,14 @@ export function DemoModernFM() {
       <div className="h-8 border-b border-gray-200 flex items-center px-4 text-xs bg-gray-50 shrink-0">
         <button
           onClick={() => { setCurrentCollection(null); setSelectedFile(null); }}
-          className={`hover:underline ${!currentCollection ? 'font-bold' : 'text-gray-500'}`}
+          className={`hover:underline ${!currentFolder ? 'font-bold' : 'text-gray-500'}`}
         >
           Z:
         </button>
-        {currentCollection && (
+        {currentFolder && (
           <>
             <span className="mx-1 text-gray-400">/</span>
-            <span className="font-bold">{currentCollection}</span>
+            <span className="font-bold">{currentFolder}</span>
           </>
         )}
         <span className="mx-1 text-gray-400">/</span>
@@ -124,24 +124,24 @@ export function DemoModernFM() {
         {/* Sidebar */}
         <div className="w-48 border-r border-gray-200 overflow-y-auto shrink-0">
           <div className="py-2">
-            <div className="px-3 py-1 text-[10px] text-gray-400 uppercase tracking-wider">Collections</div>
+            <div className="px-3 py-1 text-[10px] text-gray-400 uppercase tracking-wider">Folders</div>
             <button
               onClick={() => { setCurrentCollection(null); setSelectedFile(null); }}
               className={`block w-full text-left px-3 py-1.5 text-xs ${
-                !currentCollection ? 'bg-black text-white' : 'hover:bg-gray-100'
+                !currentFolder ? 'bg-black text-white' : 'hover:bg-gray-100'
               }`}
             >
               All files
             </button>
-            {MOCK_COLLECTIONS.map((col) => (
+            {MOCK_FOLDERS.map((col) => (
               <button
                 key={col.name}
                 onClick={() => { setCurrentCollection(col.name); setSelectedFile(null); }}
                 className={`block w-full text-left px-3 py-1.5 text-xs ${
-                  currentCollection === col.name ? 'bg-black text-white' : 'hover:bg-gray-100'
+                  currentFolder === col.name ? 'bg-black text-white' : 'hover:bg-gray-100'
                 }`}
               >
-                {col.name} <span className={currentCollection === col.name ? 'text-gray-400' : 'text-gray-300'}>{col.count}</span>
+                {col.name} <span className={currentFolder === col.name ? 'text-gray-400' : 'text-gray-300'}>{col.count}</span>
               </button>
             ))}
           </div>
@@ -338,7 +338,7 @@ function DetailPanel({ file, onClose }: { file: MockFile; onClose: () => void })
         {/* Metadata */}
         <div className="space-y-2 text-xs">
           <MetaRow label="creator" value={file.creator} />
-          <MetaRow label="collection" value={file.collection || '--'} />
+          <MetaRow label="folder" value={file.folder || '--'} />
           <MetaRow label="date" value={formatDate(file.date)} />
           <MetaRow label="holders" value={formatHolders(file.holders)} />
           <MetaRow label="mkt cap" value={file.marketCap} />
