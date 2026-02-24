@@ -85,6 +85,7 @@ export const FILE_TYPE_ICONS: Record<string, React.FC<{ className?: string }>> =
   IMG: IconImage,
   VID: IconVideo,
   MD: IconCode,
+  CODE: IconCode,
   PLY: IconCloud,
   FILE: IconFile,
 };

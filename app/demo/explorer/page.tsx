@@ -18,7 +18,7 @@ export default function ExplorerDemoPage() {
   return (
     <div className="min-h-screen" style={{ background: '#E8E8E8' }}>
       {/* Demo selector bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 font-mono" style={{ background: '#1E1E1E', borderBottom: '1px solid #333' }}>
+      <div className="fixed top-0 left-0 right-0 z-50 font-display" style={{ background: '#1E1E1E', borderBottom: '1px solid #333' }}>
         <div className="flex items-center h-10 px-4 gap-6">
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#666' }}>DEMO</span>
           <div className="flex items-center gap-1">

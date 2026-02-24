@@ -210,10 +210,14 @@ export const MOCK_FOLDERS = [
   { name: 'Chromatic Studies', creator: 'color.eth', count: 1 },
 ];
 
-/** YYYY.M.DD format matching existing ReleaseRow style */
+/** YYYY.MM.DD HH:MM format */
 export function formatDateDot(dateStr: string): string {
   const d = new Date(dateStr);
-  return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${d.getFullYear()}.${mm}.${dd} ${hh}:${min}`;
 }
 
 export function formatHolders(n: number): string {

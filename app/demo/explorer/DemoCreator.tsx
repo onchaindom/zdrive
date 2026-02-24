@@ -1,21 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { MOCK_FILES, MOCK_FOLDERS, formatDateDot, formatHolders, type MockFile } from './mockdata';
-
-/**
- * Creator page demo
- *
- * - Creator profile header
- * - Their releases listed same style as the feed
- * - Folder grouping toggle
- * - Same color scheme: bg #E8E8E8, text #1E1E1E
- */
+import { MOCK_FILES, formatDateDot, formatHolders, type MockFile } from './mockdata';
+import { FILE_TYPE_ICONS, IconFile } from '@/components/ui/FileTypeIcon';
 
 const BG = '#E8E8E8';
 const TEXT = '#1E1E1E';
 const MUTED = '#888888';
-const BORDER = '#C8C8C8';
+const DOTTED = '#ABABAB';
 const SURFACE = '#DEDEDE';
 const HOVER = '#D4D4D4';
 
@@ -26,6 +18,11 @@ const CREATOR_BIO = 'Exploring emergence, tension, and form through generative p
 const CREATOR_SYMBOL = '$MORPH';
 
 type ViewMode = 'all' | 'by-folder';
+
+function FileIcon({ type }: { type: string }) {
+  const Icon = FILE_TYPE_ICONS[type] || IconFile;
+  return <Icon className="w-4 h-4" />;
+}
 
 export function DemoCreator() {
   const [viewMode, setViewMode] = useState<ViewMode>('all');
@@ -65,29 +62,36 @@ export function DemoCreator() {
 
   return (
     <div
-      className="min-h-screen font-mono text-sm"
+      className="min-h-screen font-display text-sm"
       style={{ background: BG, color: TEXT }}
     >
       {/* ── Header ────────────────────────────────────────────────────── */}
       <header
-        className="h-12 flex items-center px-6 gap-6"
-        style={{ borderBottom: `1px solid ${BORDER}` }}
+        className="h-12 flex items-center px-6 gap-4"
+        style={{ borderBottom: `0.5px dotted ${DOTTED}` }}
       >
-        <span className="font-bold text-base tracking-tight">Z:DRIVE</span>
-        <div className="flex items-center gap-1.5 text-xs">
+        <nav className="flex items-center gap-1 text-xs font-light">
           <span className="cursor-pointer hover:underline" style={{ color: MUTED }}>Z:</span>
-          <span style={{ color: MUTED }}>/</span>
-          <span>{CREATOR}</span>
-        </div>
-        <div className="ml-auto flex items-center gap-4 text-xs" style={{ color: MUTED }}>
-          <span className="cursor-pointer hover:underline">Feed</span>
-          <span className="cursor-pointer hover:underline">Create</span>
+          <span style={{ color: MUTED }}>{' \\ '}</span>
+          <span className="font-bold">{CREATOR.toUpperCase()}</span>
+        </nav>
+        <div className="ml-auto flex items-center gap-4">
+          <span className="text-xs font-light tracking-wide" style={{ color: MUTED }}>
+            UPLOAD&#8599;
+          </span>
           <button
-            className="px-3 py-1.5"
-            style={{ border: `1px solid ${TEXT}`, color: TEXT }}
+            className="px-2.5 py-1 text-xs font-mono"
+            style={{ border: `0.5px dotted ${DOTTED}`, color: TEXT }}
           >
-            Connect
+            +++
           </button>
+          <div className="flex items-center gap-2">
+            <div
+              className="w-6 h-6 rounded-full"
+              style={{ background: DOTTED }}
+            />
+            <span className="text-xs font-light">USER.ETH</span>
+          </div>
         </div>
       </header>
 
@@ -97,16 +101,16 @@ export function DemoCreator() {
           {/* Avatar */}
           <div
             className="w-12 h-12 shrink-0 rounded-full"
-            style={{ background: BORDER }}
+            style={{ background: DOTTED }}
           />
           <div className="flex-1">
             <h1 className="text-xl font-bold tracking-tight">{CREATOR}</h1>
-            <p className="text-xs mt-1 leading-relaxed" style={{ color: MUTED }}>
+            <p className="text-xs mt-1 leading-relaxed font-light" style={{ color: MUTED }}>
               {CREATOR_BIO}
             </p>
-            <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: MUTED }}>
+            <div className="flex items-center gap-3 mt-2 text-xs font-mono" style={{ color: MUTED }}>
               <span>{CREATOR_SYMBOL}</span>
-              <span className="underline cursor-pointer">Basescan</span>
+              <span className="underline cursor-pointer font-display font-light">Basescan</span>
               <span>{CREATOR_ADDR}</span>
             </div>
           </div>
@@ -115,15 +119,15 @@ export function DemoCreator() {
         {/* ── Folders ─────────────────────────────────────────────────── */}
         {folders.length > 0 && (
           <div className="mb-6">
-            <div className="text-[10px] uppercase tracking-widest mb-2" style={{ color: MUTED }}>
-              / Folders
+            <div className="text-[10px] uppercase tracking-widest mb-2 font-light" style={{ color: MUTED }}>
+              FOLDERS
             </div>
             <div className="flex flex-wrap gap-2">
               {folders.map((f) => (
                 <span
                   key={f}
-                  className="px-3 py-1.5 text-xs cursor-pointer transition-colors"
-                  style={{ border: `1px solid ${BORDER}` }}
+                  className="px-3 py-1.5 text-xs cursor-pointer transition-colors font-light"
+                  style={{ border: `0.5px dotted ${DOTTED}` }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = HOVER)}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
@@ -136,30 +140,30 @@ export function DemoCreator() {
 
         {/* ── View Toggle ─────────────────────────────────────────────── */}
         <div className="flex items-center gap-4 mb-4">
-          <div className="flex" style={{ border: `1px solid ${BORDER}` }}>
+          <div className="flex" style={{ border: `0.5px dotted ${DOTTED}` }}>
             <button
               onClick={() => setViewMode('all')}
-              className="px-3 py-1.5 text-xs transition-colors"
+              className="px-3 py-1.5 text-xs transition-colors font-light"
               style={{
                 background: viewMode === 'all' ? SURFACE : 'transparent',
-                fontWeight: viewMode === 'all' ? 700 : 400,
+                fontWeight: viewMode === 'all' ? 400 : 300,
               }}
             >
               All
             </button>
             <button
               onClick={() => setViewMode('by-folder')}
-              className="px-3 py-1.5 text-xs transition-colors"
+              className="px-3 py-1.5 text-xs transition-colors font-light"
               style={{
                 background: viewMode === 'by-folder' ? SURFACE : 'transparent',
-                borderLeft: `1px solid ${BORDER}`,
-                fontWeight: viewMode === 'by-folder' ? 700 : 400,
+                borderLeft: `0.5px dotted ${DOTTED}`,
+                fontWeight: viewMode === 'by-folder' ? 400 : 300,
               }}
             >
               By Folder
             </button>
           </div>
-          <span className="text-xs" style={{ color: MUTED }}>
+          <span className="text-xs font-light" style={{ color: MUTED }}>
             {releases.length} releases
           </span>
         </div>
@@ -173,7 +177,7 @@ export function DemoCreator() {
               <div key={group.title}>
                 <h3 className="text-sm font-bold tracking-tight mb-2">
                   {group.title}
-                  <span className="ml-2 font-normal" style={{ color: MUTED }}>
+                  <span className="ml-2 font-light" style={{ color: MUTED }}>
                     ({group.items.length})
                   </span>
                 </h3>
@@ -191,22 +195,22 @@ export function DemoCreator() {
 
 function ReleaseTable({ files }: { files: MockFile[] }) {
   return (
-    <div style={{ border: `1px solid ${BORDER}` }}>
+    <div style={{ border: `0.5px dotted ${DOTTED}` }}>
       {/* Header */}
       <div
-        className="grid items-center h-8 px-3 text-[10px] uppercase tracking-widest"
+        className="grid items-center h-8 px-3 text-[10px] uppercase tracking-widest font-light"
         style={{
-          gridTemplateColumns: '90px 1fr 56px 72px 64px 72px',
+          gridTemplateColumns: '48px 1fr 140px 80px 80px 72px',
           color: MUTED,
-          borderBottom: `1px solid ${BORDER}`,
+          borderBottom: `0.5px dotted ${DOTTED}`,
         }}
       >
-        <span>/ Date</span>
-        <span>/ Title</span>
-        <span>/ Type</span>
-        <span className="text-right">/ Mcap</span>
-        <span className="text-right">/ Holders</span>
-        <span className="text-right">/ Volume</span>
+        <span>TYPE</span>
+        <span>TITLE</span>
+        <span>CREATED</span>
+        <span className="text-right">HOLDERS</span>
+        <span className="text-right">VOL</span>
+        <span className="text-right">COLLECT</span>
       </div>
 
       {/* Rows */}
@@ -215,32 +219,34 @@ function ReleaseTable({ files }: { files: MockFile[] }) {
           key={file.contract}
           className="grid items-center h-11 px-3 cursor-pointer transition-colors"
           style={{
-            gridTemplateColumns: '90px 1fr 56px 72px 64px 72px',
-            borderBottom: `1px solid ${BORDER}`,
+            gridTemplateColumns: '48px 1fr 140px 80px 80px 72px',
+            borderBottom: `0.5px dotted ${DOTTED}`,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = HOVER)}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
         >
-          <span className="text-xs" style={{ color: MUTED }}>
-            {formatDateDot(file.date)}
+          <span style={{ color: MUTED }}>
+            <FileIcon type={file.type} />
           </span>
-          <span className="text-[15px] tracking-tight truncate pr-4 font-bold">
+          <span className="text-sm tracking-tight truncate pr-4 font-bold">
             {file.name}
           </span>
-          <span
-            className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 text-center"
-            style={{ border: `1px solid ${BORDER}`, color: MUTED }}
-          >
-            {file.type}
+          <span className="text-xs font-mono" style={{ color: MUTED }}>
+            {formatDateDot(file.date)}
           </span>
-          <span className="text-xs text-right" style={{ color: MUTED }}>
-            {file.marketCap}
-          </span>
-          <span className="text-xs text-right" style={{ color: MUTED }}>
+          <span className="text-xs text-right font-mono" style={{ color: MUTED }}>
             {formatHolders(file.holders)}
           </span>
-          <span className="text-xs text-right" style={{ color: MUTED }}>
-            {file.volume}
+          <span className="text-xs text-right font-mono" style={{ color: MUTED }}>
+            {file.volNum}
+          </span>
+          <span className="flex justify-end">
+            <button
+              className="px-2 py-0.5 text-xs font-mono"
+              style={{ border: `0.5px dotted ${DOTTED}`, color: MUTED }}
+            >
+              +++
+            </button>
           </span>
         </div>
       ))}
