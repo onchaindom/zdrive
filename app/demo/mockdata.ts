@@ -40,12 +40,12 @@ export interface PlatformStats {
 // ─── Creators ────────────────────────────────────────────────────────────────
 
 export const MOCK_CREATORS: MockCreator[] = [
-  { address: '0xA3f2B7c9D1e4F8a6', name: 'morph.eth', bio: 'Exploring the boundaries of generative art and computational form. Based in Berlin.', avatarSeed: '0xA3f2B7c9', coinSymbol: 'MORPH' },
-  { address: '0x7Fe1D4a2B9c3E5f8', name: 'vera.base', bio: 'Documentary photographer and visual researcher. Long-form projects on landscape and memory.', avatarSeed: '0x7Fe1D4a2', coinSymbol: 'VERA' },
-  { address: '0xB8c4E9f3A1d6C7b2', name: 'fieldwork.eth', bio: 'Field recordings, spatial audio, and sound design for physical spaces.', avatarSeed: '0xB8c4E9f3', coinSymbol: 'FIELD' },
-  { address: '0x2Da9F6b1C8e4A3d7', name: 'syl.base', bio: 'Writer and researcher. Essays on technology, culture, and the built environment.', avatarSeed: '0x2Da9F6b1', coinSymbol: 'SYL' },
-  { address: '0xC5e7A4d2F9b1E8c3', name: 'hex.eth', bio: 'Creative coder. Tools, toys, and experiments in browser-native media.', avatarSeed: '0xC5e7A4d2', coinSymbol: 'HEX' },
-  { address: '0x9Fb3C8e5D2a4B7f1', name: 'archive.base', bio: 'Digital preservation and open-access publishing. Running a small press on-chain.', avatarSeed: '0x9Fb3C8e5', coinSymbol: 'ARCH' },
+  { address: '0xA3f2B7c9D1e4F8a6', name: 'morph.eth', bio: 'Exploring the boundaries of generative art and computational form. Based in Berlin.', avatarSeed: '0x3fCbf507dE', coinSymbol: 'MORPH' },
+  { address: '0x7Fe1D4a2B9c3E5f8', name: 'vera.base', bio: 'Documentary photographer and visual researcher. Long-form projects on landscape and memory.', avatarSeed: '0x8eBA2D8Df0', coinSymbol: 'VERA' },
+  { address: '0xB8c4E9f3A1d6C7b2', name: 'fieldwork.eth', bio: 'Field recordings, spatial audio, and sound design for physical spaces.', avatarSeed: '0xdEdC8EC2c6', coinSymbol: 'FIELD' },
+  { address: '0x2Da9F6b1C8e4A3d7', name: 'syl.base', bio: 'Writer and researcher. Essays on technology, culture, and the built environment.', avatarSeed: '0xb1ED96bEff', coinSymbol: 'SYL' },
+  { address: '0xC5e7A4d2F9b1E8c3', name: 'hex.eth', bio: 'Creative coder. Tools, toys, and experiments in browser-native media.', avatarSeed: '0xD9e839E4e6', coinSymbol: 'HEX' },
+  { address: '0x9Fb3C8e5D2a4B7f1', name: 'archive.base', bio: 'Digital preservation and open-access publishing. Running a small press on-chain.', avatarSeed: '0x71fc722D6F', coinSymbol: 'ARCH' },
 ];
 
 // ─── Collections ─────────────────────────────────────────────────────────────
@@ -152,4 +152,22 @@ export function getCreatorCounts(releases: MockRelease[]): Record<string, number
     counts[key] = (counts[key] || 0) + 1;
   }
   return counts;
+}
+
+// ─── File extension map ──────────────────────────────────────────────────────
+
+export const TYPE_EXTENSIONS: Record<ReleaseType, string> = {
+  PDF: '.pdf',
+  '3D': '.glb',
+  IMG: '.png',
+  VID: '.mp4',
+  CODE: '.md',
+  PLY: '.ply',
+  BLOG: '.html',
+};
+
+export function releaseName(release: MockRelease): string {
+  const ext = TYPE_EXTENSIONS[release.type];
+  if (release.name.includes('.')) return release.name;
+  return `${release.name}${ext}`;
 }

@@ -22,6 +22,7 @@
   --zd-accent-hover: #3D3A35;
   --zd-button-bg: #EAE6E0;
   --zd-button-bg-hover: #DDD8D0;
+  --zd-cta: #2DD4BF;
 }
 
 /* Z:DRIVE Design System — Dark Mode */
@@ -38,6 +39,7 @@
   --zd-accent-hover: #C5C0B8;
   --zd-button-bg: #2A2826;
   --zd-button-bg-hover: #3E3B37;
+  --zd-cta: #14B8A6;
 }
 
 * {

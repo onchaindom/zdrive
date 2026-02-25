@@ -23,6 +23,7 @@ const config: Config = {
           'accent-hover': 'var(--zd-accent-hover)',
           'button-bg': 'var(--zd-button-bg)',
           'button-bg-hover': 'var(--zd-button-bg-hover)',
+          cta: 'var(--zd-cta)',
         },
       },
       fontFamily: {
