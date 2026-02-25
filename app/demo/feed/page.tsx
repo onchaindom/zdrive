@@ -1,137 +1,186 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   MOCK_RELEASES,
-  PLATFORM_STATS,
   getCreatorByAddress,
-  getTypeCounts,
-  getCollectionCounts,
-  getCreatorCounts,
-  formatDate,
-  type ReleaseType,
+  formatDateTime,
+  formatHolders,
   type MockRelease,
 } from '../mockdata';
+import { Zorb, FILE_TYPE_ICONS, IconFile, Sparkline, DisclosureLink } from '@/components/ui';
 
-// ─── Type badge labels ───────────────────────────────────────────────────────
+// ─── Breadcrumb Header ───────────────────────────────────────────────────────
 
-const TYPE_LABELS: Record<ReleaseType, string> = {
-  PDF: 'PDF',
-  '3D': '3D',
-  IMG: 'IMG',
-  VID: 'VID',
-  CODE: 'CODE',
-  PLY: 'PLY',
-  BLOG: 'BLOG',
-};
-
-// ─── Stats Ticker ────────────────────────────────────────────────────────────
-
-function StatsTicker() {
-  const stats = [
-    `TOTAL RELEASES: ${PLATFORM_STATS.totalReleases}`,
-    `CREATORS: ${PLATFORM_STATS.creators}`,
-    `TOTAL VOLUME: ${PLATFORM_STATS.totalVolume} ETH`,
-    `UNIQUE HOLDERS: ${PLATFORM_STATS.uniqueHolders.toLocaleString()}+`,
-  ];
+function FeedBreadcrumb({ selected }: { selected: MockRelease | null }) {
+  const creator = selected ? getCreatorByAddress(selected.creator) : null;
 
   return (
-    <div className="border-b border-zd-border overflow-hidden">
-      <div className="flex animate-marquee whitespace-nowrap py-2">
-        {[...stats, ...stats].map((stat, i) => (
-          <span key={i} className="text-xs font-mono text-zd-text-muted mx-6">
-            {stat}
-          </span>
-        ))}
+    <div className="h-12 border-b border-zd-border bg-zd-bg flex items-center px-6 gap-6">
+      <div className="font-display tracking-tight text-lg flex items-center gap-0">
+        <Link href="/demo" className="text-zd-text transition-colors duration-150 hover:text-zd-text-secondary">Z:</Link>
+        {selected && creator && (
+          <>
+            <span className="text-zd-text-muted mx-1.5">\</span>
+            <span className="text-zd-text uppercase">{creator.name}</span>
+          </>
+        )}
+        {selected && selected.collection && (
+          <>
+            <span className="text-zd-text-muted mx-1.5">\</span>
+            <span className="text-zd-text uppercase">{selected.collection}</span>
+          </>
+        )}
+        {selected && (
+          <>
+            <span className="text-zd-text-muted mx-1.5">\</span>
+            <span className="font-bold text-zd-text uppercase">{selected.name}</span>
+          </>
+        )}
       </div>
+      <nav className="flex items-center gap-4 ml-auto">
+        <span className="text-xs text-zd-text-muted uppercase tracking-wide">Upload:</span>
+        <button className="text-sm font-mono text-zd-text border border-zd-border px-2 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100">
+          +++
+        </button>
+        <div className="flex items-center gap-2">
+          <Zorb size={20} seed="0xA3f2B7c9" />
+          <span className="text-xs text-zd-text uppercase">onchaindom.eth</span>
+        </div>
+      </nav>
     </div>
   );
 }
 
-// ─── Filter Disclosure ───────────────────────────────────────────────────────
+// ─── Detail Sidebar ──────────────────────────────────────────────────────────
 
-function FilterGroup({
-  label,
-  items,
-  selected,
-  onToggle,
-}: {
-  label: string;
-  items: { key: string; count: number }[];
-  selected: Set<string>;
-  onToggle: (key: string) => void;
-}) {
-  const [open, setOpen] = useState(true);
+function DetailSidebar({ release }: { release: MockRelease }) {
+  const creator = getCreatorByAddress(release.creator);
+  const TypeIcon = FILE_TYPE_ICONS[release.type] || IconFile;
 
   return (
-    <div className="border-b border-zd-border pb-4 mb-4 last:border-b-0 last:mb-0 last:pb-0">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full text-left group"
-      >
-        <span className="text-xs font-mono text-zd-text-secondary uppercase tracking-wide">/ {label}</span>
-        <span className="text-xs text-zd-text-muted transition-transform duration-150" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
-          &#9662;
-        </span>
-      </button>
-      {open && (
-        <div className="mt-3 space-y-1.5">
-          {items.map((item) => (
-            <label
-              key={item.key}
-              className="flex items-center gap-2 cursor-pointer group/item"
-            >
-              <input
-                type="checkbox"
-                checked={selected.has(item.key)}
-                onChange={() => onToggle(item.key)}
-                className="sr-only"
-              />
-              <span
-                className={`w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors duration-100 ${
-                  selected.has(item.key)
-                    ? 'border-zd-text bg-zd-text'
-                    : 'border-zd-border group-hover/item:border-zd-border-hover'
-                }`}
-              >
-                {selected.has(item.key) && (
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <path d="M1.5 4L3 5.5L6.5 2" stroke="var(--zd-bg)" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </span>
-              <span className="text-sm text-zd-text-secondary group-hover/item:text-zd-text transition-colors duration-100 flex-1">{item.key}</span>
-              <span className="text-xs font-mono text-zd-text-muted">{item.count}</span>
-            </label>
-          ))}
+    <div className="w-[320px] flex-shrink-0 p-6">
+      {/* Header: icon + name + collect */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <TypeIcon />
+          <span className="font-display text-base tracking-tight">{release.name}</span>
+        </div>
+        <button className="text-sm font-mono text-zd-text border border-zd-border px-2 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100 flex-shrink-0">
+          +++
+        </button>
+      </div>
+
+      {/* Creator */}
+      {creator && (
+        <div className="flex items-center gap-1.5 mt-2">
+          <Zorb size={14} seed={creator.avatarSeed} />
+          <span className="text-xs text-zd-text-muted uppercase">{creator.name}</span>
         </div>
       )}
+
+      {/* Description */}
+      <p className="text-sm text-zd-text-secondary mt-4 leading-relaxed">
+        {release.name} is a {release.type.toLowerCase()} about {release.name.toLowerCase()} by {creator?.name || 'unknown'}
+      </p>
+
+      {/* Divider */}
+      <div className="border-t border-zd-border mt-5 pt-4">
+        <DisclosureLink label="Details">
+          {/* MARKET */}
+          <div className="mt-2">
+            <div className="flex items-center gap-1.5 mb-2">
+              <Sparkline data={[12, 15, 14, 18, 22, 19, 25]} width={14} height={10} />
+              <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Market</span>
+            </div>
+            <div className="border-t border-zd-border pt-2 space-y-1">
+              <p className="text-sm text-zd-text-secondary">Market Cap</p>
+              <p className="text-sm text-zd-text-secondary">Volume</p>
+              <p className="text-sm text-zd-text-secondary">Holders</p>
+            </div>
+          </div>
+
+          {/* COIN */}
+          <div className="mt-4">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-[10px] text-zd-text-muted">&#9679;</span>
+              <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Coin</span>
+            </div>
+            <div className="border-t border-zd-border pt-2 space-y-1">
+              <p className="text-sm text-zd-text-secondary">Market Cap</p>
+              <p className="text-sm text-zd-text-secondary">Volume</p>
+              <p className="text-sm text-zd-text-secondary">Holders</p>
+            </div>
+          </div>
+
+          {/* USAGE */}
+          <div className="mt-4">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-[10px] text-zd-text-muted">&#9632;</span>
+              <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Usage</span>
+            </div>
+            <div className="border-t border-zd-border pt-2 space-y-1">
+              <p className="text-sm text-zd-text-secondary">Market Cap</p>
+              <p className="text-sm text-zd-text-secondary">Volume</p>
+              <p className="text-sm text-zd-text-secondary">Holders</p>
+            </div>
+          </div>
+        </DisclosureLink>
+      </div>
     </div>
   );
 }
 
 // ─── Release Row ─────────────────────────────────────────────────────────────
 
-function ReleaseRow({ release }: { release: MockRelease }) {
+const COL_GRID = 'grid-cols-[48px_1fr_160px_140px_80px_64px_64px]';
+
+function ReleaseRow({
+  release,
+  isSelected,
+  onSelect,
+}: {
+  release: MockRelease;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
   const creator = getCreatorByAddress(release.creator);
+  const TypeIcon = FILE_TYPE_ICONS[release.type] || IconFile;
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_60px_36px] items-center border-b border-zd-border py-3 px-2 -mx-2 group transition-colors duration-100 hover:bg-zd-surface-hover cursor-pointer">
-      <div className="flex items-center gap-3 min-w-0">
-        <span className="text-[8px] text-zd-text-muted leading-none flex-shrink-0">&#9632;</span>
-        <span className="text-xs font-mono text-zd-text-muted flex-shrink-0 w-[72px]">{formatDate(release.date)}</span>
-        <span className="text-sm text-zd-text truncate">{release.name}</span>
-        {creator && (
-          <span className="text-xs text-zd-text-muted truncate hidden sm:inline">{creator.name}</span>
-        )}
+    <div
+      onClick={onSelect}
+      className={`grid ${COL_GRID} items-center h-12 px-4 border-b border-zd-border cursor-pointer transition-colors duration-100 ${
+        isSelected ? 'bg-zd-surface' : 'hover:bg-zd-surface-hover'
+      }`}
+    >
+      <div className="flex justify-center text-zd-text">
+        <TypeIcon />
       </div>
-      <span className="text-[10px] font-mono text-zd-text-secondary uppercase tracking-wider text-right">
-        {TYPE_LABELS[release.type]}
-      </span>
-      <button className="text-sm text-zd-text-muted hover:text-zd-text transition-colors duration-100 text-right opacity-0 group-hover:opacity-100">
-        +
-      </button>
+      <div className="font-display text-base tracking-tight truncate pr-4">
+        {release.name}
+      </div>
+      <div className="text-sm text-zd-text-secondary truncate">
+        {creator?.name || release.creator}
+      </div>
+      <div className="text-xs font-mono text-zd-text-muted">
+        {formatDateTime(release.date)}
+      </div>
+      <div className="text-xs font-mono text-zd-text-muted text-right">
+        {formatHolders(release.holders)}
+      </div>
+      <div className="text-xs font-mono text-zd-text-muted text-right">
+        {release.volume}
+      </div>
+      <div className="flex justify-end">
+        <button
+          onClick={(e) => e.stopPropagation()}
+          className="text-xs font-mono text-zd-text border border-zd-border px-1.5 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100"
+        >
+          +++
+        </button>
+      </div>
     </div>
   );
 }
@@ -139,141 +188,47 @@ function ReleaseRow({ release }: { release: MockRelease }) {
 // ─── Main Feed Demo ──────────────────────────────────────────────────────────
 
 export default function FeedDemoPage() {
-  const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set());
-  const [selectedCollections, setSelectedCollections] = useState<Set<string>>(new Set());
-  const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
-
-  const toggleInSet = (set: Set<string>, key: string): Set<string> => {
-    const next = new Set(set);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    return next;
-  };
-
-  const hasFilters = selectedTypes.size > 0 || selectedCollections.size > 0 || selectedCreators.size > 0;
-
-  const filteredReleases = useMemo(() => {
-    return MOCK_RELEASES.filter((r) => {
-      if (selectedTypes.size > 0 && !selectedTypes.has(r.type)) return false;
-      if (selectedCollections.size > 0) {
-        const col = r.collection || 'Uncollected';
-        if (!selectedCollections.has(col)) return false;
-      }
-      if (selectedCreators.size > 0) {
-        const creator = getCreatorByAddress(r.creator);
-        const name = creator?.name || r.creator;
-        if (!selectedCreators.has(name)) return false;
-      }
-      return true;
-    });
-  }, [selectedTypes, selectedCollections, selectedCreators]);
-
-  const typeCounts = useMemo(() => getTypeCounts(MOCK_RELEASES), []);
-  const collectionCounts = useMemo(() => getCollectionCounts(MOCK_RELEASES), []);
-  const creatorCounts = useMemo(() => getCreatorCounts(MOCK_RELEASES), []);
-
-  const typeItems = Object.entries(typeCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([key, count]) => ({ key, count }));
-
-  const collectionItems = Object.entries(collectionCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([key, count]) => ({ key, count }));
-
-  const creatorItems = Object.entries(creatorCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([key, count]) => ({ key, count }));
-
-  const clearFilters = () => {
-    setSelectedTypes(new Set());
-    setSelectedCollections(new Set());
-    setSelectedCreators(new Set());
-  };
+  const [selectedRelease, setSelectedRelease] = useState<MockRelease | null>(null);
 
   return (
-    <div className="max-w-[1100px] mx-auto">
-      {/* Back link */}
-      <div className="px-6 pt-6">
-        <Link href="/demo" className="text-sm text-zd-text-muted hover:text-zd-text-secondary transition-colors duration-150">&larr; Back to demos</Link>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      {/* Breadcrumb header */}
+      <FeedBreadcrumb selected={selectedRelease} />
 
-      {/* Stats ticker */}
-      <div className="mt-6">
-        <StatsTicker />
-      </div>
-
-      {/* Page title */}
-      <div className="px-6 pt-10 pb-8">
-        <h1 className="font-display tracking-tighter" style={{ fontSize: '3.5rem', lineHeight: 1.05 }}>
-          Feed <span className="text-zd-text-muted">({filteredReleases.length})</span>
-        </h1>
-      </div>
-
-      {/* Two-column layout */}
-      <div className="flex gap-0 border-t border-zd-border">
-        {/* Filter sidebar */}
-        <aside className="w-[240px] flex-shrink-0 border-r border-zd-border px-6 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <span className="text-xs font-mono text-zd-text-secondary uppercase tracking-wide">/ Filter</span>
-            {hasFilters && (
-              <button
-                onClick={clearFilters}
-                className="text-xs text-zd-text-muted hover:text-zd-text-secondary transition-colors duration-100"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
-          <FilterGroup
-            label="Type"
-            items={typeItems}
-            selected={selectedTypes}
-            onToggle={(key) => setSelectedTypes(toggleInSet(selectedTypes, key))}
-          />
-          <FilterGroup
-            label="Collection"
-            items={collectionItems}
-            selected={selectedCollections}
-            onToggle={(key) => setSelectedCollections(toggleInSet(selectedCollections, key))}
-          />
-          <FilterGroup
-            label="Creator"
-            items={creatorItems}
-            selected={selectedCreators}
-            onToggle={(key) => setSelectedCreators(toggleInSet(selectedCreators, key))}
-          />
-        </aside>
-
-        {/* Release table */}
-        <main className="flex-1 min-w-0 px-6 py-6">
+      {/* Content area */}
+      <div className="flex flex-1">
+        {/* Table area */}
+        <div className="flex-1 min-w-0">
           {/* Column headers */}
-          <div className="grid grid-cols-[minmax(0,1fr)_60px_36px] items-center border-b border-zd-border pb-2 mb-1 px-2 -mx-2">
-            <div className="flex items-center gap-3">
-              <span className="w-[8px]" />
-              <span className="text-xs font-mono text-zd-text-muted uppercase tracking-wide w-[72px]">/ Date</span>
-              <span className="text-xs font-mono text-zd-text-muted uppercase tracking-wide">/ Name</span>
-            </div>
-            <span className="text-xs font-mono text-zd-text-muted uppercase tracking-wide text-right">/ Type</span>
-            <span className="w-[36px]" />
+          <div className={`grid ${COL_GRID} items-center h-9 px-4 border-b border-zd-border`}>
+            <span className="text-[11px] text-zd-text-muted uppercase tracking-wider text-center">Type</span>
+            <span className="text-[11px] text-zd-text-muted uppercase tracking-wider">Title</span>
+            <span className="text-[11px] text-zd-text-muted uppercase tracking-wider">Creator</span>
+            <span className="text-[11px] text-zd-text-muted uppercase tracking-wider">Created</span>
+            <span className="text-[11px] text-zd-text-muted uppercase tracking-wider text-right">Holders</span>
+            <span className="text-[11px] text-zd-text-muted uppercase tracking-wider text-right">Vol</span>
+            <span className="text-[11px] text-zd-text-muted uppercase tracking-wider text-right">Collect</span>
           </div>
 
           {/* Rows */}
-          {filteredReleases.length > 0 ? (
-            filteredReleases.map((release) => (
-              <ReleaseRow key={release.contractAddress} release={release} />
-            ))
-          ) : (
-            <div className="py-12 text-center">
-              <p className="text-sm text-zd-text-muted">No releases match the current filters.</p>
-              <button
-                onClick={clearFilters}
-                className="text-sm text-zd-text-secondary underline mt-2 hover:text-zd-text transition-colors duration-100"
-              >
-                Clear filters
-              </button>
-            </div>
-          )}
-        </main>
+          {MOCK_RELEASES.map((release) => (
+            <ReleaseRow
+              key={release.contractAddress}
+              release={release}
+              isSelected={selectedRelease?.contractAddress === release.contractAddress}
+              onSelect={() => setSelectedRelease(
+                selectedRelease?.contractAddress === release.contractAddress ? null : release
+              )}
+            />
+          ))}
+        </div>
+
+        {/* Detail sidebar */}
+        {selectedRelease && (
+          <aside className="border-l border-zd-border">
+            <DetailSidebar release={selectedRelease} />
+          </aside>
+        )}
       </div>
     </div>
   );

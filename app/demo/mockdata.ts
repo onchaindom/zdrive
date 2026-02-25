@@ -112,6 +112,18 @@ export function formatDate(dateStr: string): string {
   return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
 }
 
+export function formatDateTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}.${month}.${day} 12:39`;
+}
+
+export function formatHolders(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+}
+
 /** Get type counts from release list */
 export function getTypeCounts(releases: MockRelease[]): Record<string, number> {
   const counts: Record<string, number> = {};
