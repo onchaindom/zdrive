@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   MOCK_RELEASES,
@@ -11,37 +11,86 @@ import {
 } from '../mockdata';
 import { Zorb, FILE_TYPE_ICONS, IconFile, Sparkline, DisclosureLink } from '@/components/ui';
 
+// ─── Preview Modal ───────────────────────────────────────────────────────────
+
+function PreviewModal({ release, onClose }: { release: MockRelease; onClose: () => void }) {
+  const TypeIcon = FILE_TYPE_ICONS[release.type] || IconFile;
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-zd-bg/80" />
+      <div
+        className="relative bg-zd-bg border border-zd-text w-full max-w-2xl max-h-[80vh] z-50"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-zd-text">
+          <div className="flex items-center gap-2">
+            <TypeIcon />
+            <span className="text-sm font-mono">{release.name}</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-zd-text text-lg leading-none hover:text-zd-text-secondary transition-colors duration-100"
+          >
+            &times;
+          </button>
+        </div>
+        {/* Mock preview area */}
+        <div className="flex items-center justify-center p-12 min-h-[400px]">
+          <div className="text-center">
+            <div className="w-24 h-24 mx-auto mb-4 border border-dashed border-zd-text flex items-center justify-center">
+              <TypeIcon className="w-8 h-8" />
+            </div>
+            <p className="text-sm text-zd-text-secondary">{release.type} preview</p>
+            <p className="text-xs text-zd-text-muted mt-1">{release.name}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Breadcrumb Header ───────────────────────────────────────────────────────
 
 function FeedBreadcrumb({ selected }: { selected: MockRelease | null }) {
   const creator = selected ? getCreatorByAddress(selected.creator) : null;
 
   return (
-    <div className="h-12 border-b border-zd-border bg-zd-bg flex items-center px-6 gap-6">
+    <div className="h-12 border-b border-zd-text bg-zd-bg flex items-center px-6 gap-6 sticky top-0 z-10">
       <div className="font-display tracking-tight text-lg flex items-center gap-0">
         <Link href="/demo" className="text-zd-text transition-colors duration-150 hover:text-zd-text-secondary">Z:</Link>
         {selected && creator && (
           <>
-            <span className="text-zd-text-muted mx-1.5">\</span>
+            <span className="text-zd-text mx-1.5">\</span>
             <span className="text-zd-text uppercase">{creator.name}</span>
           </>
         )}
         {selected && selected.collection && (
           <>
-            <span className="text-zd-text-muted mx-1.5">\</span>
+            <span className="text-zd-text mx-1.5">\</span>
             <span className="text-zd-text uppercase">{selected.collection}</span>
           </>
         )}
         {selected && (
           <>
-            <span className="text-zd-text-muted mx-1.5">\</span>
+            <span className="text-zd-text mx-1.5">\</span>
             <span className="font-bold text-zd-text uppercase">{selected.name}</span>
           </>
         )}
       </div>
       <nav className="flex items-center gap-4 ml-auto">
         <span className="text-xs text-zd-text-muted uppercase tracking-wide">Upload:</span>
-        <button className="text-sm font-mono text-zd-text border border-zd-border px-2 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100">
+        <button className="text-sm font-mono text-zd-text border border-zd-text px-2 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100">
           +++
         </button>
         <div className="flex items-center gap-2">
@@ -55,7 +104,7 @@ function FeedBreadcrumb({ selected }: { selected: MockRelease | null }) {
 
 // ─── Detail Sidebar ──────────────────────────────────────────────────────────
 
-function DetailSidebar({ release }: { release: MockRelease }) {
+function DetailSidebar({ release, onOpenPreview }: { release: MockRelease; onOpenPreview: () => void }) {
   const creator = getCreatorByAddress(release.creator);
   const TypeIcon = FILE_TYPE_ICONS[release.type] || IconFile;
 
@@ -67,7 +116,7 @@ function DetailSidebar({ release }: { release: MockRelease }) {
           <TypeIcon />
           <span className="font-display text-base tracking-tight">{release.name}</span>
         </div>
-        <button className="text-sm font-mono text-zd-text border border-zd-border px-2 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100 flex-shrink-0">
+        <button className="text-sm font-mono text-zd-text border border-zd-text px-2 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100 flex-shrink-0">
           +++
         </button>
       </div>
@@ -80,13 +129,24 @@ function DetailSidebar({ release }: { release: MockRelease }) {
         </div>
       )}
 
+      {/* Preview thumbnail */}
+      <button
+        onClick={onOpenPreview}
+        className="w-full mt-4 border border-zd-text flex items-center justify-center py-8 group cursor-pointer hover:bg-zd-surface-hover transition-colors duration-100"
+      >
+        <div className="text-center">
+          <TypeIcon className="w-8 h-8 mx-auto" />
+          <p className="text-xs text-zd-text-muted mt-2 group-hover:text-zd-text-secondary transition-colors duration-100">Click to expand</p>
+        </div>
+      </button>
+
       {/* Description */}
       <p className="text-sm text-zd-text-secondary mt-4 leading-relaxed">
         {release.name} is a {release.type.toLowerCase()} about {release.name.toLowerCase()} by {creator?.name || 'unknown'}
       </p>
 
       {/* Divider */}
-      <div className="border-t border-zd-border mt-5 pt-4">
+      <div className="border-t border-zd-text mt-5 pt-4">
         <DisclosureLink label="Details">
           {/* MARKET */}
           <div className="mt-2">
@@ -94,7 +154,7 @@ function DetailSidebar({ release }: { release: MockRelease }) {
               <Sparkline data={[12, 15, 14, 18, 22, 19, 25]} width={14} height={10} />
               <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Market</span>
             </div>
-            <div className="border-t border-zd-border pt-2 space-y-1">
+            <div className="border-t border-zd-text pt-2 space-y-1">
               <p className="text-sm text-zd-text-secondary">Market Cap</p>
               <p className="text-sm text-zd-text-secondary">Volume</p>
               <p className="text-sm text-zd-text-secondary">Holders</p>
@@ -107,7 +167,7 @@ function DetailSidebar({ release }: { release: MockRelease }) {
               <span className="text-[10px] text-zd-text-muted">&#9679;</span>
               <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Coin</span>
             </div>
-            <div className="border-t border-zd-border pt-2 space-y-1">
+            <div className="border-t border-zd-text pt-2 space-y-1">
               <p className="text-sm text-zd-text-secondary">Market Cap</p>
               <p className="text-sm text-zd-text-secondary">Volume</p>
               <p className="text-sm text-zd-text-secondary">Holders</p>
@@ -120,7 +180,7 @@ function DetailSidebar({ release }: { release: MockRelease }) {
               <span className="text-[10px] text-zd-text-muted">&#9632;</span>
               <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Usage</span>
             </div>
-            <div className="border-t border-zd-border pt-2 space-y-1">
+            <div className="border-t border-zd-text pt-2 space-y-1">
               <p className="text-sm text-zd-text-secondary">Market Cap</p>
               <p className="text-sm text-zd-text-secondary">Volume</p>
               <p className="text-sm text-zd-text-secondary">Holders</p>
@@ -151,7 +211,7 @@ function ReleaseRow({
   return (
     <div
       onClick={onSelect}
-      className={`grid ${COL_GRID} items-center h-12 px-4 border-b border-zd-border cursor-pointer transition-colors duration-100 ${
+      className={`grid ${COL_GRID} items-center h-12 px-4 border-b border-zd-text cursor-pointer transition-colors duration-100 ${
         isSelected ? 'bg-zd-surface' : 'hover:bg-zd-surface-hover'
       }`}
     >
@@ -176,7 +236,7 @@ function ReleaseRow({
       <div className="flex justify-end">
         <button
           onClick={(e) => e.stopPropagation()}
-          className="text-xs font-mono text-zd-text border border-zd-border px-1.5 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100"
+          className="text-xs font-mono text-zd-text border border-zd-text px-1.5 py-0.5 hover:bg-zd-surface-hover transition-colors duration-100"
         >
           +++
         </button>
@@ -189,6 +249,7 @@ function ReleaseRow({
 
 export default function FeedDemoPage() {
   const [selectedRelease, setSelectedRelease] = useState<MockRelease | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -200,7 +261,7 @@ export default function FeedDemoPage() {
         {/* Table area */}
         <div className="flex-1 min-w-0">
           {/* Column headers */}
-          <div className={`grid ${COL_GRID} items-center h-9 px-4 border-b border-zd-border`}>
+          <div className={`grid ${COL_GRID} items-center h-9 px-4 border-b border-zd-text`}>
             <span className="text-[11px] text-zd-text-muted uppercase tracking-wider text-center">Type</span>
             <span className="text-[11px] text-zd-text-muted uppercase tracking-wider">Title</span>
             <span className="text-[11px] text-zd-text-muted uppercase tracking-wider">Creator</span>
@@ -225,11 +286,16 @@ export default function FeedDemoPage() {
 
         {/* Detail sidebar */}
         {selectedRelease && (
-          <aside className="border-l border-zd-border">
-            <DetailSidebar release={selectedRelease} />
+          <aside className="border-l border-zd-text">
+            <DetailSidebar release={selectedRelease} onOpenPreview={() => setPreviewOpen(true)} />
           </aside>
         )}
       </div>
+
+      {/* Preview modal */}
+      {previewOpen && selectedRelease && (
+        <PreviewModal release={selectedRelease} onClose={() => setPreviewOpen(false)} />
+      )}
     </div>
   );
 }
