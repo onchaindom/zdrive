@@ -94,7 +94,7 @@ export default async function ReleaseDetailPage({ params }: ReleaseDetailPagePro
         <aside className="w-[480px] flex-shrink-0 border-l border-zd-text overflow-y-auto">
           <div className="p-6">
             {/* Title */}
-            <h1 className="font-display text-xl tracking-tight leading-tight">{release.name}</h1>
+            <h1 className="font-display text-base tracking-tight">{release.name}</h1>
 
             {/* Creator */}
             {creator && (
@@ -107,108 +107,103 @@ export default async function ReleaseDetailPage({ params }: ReleaseDetailPagePro
             {/* Collection */}
             {release.collection && (
               <div className="mt-2">
-                <span className="text-sm text-zd-text-secondary">Part of </span>
-                <span className="text-sm text-zd-text underline">{release.collection}</span>
+                <span className="text-xs text-zd-text-muted">Part of </span>
+                <span className="text-xs text-zd-text underline">{release.collection}</span>
               </div>
             )}
 
             {/* Description */}
-            <p className="text-sm text-zd-text-secondary mt-3 leading-relaxed">
+            <p className="text-sm text-zd-text-secondary mt-3 leading-snug">
               {release.name} is a {release.type.toLowerCase()} about {release.name.toLowerCase()} by {creator?.name || 'unknown'}
             </p>
 
             {/* Collect button */}
-            <button className="w-full border border-dotted border-zd-text bg-transparent text-zd-text hover:bg-zd-surface-hover transition-colors duration-100 font-display text-sm tracking-tight py-2.5 px-4 mt-4">
+            <button className="w-full border border-dotted border-zd-text bg-transparent text-zd-text hover:bg-zd-surface-hover transition-colors duration-100 font-mono text-xs py-1.5 px-4 mt-4">
               Collect
             </button>
           </div>
 
-          {/* Details title */}
-          <div className="border-t border-zd-text px-6 pt-3">
-            <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Details</span>
-          </div>
-
           {/* CONTENT */}
           <div className="border-t border-zd-text px-6 pt-3">
-            <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Content</span>
+            <span className="text-[11px] text-zd-text-muted italic uppercase tracking-wider">Content</span>
             <div className="mt-2 space-y-1.5">
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Type</span>
-                <span className="font-mono text-xs">{release.type}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Type</span>
+                <span className="font-mono text-xs text-zd-text-muted">{release.type}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Filename</span>
-                <span className="font-mono text-xs">{filename}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Filename</span>
+                <span className="font-mono text-xs text-zd-text-muted">{filename}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Collection</span>
-                <span className="font-mono text-xs">{release.collection || '—'}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Collection</span>
+                <span className="font-mono text-xs text-zd-text-muted">{release.collection || '—'}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">License</span>
-                <a href="#" className="font-mono text-xs underline hover:text-zd-text-secondary transition-colors duration-100">CBE-CC0</a>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">License</span>
+                <a href="#" className="font-mono text-xs text-zd-text-muted underline hover:text-zd-text transition-colors duration-100">CBE-CC0</a>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Download gate</span>
-                <span className="font-mono text-xs">Collect 1</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Download gate</span>
+                <span className="font-mono text-xs text-zd-text-muted">Collect 1</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Commercial use</span>
-                <span className="font-mono text-xs">Own 100 ${creator?.coinSymbol || 'TOKEN'}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Commercial use</span>
+                <span className="font-mono text-xs text-zd-text-muted">Own 100 ${creator?.coinSymbol || 'TOKEN'}</span>
               </div>
             </div>
           </div>
 
           {/* COIN */}
           <div className="border-t border-zd-text px-6 pt-3">
-            <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Coin</span>
+            <span className="text-[11px] text-zd-text-muted italic uppercase tracking-wider">Coin</span>
             <div className="mt-2 space-y-1.5">
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Symbol</span>
-                <span className="font-mono text-xs">${creator?.coinSymbol || 'TOKEN'}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Symbol</span>
+                <span className="font-mono text-xs text-zd-text-muted">${creator?.coinSymbol || 'TOKEN'}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Address</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Address</span>
                 <span className="font-mono text-xs text-zd-text-muted">{release.contractAddress}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Total supply</span>
-                <span className="font-mono text-xs">1,000,000,000</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Total supply</span>
+                <span className="font-mono text-xs text-zd-text-muted">1,000,000,000</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Creator</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Creator</span>
                 <span className="font-mono text-xs text-zd-text-muted">{creator?.address.slice(0, 8)}...{creator?.address.slice(-4)}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Created</span>
-                <span className="font-mono text-xs">{formatDateTime(release.date)}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Created</span>
+                <span className="font-mono text-xs text-zd-text-muted">{formatDateTime(release.date)}</span>
               </div>
               <div className="space-y-1 mt-1.5">
-                <a href="#" className="block text-sm text-zd-text-secondary underline hover:text-zd-text transition-colors duration-100">View on Zora</a>
-                <a href="#" className="block text-sm text-zd-text-secondary underline hover:text-zd-text transition-colors duration-100">View on Basescan</a>
+                <a href="#" className="block text-xs text-zd-text-muted underline hover:text-zd-text transition-colors duration-100">View on Zora</a>
+                <a href="#" className="block text-xs text-zd-text-muted underline hover:text-zd-text transition-colors duration-100">View on Basescan</a>
               </div>
             </div>
           </div>
 
           {/* MARKET */}
           <div className="border-t border-zd-text px-6 pt-3 pb-6">
-            <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Market</span>
+            <span className="text-[11px] text-zd-text-muted italic uppercase tracking-wider">Market</span>
             <div className="mt-2 space-y-1.5">
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Market cap</span>
-                <span className="font-mono text-xs">${release.marketCap.toLocaleString()}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Market cap</span>
+                <span className="font-mono text-xs text-zd-text-muted">${release.marketCap.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Volume (24h)</span>
-                <span className="font-mono text-xs">${(release.volume * 38.2).toFixed(0)}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Volume (24h)</span>
+                <span className="font-mono text-xs text-zd-text-muted">${(release.volume * 38.2).toFixed(0)}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Total volume</span>
-                <span className="font-mono text-xs">{release.volume} ETH</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Total volume</span>
+                <span className="font-mono text-xs text-zd-text-muted">{release.volume} ETH</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zd-text-secondary">Unique holders</span>
-                <span className="font-mono text-xs">{release.holders.toLocaleString()}</span>
+              <div className="flex justify-between">
+                <span className="text-xs text-zd-text-muted">Unique holders</span>
+                <span className="font-mono text-xs text-zd-text-muted">{release.holders.toLocaleString()}</span>
               </div>
             </div>
           </div>
