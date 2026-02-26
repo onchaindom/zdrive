@@ -119,111 +119,118 @@ function FeedBreadcrumb({ selected }: { selected: MockRelease | null }) {
 function DetailSidebar({
   release,
   onOpenPreview,
-  onClose,
 }: {
   release: MockRelease;
   onOpenPreview: () => void;
-  onClose: () => void;
 }) {
   const creator = getCreatorByAddress(release.creator);
   const TypeIcon = FILE_TYPE_ICONS[release.type] || IconFile;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Sidebar header with close button */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-zd-text flex-shrink-0">
+      {/* Sidebar header */}
+      <div className="flex items-center px-6 py-3 border-b border-zd-text flex-shrink-0">
         <div className="flex items-center gap-2">
           <TypeIcon />
           <Link href={`/demo/release/${release.contractAddress}`} className="font-display text-base tracking-tight hover:text-zd-text-secondary transition-colors duration-100">
             {releaseName(release)}
           </Link>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={(e) => { e.stopPropagation(); }}
-            className="text-xs font-mono bg-zd-text text-zd-bg px-1.5 py-0.5 hover:bg-zd-cta transition-colors duration-100"
-          >
-            +++
-          </button>
-          <button
-            onClick={onClose}
-            className="text-zd-text text-lg leading-none hover:text-zd-text-secondary transition-colors duration-100 ml-1"
-          >
-            &times;
-          </button>
-        </div>
       </div>
 
       {/* Scrollable sidebar content */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {/* Creator */}
-        {creator && (
-          <div className="flex items-center gap-1.5">
-            <Zorb size={14} seed={creator.avatarSeed} />
-            <span className="text-xs text-zd-text uppercase">{creator.name}</span>
-          </div>
-        )}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6">
+          {/* Creator */}
+          {creator && (
+            <div className="flex items-center gap-1.5">
+              <Zorb size={14} seed={creator.avatarSeed} />
+              <span className="text-xs text-zd-text uppercase">{creator.name}</span>
+            </div>
+          )}
 
-        {/* Description */}
-        <p className="text-sm text-zd-text-secondary mt-3 leading-relaxed">
-          {release.name} is a {release.type.toLowerCase()} about {release.name.toLowerCase()} by {creator?.name || 'unknown'}
-        </p>
+          {/* Description */}
+          <p className="text-sm text-zd-text-secondary mt-3 leading-relaxed">
+            {release.name} is a {release.type.toLowerCase()} about {release.name.toLowerCase()} by {creator?.name || 'unknown'}
+          </p>
 
-        {/* Preview frame (matching PreviewShell) */}
-        <div className="mt-4 border border-zd-text bg-zd-surface group/preview">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-zd-text">
-            <TypeIcon />
-            <span className="text-xs font-mono text-zd-text-secondary truncate">{releaseName(release)}</span>
+          {/* Preview frame */}
+          <div className="mt-4 border border-zd-text bg-zd-surface group/preview">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-zd-text">
+              <TypeIcon />
+              <span className="text-xs font-mono text-zd-text-secondary truncate">{releaseName(release)}</span>
+            </div>
+            <div className="relative">
+              <button
+                onClick={onOpenPreview}
+                className="w-full flex items-center justify-center aspect-[4/3] cursor-pointer hover:bg-zd-surface-hover transition-colors duration-100"
+              >
+                <div className="text-center">
+                  <TypeIcon className="w-10 h-10 mx-auto" />
+                  <p className="text-xs text-zd-text-muted mt-2 group-hover/preview:text-zd-text-secondary transition-colors duration-100">Click to expand</p>
+                </div>
+              </button>
+              <button
+                className="absolute top-2 right-2 bg-zd-bg/70 p-1.5 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-150 text-zd-text-secondary hover:text-zd-text"
+                aria-label="Download"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M8 2v8.5" />
+                  <path d="M4.5 7.5 8 11l3.5-3.5" />
+                  <path d="M3 13h10" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <div className="relative">
-            <button
-              onClick={onOpenPreview}
-              className="w-full flex items-center justify-center aspect-[4/3] cursor-pointer hover:bg-zd-surface-hover transition-colors duration-100"
-            >
-              <div className="text-center">
-                <TypeIcon className="w-10 h-10 mx-auto" />
-                <p className="text-xs text-zd-text-muted mt-2 group-hover/preview:text-zd-text-secondary transition-colors duration-100">Click to expand</p>
-              </div>
-            </button>
-            <button
-              className="absolute top-2 right-2 bg-zd-bg/70 p-1.5 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-150 text-zd-text-secondary hover:text-zd-text"
-              aria-label="Download"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M8 2v8.5" />
-                <path d="M4.5 7.5 8 11l3.5-3.5" />
-                <path d="M3 13h10" />
-              </svg>
-            </button>
-          </div>
+
+          {/* Collect button */}
+          <button
+            onClick={(e) => e.stopPropagation()}
+            className="w-full border border-dotted border-zd-text bg-transparent text-zd-text hover:bg-zd-surface-hover transition-colors duration-100 font-display text-sm tracking-tight py-2.5 px-4 mt-4"
+          >
+            Collect
+          </button>
         </div>
 
-        {/* MARKET details */}
-        <div className="border-t border-zd-text mt-5 pt-3">
-          <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Market</span>
+        {/* Details title */}
+        <div className="border-t border-zd-text px-6 pt-3">
+          <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Details</span>
+        </div>
+
+        {/* CONTENT details */}
+        <div className="border-t border-zd-text px-6 pt-3">
+          <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Content</span>
           <div className="mt-2 space-y-1.5">
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Market cap</span>
-              <span className="font-mono text-xs">${release.marketCap.toLocaleString()}</span>
+              <span className="text-zd-text-secondary">Type</span>
+              <span className="font-mono text-xs">{release.type}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Volume (24h)</span>
-              <span className="font-mono text-xs">${(release.volume * 38.2).toFixed(0)}</span>
+              <span className="text-zd-text-secondary">Filename</span>
+              <span className="font-mono text-xs">{releaseName(release)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Total volume</span>
-              <span className="font-mono text-xs">{release.volume} ETH</span>
+              <span className="text-zd-text-secondary">Collection</span>
+              <span className="font-mono text-xs">{release.collection || '—'}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Unique holders</span>
-              <span className="font-mono text-xs">{release.holders.toLocaleString()}</span>
+              <span className="text-zd-text-secondary">License</span>
+              <a href="#" className="font-mono text-xs underline hover:text-zd-text-secondary transition-colors duration-100">CBE-CC0</a>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-zd-text-secondary">Download gate</span>
+              <span className="font-mono text-xs">Collect 1</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-zd-text-secondary">Commercial use</span>
+              <span className="font-mono text-xs">Own 100 ${creator?.coinSymbol || 'TOKEN'}</span>
             </div>
           </div>
         </div>
 
         {/* COIN details */}
-        <div className="border-t border-zd-text mt-5 pt-3">
+        <div className="border-t border-zd-text px-6 pt-3">
           <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Coin</span>
           <div className="mt-2 space-y-1.5">
             <div className="flex justify-between text-sm">
@@ -253,33 +260,25 @@ function DetailSidebar({
           </div>
         </div>
 
-        {/* CONTENT details */}
-        <div className="border-t border-zd-text mt-5 pt-3">
-          <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Content</span>
+        {/* MARKET details */}
+        <div className="border-t border-zd-text px-6 pt-3 pb-6">
+          <span className="text-[11px] font-medium text-zd-text-muted uppercase tracking-wide">Market</span>
           <div className="mt-2 space-y-1.5">
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Type</span>
-              <span className="font-mono text-xs">{release.type}</span>
+              <span className="text-zd-text-secondary">Market cap</span>
+              <span className="font-mono text-xs">${release.marketCap.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Filename</span>
-              <span className="font-mono text-xs">{releaseName(release)}</span>
+              <span className="text-zd-text-secondary">Volume (24h)</span>
+              <span className="font-mono text-xs">${(release.volume * 38.2).toFixed(0)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Collection</span>
-              <span className="font-mono text-xs">{release.collection || '—'}</span>
+              <span className="text-zd-text-secondary">Total volume</span>
+              <span className="font-mono text-xs">{release.volume} ETH</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">License</span>
-              <a href="#" className="font-mono text-xs underline hover:text-zd-text-secondary transition-colors duration-100">CBE-CC0</a>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Download gate</span>
-              <span className="font-mono text-xs">Collect 1</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-zd-text-secondary">Commercial use</span>
-              <span className="font-mono text-xs">Own 100 ${creator?.coinSymbol || 'TOKEN'}</span>
+              <span className="text-zd-text-secondary">Unique holders</span>
+              <span className="font-mono text-xs">{release.holders.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -341,7 +340,7 @@ function ReleaseRow({
       <div className="flex justify-end">
         <button
           onClick={(e) => e.stopPropagation()}
-          className="text-xs font-mono bg-zd-text text-zd-bg px-1.5 py-0.5 hover:bg-zd-cta transition-colors duration-100"
+          className="text-xs font-mono border border-dotted border-zd-text bg-transparent text-zd-text hover:bg-zd-surface-hover transition-colors duration-100 px-1.5 py-0.5"
         >
           +++
         </button>
@@ -358,7 +357,7 @@ export default function FeedDemoPage() {
 
   return (
     <div className="h-screen overflow-hidden flex flex-col">
-      {/* Breadcrumb header — stays at top, not in scroll container */}
+      {/* Breadcrumb header */}
       <FeedBreadcrumb selected={selectedRelease} />
 
       {/* Content area */}
@@ -395,11 +394,16 @@ export default function FeedDemoPage() {
 
         {/* Detail sidebar — independent scroll */}
         {selectedRelease && (
-          <aside className="w-[480px] flex-shrink-0 border-l border-zd-text overflow-hidden">
+          <aside className="w-[480px] flex-shrink-0 border-l border-zd-text overflow-hidden relative">
+            <button
+              onClick={() => setSelectedRelease(null)}
+              className="absolute -left-8 top-3 w-6 h-6 flex items-center justify-center text-zd-text text-lg leading-none hover:text-zd-text-secondary transition-colors duration-100"
+            >
+              &times;
+            </button>
             <DetailSidebar
               release={selectedRelease}
               onOpenPreview={() => setPreviewOpen(true)}
-              onClose={() => setSelectedRelease(null)}
             />
           </aside>
         )}
